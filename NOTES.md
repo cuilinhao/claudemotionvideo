@@ -1,4 +1,16 @@
-# Claude Motion Video — 当前复刻记录
+# Claude Motion Video — 界面与发布记录
+
+## 2026-10-18：Claude Motion 视觉主题
+
+- 用户要求参考 `https://claudemontiondesignskills.org/`，并先查看 `/Users/pgy/Desktop/claudemotion` 源码；保留本站功能、品牌、页面内容和视频素材。
+- 以该项目的 `src/styles.css` 为视觉依据：暖白 `#faf9f5`、墨黑 `#141413`、米灰卡片、珊瑚色强调，以及 Instrument Sans、Source Serif 4、DM Mono 三套自托管字体。正文颜色略加深以保证小字对比度。
+- 新增 `src/motion-theme.css`、`src/motion-studio-theme.css` 作为末层样式，覆盖 13 个公开页面、Studio、账户、项目列表、登录、客服、视频设置和音频弹窗。保留原有响应式工作台结构，调整公开页面标题、留白与圆角；favicon 只换颜色。
+- worker、API、鉴权、支付、积分、视频生成、音频、渲染和业务组件均无代码变化；原演示视频、Canvas 和视频内的配色未修改。
+- 验证：类型检查通过；25 个测试文件、236 项测试通过；最终构建通过；资源审计通过（13 路由、470 案例、21 效果、1,153 个本地资源引用）。12 个字体资源全部同源可用。
+- 浏览器验证：1440px 首页、价格页、Studio；390px 首页、价格页、登录和音频弹窗；其余 13 个页面无横向溢出或破图，记录见 `RECON/motion-theme-layout.json`。月/年价格切换、手机导航、免费示例生成 v2、视频设置与客服弹窗正常；本轮未发起付费生成或付款。
+- 截图：`RECON/screenshots/motion-theme/`。本节记录视觉改版，以下 Tellcut 复刻记录为改版前基线。
+
+## Tellcut 复刻基线
 
 更新：2026-10-18。本文件记录本轮 Tellcut 公开页面与 Studio 一致性改版；**本轮首个生产版本已部署，代码已推送 main；真实 Google 登录、正式 Stripe Checkout 跳转、音频弹层与本地/线上音频导出已通过验收。** 首轮部署 `b58dce5d` 对应提交 `6ea7d5b`；补充 Google 登录和 Cloudflare 分析说明的最终隐私版 `cff42ef3-aa1f-42d4-9ee8-7c7a0585537b` 已部署，仅更新 `/privacy/index.html`，业务 bundle 未变。
 

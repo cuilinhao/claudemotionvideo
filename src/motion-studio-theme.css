@@ -1,0 +1,470 @@
+/* Studio's visual layer, matching the local claudemotion design reference.
+   Higher specificity keeps the dynamically loaded Base CSS from restoring its
+   dark body tokens. Layout, breakpoints, media pixels and brand swatches remain
+   owned by the existing Studio implementation. */
+html body.shell-body {
+  --bg: #faf9f5;
+  --bg-2: #f0eee6;
+  --surface: #f0eee6;
+  --bg-3: #e8e2d6;
+  --card: #e8e2d6;
+  --panel: #faf9f5;
+  --text: #141413;
+  --ink: #141413;
+  --text-2: #5e5d59;
+  --muted: #5e5d59;
+  --text-3: #6e6b64;
+  --line: #dad4c6;
+  --line-2: #c8c0b0;
+  --coral: #d97757;
+  --accent: #d97757;
+  --coral-2: #a95135;
+  --soft: #d977571c;
+  --display: "Instrument Sans", Arial, sans-serif;
+  --headline: "Source Serif 4", Georgia, serif;
+  --serif: "Source Serif 4", Georgia, serif;
+  --mono: "DM Mono", ui-monospace, monospace;
+  --radius: 10px;
+  --shadow: 0 1px 3px #14141308, 0 10px 28px #1414130a;
+  color-scheme: light;
+  color: var(--text);
+  background: var(--bg);
+  font-family: var(--display);
+}
+
+/* App surfaces; media containers deliberately keep their original dark paint. */
+body.shell-body .studio-shell,
+body.shell-body .studio-shell :is(.ws, .ed-chat, .ed-track, .ws-track) {
+  color: var(--text);
+  background: var(--bg);
+}
+
+body.shell-body .studio-shell :is(.shell-side, .ws-stage, .ed-stage) {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+body.shell-body .studio-shell :is(.shell-acct, .shell-nav, .ws-chat, .ed-chat, .ed-track, .ws-track, .ed-assets) {
+  border-color: var(--line);
+}
+
+body.shell-body .studio-shell :is(.ws-card, .ws-placeholder) {
+  background: var(--bg);
+  border-color: var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+body.shell-body .studio-shell :is(.ed-making h2, .studio-head h1),
+body.shell-body .studio-shell .cmv-audio-dialog h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -.025em;
+}
+
+/* Sidebar, account menu and primary controls. */
+body.shell-body .studio-shell :is(.ws-new, .btn.primary, .ed-send, .tl-play),
+body.shell-body .studio-shell .cmv-audio-dialog .button-primary,
+body.shell-body .cmv-floating .btn.primary {
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
+}
+
+body.shell-body .studio-shell :is(.ws-new, .btn.primary):hover:not(:disabled),
+body.shell-body .studio-shell .cmv-audio-dialog .button-primary:hover:not(:disabled),
+body.shell-body .cmv-floating .btn.primary:hover:not(:disabled) {
+  color: var(--bg);
+  background: #34352e;
+  border-color: #34352e;
+  box-shadow: none;
+}
+
+body.shell-body .studio-shell :is(.btn, .ws-new, .ws-item, .shell-fold, .ed-tool),
+body.shell-body .cmv-floating :is(.btn, .chip) {
+  border-radius: 8px;
+}
+
+body.shell-body .studio-shell :is(.ws-item, .acct-me, .shell-nav a) {
+  color: var(--text);
+}
+
+body.shell-body .studio-shell :is(.ws-item, .acct-me, .shell-fold, .shell-nav a):hover,
+body.shell-body .studio-shell .acct-me[aria-expanded="true"] {
+  color: var(--text);
+  background: var(--card);
+}
+
+body.shell-body .studio-shell .ws-item[aria-pressed="true"] {
+  color: var(--text);
+  background: var(--bg);
+  box-shadow: 0 1px 3px #1414130a;
+}
+
+body.shell-body .studio-shell .ws-item-tag {
+  --coral: var(--coral-2);
+}
+
+body.shell-body .studio-shell :is(.credits-pill, .avatar) {
+  color: var(--text);
+  background: var(--card);
+  border-color: var(--line);
+}
+
+body.shell-body .studio-shell .acct-menu {
+  color: var(--text);
+  background: var(--bg);
+  border-color: var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+body.shell-body .studio-shell .acct-menu :is(a, button):hover {
+  background: var(--surface);
+}
+
+body.shell-body .studio-shell .acct-menu .acct-upgrade,
+body.shell-body .studio-shell .cmp-added .pchip-fx {
+  color: var(--coral-2);
+  background: var(--soft);
+}
+
+body.shell-body .studio-shell .acct-menu .acct-upgrade:hover {
+  color: var(--coral-2);
+  background: #d9775729;
+}
+
+/* Conversation, generation state and the prompt composer. */
+body.shell-body .studio-shell :is(.ed-user p, .ed-answered) {
+  color: var(--text);
+  background: var(--surface);
+  border-radius: 14px;
+}
+
+body.shell-body .studio-shell :is(.ed-opus, .ed-run-head, .ed-done) {
+  color: var(--text);
+}
+
+body.shell-body .studio-shell :is(.ws-tag, .ws-own button, .link-btn, .ed-done > svg) {
+  color: var(--coral-2);
+}
+
+body.shell-body .studio-shell .ws-tag-plain {
+  color: var(--text-2);
+}
+
+body.shell-body .studio-shell .run-steps li.done::before {
+  /* The existing check image is dark, so give it a light backing. */
+  background-color: var(--surface);
+  border-color: var(--text);
+}
+
+body.shell-body .studio-shell :is(.ed-ask-box, .cmp-box) {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--line);
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px var(--line), 0 2px 6px #14141304;
+}
+
+body.shell-body .studio-shell :is(.ed-ask-box, .cmp-box):focus-within {
+  border-color: var(--line-2);
+  box-shadow: inset 0 0 0 1px var(--line-2), 0 2px 6px #14141304;
+}
+
+body.shell-body .studio-shell :is(.ed-ask-box, .cmp-box).dragging {
+  box-shadow: inset 0 0 0 2px var(--coral-2);
+}
+
+body.shell-body .studio-shell .ed-ask-box textarea {
+  color: var(--text);
+  background: transparent;
+  caret-color: var(--coral-2);
+  font-family: var(--display);
+}
+
+body.shell-body .studio-shell textarea::placeholder {
+  color: var(--text-3);
+  opacity: 1;
+}
+
+body.shell-body .studio-shell :is(.ws-tools, .ed-ask-foot) .tool-pill,
+body.shell-body .studio-shell :is(.ed-tool, .tool-round, .ed-attach, .ws-back) {
+  color: var(--text-2);
+  background: var(--card);
+  border-color: var(--line);
+  border-radius: 8px;
+}
+
+body.shell-body .studio-shell :is(.tool-pill, .ed-tool, .tool-round, .ed-attach, .ws-back):hover:not(:disabled),
+body.shell-body .studio-shell .ed-tool[aria-expanded="true"] {
+  color: var(--text);
+  background: #ded7ca;
+}
+
+body.shell-body .studio-shell :is(.ed-scope, .ws-try button),
+body.shell-body .studio-shell .ed-options button[aria-pressed="true"] {
+  color: var(--coral-2);
+  background: var(--soft);
+  border-color: var(--coral);
+  border-radius: 8px;
+}
+
+body.shell-body .studio-shell :is(.ed-scope button, .fx-pill.on) {
+  color: var(--coral-2);
+}
+
+body.shell-body .studio-shell .ws-try button:hover,
+body.shell-body .studio-shell .ws-try button[aria-pressed="true"] {
+  color: var(--coral-2);
+  background: #d9775729;
+}
+
+body.shell-body .studio-shell .cmp-added .pchip {
+  border-radius: 8px;
+}
+
+body.shell-body .studio-shell :is(.error, .msg-error, .audio-error, .audio-duration-warning) {
+  color: var(--coral-2);
+}
+
+/* Versions and timeline: warm neutral tracks, terracotta selection. */
+body.shell-body .studio-shell :is(.ed-vtabs button, .ed-ver-row button) {
+  color: var(--text-2);
+  background: var(--card);
+  border-color: var(--line);
+  border-radius: 8px;
+}
+
+body.shell-body .studio-shell :is(.ed-vtabs button, .ed-ver-row button):hover:not(:disabled) {
+  color: var(--text);
+  background: #ded7ca;
+}
+
+body.shell-body .studio-shell :is(.ed-vtabs button, .ed-ver-row button)[aria-pressed="true"] {
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
+}
+
+body.shell-body .studio-shell :is(.tl-shot, .tl-bar) {
+  color: var(--text-2);
+  background: var(--card);
+  border-color: var(--line);
+  border-radius: 8px;
+}
+
+body.shell-body .studio-shell .tl-shot:hover:not(:disabled):not([aria-pressed="true"]) {
+  color: var(--text);
+  background: #ded7ca;
+}
+
+body.shell-body .studio-shell .tl-shot.now {
+  color: var(--text);
+  background: #ead6c7;
+}
+
+body.shell-body .studio-shell .tl-shot[aria-pressed="true"] {
+  color: var(--text);
+  background: var(--coral);
+  border-color: var(--coral-2);
+}
+
+body.shell-body .studio-shell .tl-head,
+body.shell-body .studio-shell .tl-head::before {
+  background: var(--coral-2);
+}
+
+/* Portalled settings/effects; don't recolour canvas pixels or inline swatches. */
+body.shell-body .cmv-floating {
+  color: var(--text);
+  background: var(--bg);
+  border-color: var(--line);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px #14141308, 0 16px 40px #14141312;
+  font-family: var(--display);
+}
+
+body.shell-body .cmv-floating :is(.pop-head, .pop-foot) {
+  background: var(--bg);
+  border-color: var(--line);
+}
+
+body.shell-body .cmv-floating :is(.set-label, .pick-text span, .palette) {
+  color: var(--text-2);
+}
+
+body.shell-body .cmv-floating .seg {
+  background: var(--surface);
+  border-color: var(--line);
+  border-radius: 10px;
+}
+
+body.shell-body .cmv-floating .seg button[aria-checked="true"] {
+  color: var(--text);
+  background: var(--bg);
+  box-shadow: 0 1px 3px #14141312;
+}
+
+body.shell-body .cmv-floating :is(.brand-colors, .brand-chip) {
+  border-color: var(--line);
+}
+
+body.shell-body .cmv-floating :is(.chip, .fx-option, .pick-row) {
+  color: var(--text-2);
+  border-color: var(--line);
+  border-radius: 10px;
+}
+
+body.shell-body .cmv-floating .fx-option {
+  background: var(--bg);
+}
+
+body.shell-body .cmv-floating :is(.chip, .pick-row):hover,
+body.shell-body .cmv-floating .pick-none[aria-pressed="true"] {
+  color: var(--text);
+  background: var(--surface);
+}
+
+body.shell-body .cmv-floating .chip[aria-pressed="true"] {
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
+}
+
+body.shell-body .cmv-floating .fx-option[aria-pressed="true"] {
+  border-color: var(--coral-2);
+  box-shadow: 0 0 0 1px var(--coral-2);
+}
+
+body.shell-body .cmv-floating .pick-check {
+  color: var(--coral-2);
+}
+
+/* Audio/image dialogs and status messages inherit the same light surface. */
+body.shell-body .studio-shell :is(.cmv-audio-dialog, .cmv-images-dialog, .cmv-toast) {
+  color: var(--text);
+  background: var(--bg);
+  border-color: var(--line);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px #14141308, 0 16px 40px #14141312;
+}
+
+body.shell-body .studio-shell .cmv-audio-dialog::backdrop,
+body.shell-body .studio-shell .cmv-audio-overlay {
+  background: #17171380;
+}
+
+body.shell-body .studio-shell .cmv-audio-dialog :is(select, textarea) {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--line-2);
+  border-radius: 8px;
+  caret-color: var(--coral-2);
+}
+
+body.shell-body .studio-shell .cmv-audio-dialog :is(.audio-remove, .audio-notice, .audio-duration, small) {
+  color: var(--text-2);
+}
+
+body.shell-body .studio-shell .cmv-audio-dialog input[type="range"] {
+  accent-color: var(--coral-2);
+}
+
+body.shell-body .studio-shell .cmv-audio-dialog .button:not(.button-primary) {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+body.shell-body .studio-shell .cmv-dialog-close {
+  color: var(--text-2);
+  border-radius: 8px;
+}
+
+body.shell-body .studio-shell .cmv-dialog-close:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+
+body.shell-body .studio-shell :is(.demo-wait, .cmv-preview-busy) {
+  color: #faf9f5;
+}
+
+body.shell-body .studio-shell .demo-wait .btn {
+  color: #141413;
+  background: #faf9f5;
+  border-color: #dad4c6;
+}
+
+/* Focus remains visible without changing sizes, flow or responsive rules. */
+body.shell-body .studio-shell :is(a, button, input, select, textarea):focus-visible,
+body.shell-body .cmv-floating :is(button, input, select):focus-visible {
+  outline: 2px solid var(--coral-2);
+  outline-offset: 3px;
+}
+
+/* Auth and support mount outside studio-shell; resist the late Base link here. */
+body.shell-body :is(dialog.signin, .chat-panel) {
+  color: var(--text);
+  background: var(--bg);
+  border-color: var(--line);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px #14141308, 0 16px 40px #14141312;
+}
+
+body.shell-body dialog.signin::backdrop {
+  background: #171713b0;
+}
+
+body.shell-body .signin-form .signin-title {
+  font: 400 36px/1.15 var(--serif);
+  letter-spacing: -.03em;
+}
+
+body.shell-body :is(.signin-email input, .chat-email, .chat-label textarea) {
+  color: var(--text);
+  background: var(--bg);
+  border-color: var(--line);
+  border-radius: 8px;
+  caret-color: var(--coral-2);
+}
+
+body.shell-body :is(dialog.signin, .chat-panel) .btn {
+  border-radius: 8px;
+}
+
+body.shell-body :is(dialog.signin .btn.primary, .signin-google, .chat-panel .btn.primary, .chat-fab) {
+  color: var(--bg);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+body.shell-body :is(dialog.signin .btn.primary, .signin-google, .chat-panel .btn.primary, .chat-fab):hover:not(:disabled) {
+  color: var(--bg);
+  background: #34352e;
+  border-color: #34352e;
+}
+
+body.shell-body .chat-fab {
+  box-shadow: 0 8px 24px #14141322;
+}
+
+body.shell-body .chat-head {
+  background: var(--surface);
+  border-bottom-color: var(--line);
+}
+
+body.shell-body .chat-error {
+  color: #a33e2e;
+}
+
+body.shell-body .chat-done svg {
+  color: #356648;
+}
+
+body.shell-body :is(dialog.signin, .chat-panel) :is(a, button, input, textarea):focus-visible,
+body.shell-body .chat-fab:focus-visible {
+  outline: 2px solid var(--coral-2);
+  outline-offset: 3px;
+}

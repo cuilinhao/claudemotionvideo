@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { Analytics } from './Analytics';
 import './fidelity-shared.css';
+import './motion-theme.css';
+import './motion-studio-theme.css';
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode><BrowserRouter><Analytics /><App /></BrowserRouter></React.StrictMode>,

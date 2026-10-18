@@ -7,6 +7,7 @@ import { api, type User } from './lib/api';
 import type { AuthMode, Plan } from './lib/ui-types';
 import { trackPageView } from './lib/analytics';
 import './fidelity-shared.css';
+import './motion-theme.css';
 
 type Checkout = {plan: Plan; interval: 'month' | 'year'};
 function ReferenceApp() {

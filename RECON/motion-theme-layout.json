@@ -1,0 +1,124 @@
+{
+  "date": "2026-10-18",
+  "environment": "local",
+  "viewport": 390,
+  "checks": [
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Opus 5.5 video examples",
+      "path": "/examples",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Opus 5.5 video effects",
+      "path": "/effects",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Making videos with Claude Opus 5.5",
+      "path": "/blogs",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Opus 5.5 Video Examples: 13 Real Videos and the Prompts Behind Them",
+      "path": "/blogs/opus-5-5-video-examples",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "How to Write Opus 5.5 Video Prompts That Don't Look Generic",
+      "path": "/blogs/opus-5-5-video-prompt-guide",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Featured on",
+      "path": "/featured",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Contact us",
+      "path": "/contact",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Terms of Service",
+      "path": "/terms",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Privacy Policy",
+      "path": "/privacy",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Refund Policy",
+      "path": "/refunds",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Opus 5.5 Video Generator",
+      "path": "/opus-5-5-video-generator",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "Account and credits",
+      "path": "/account",
+      "scroll": 390,
+      "width": 390
+    },
+    {
+      "background": "rgb(250, 249, 245)",
+      "brokenImages": [],
+      "font": "\"Instrument Sans\", Arial, sans-serif",
+      "h1": "My videos",
+      "path": "/my-videos",
+      "scroll": 390,
+      "width": 390
+    }
+  ]
+}
