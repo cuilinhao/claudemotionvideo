@@ -1,0 +1,104 @@
+{
+  "checkedAt": "2026-10-18T13:12:46.465409+00:00",
+  "deployment": "2936f267-537e-4218-b121-46a546d5ce07",
+  "commit": "20771a7",
+  "summary": {
+    "requests": 7,
+    "passed": 7,
+    "failed": 0
+  },
+  "results": [
+    {
+      "url": "https://claudemotionvideo.com/",
+      "status": 200,
+      "contentType": "text/html",
+      "sha256": "95fa6359ac66d5d4ff24a9176146e9bf4f9b71593dccc29f2445a3f27bec3d60",
+      "checks": {
+        "status200": true,
+        "referrerSameOrigin": true,
+        "currentPlayerThemeLinked": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/examples",
+      "status": 200,
+      "contentType": "text/html",
+      "sha256": "5492f5ab32f9846df6375dd528f1bde5463b413c9c3ffcd6f3504bf605f3e894",
+      "checks": {
+        "status200": true,
+        "referrerSameOrigin": true,
+        "currentPlayerThemeLinked": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/opus-5-5-video-generator",
+      "status": 200,
+      "contentType": "text/html",
+      "sha256": "384ea2421f74c766c67e651b4a065332bc8202768ba691470a3c6aabc3148c8d",
+      "checks": {
+        "status200": true,
+        "referrerSameOrigin": true,
+        "currentPlayerThemeLinked": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/privacy",
+      "status": 200,
+      "contentType": "text/html",
+      "sha256": "533ccf8802f8d6227c669704b38766025c75f76c59bf80eef0681ad9f7f411a9",
+      "checks": {
+        "status200": true,
+        "xVideoCdnDisclosed": true,
+        "connectionDataDisclosed": true,
+        "authorAttributionDisclosed": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/reference-assets/app.js",
+      "status": 200,
+      "contentType": "text/javascript",
+      "sha256": "ad47af11f14844ed1cc68d31ffc0db455c4a32f078c766f95da4e34d6c3bbf58",
+      "localSha256": "ad47af11f14844ed1cc68d31ffc0db455c4a32f078c766f95da4e34d6c3bbf58",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/reference-assets/data/example-media.json",
+      "status": 200,
+      "contentType": "application/json",
+      "sha256": "6b4da179ea6d6df186a5c00af17b64536c386c8853690eef10bdc5ca54443193",
+      "localSha256": "6b4da179ea6d6df186a5c00af17b64536c386c8853690eef10bdc5ca54443193",
+      "mappingCount": 470,
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true,
+        "all470Mappings": true,
+        "validMediaShape": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/motion-theme-CdTB4znr.css",
+      "status": 200,
+      "contentType": "text/css",
+      "sha256": "1ae588f9cc9e8639e395c52929d00eed345a61289f0827c54ceda6749a81643a",
+      "localSha256": "1ae588f9cc9e8639e395c52929d00eed345a61289f0827c54ceda6749a81643a",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true,
+        "playerStyle": true,
+        "loadingStateStyle": true,
+        "errorStateStyle": true,
+        "hiddenStatesStyle": true
+      },
+      "passed": true
+    }
+  ]
+}

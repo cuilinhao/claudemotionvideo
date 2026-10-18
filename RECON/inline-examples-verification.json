@@ -1,0 +1,50 @@
+{
+  "deploymentVersion": "2936f267-537e-4218-b121-46a546d5ce07",
+  "codeCommit": "20771a7",
+  "site": "https://claudemotionvideo.com/",
+  "checks": {
+    "typecheck": "passed",
+    "testFiles": 27,
+    "tests": 268,
+    "build": "passed",
+    "sourceCount": 470,
+    "allSourcesRangeGet": "206 video/mp4"
+  },
+  "productionBrowser": {
+    "landscape": {
+      "currentTime": 3.90135,
+      "duration": 15.061333,
+      "readyState": 4,
+      "paused": false,
+      "muted": false,
+      "width": 1280,
+      "height": 720
+    },
+    "audioExample": {
+      "currentTime": 4.70061,
+      "duration": 306.480181,
+      "readyState": 4,
+      "paused": false,
+      "muted": false,
+      "width": 1280,
+      "height": 720,
+      "nativePauseVerified": true
+    },
+    "squareMobile": {
+      "currentTime": 5.671403,
+      "duration": 14.058667,
+      "readyState": 4,
+      "paused": false,
+      "muted": false,
+      "width": 720,
+      "height": 720,
+      "viewportWidth": 390,
+      "horizontalOverflow": false
+    },
+    "close": {
+      "open": false,
+      "remainingVideos": 0
+    },
+    "locationAfterPlay": "https://claudemotionvideo.com/"
+  }
+}

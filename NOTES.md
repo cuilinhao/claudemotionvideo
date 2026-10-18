@@ -10,6 +10,8 @@
 - 已完成类型检查、268 项测试（含 18 项播放器行为回归与 14 项来源同步回归）及构建审计。审计要求 470 个视频源全部存在、URL 和尺寸有效，且播放页面使用兼容 CDN 的 referrer 策略。
 - 浏览器已实播横屏、方形、竖屏及 306 秒带 AAC 音轨的示例；验证暂停、关闭/Esc 清理、手机 390px 无横向溢出及首页/列表页面不发生站外导航。证据位于 `RECON/screenshots/inline-examples/`，来源实际 Range 请求结果见 `RECON/example-media-sync.json`。
 
+- 已发布：提交 `20771a7` 推送到 `main`，Cloudflare 正式版本 `2936f267-537e-4218-b121-46a546d5ce07`。正式站实播 15 秒横屏、306 秒带音轨长视频及手机方形视频，均达到 readyState 4、未静音、时间正常推进且 URL 保持本站；暂停、关闭/Esc 清理及 390px 无溢出验证通过。生产截图以 `production-` 开头。
+
 ## 2026-10-18：Claude Motion 视觉主题
 
 - 用户要求参考 `https://claudemontiondesignskills.org/`，并先查看 `/Users/pgy/Desktop/claudemotion` 源码；保留本站功能、品牌、页面内容和视频素材。
