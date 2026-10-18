@@ -15,7 +15,7 @@
 - [x] FAQPage 的 8 个问答与可见文本逐字一致，首页及两个工具页均含 HowTo。Google 已撤下 FAQ/HowTo 富结果支持，因此它们不会出现在当前 Rich Results Test 的识别项目中；不能按旧任务书要求勾选“二者均被该工具展示”。
 - [x] 从 8 个生成页面读取的全部 VideoObject 联合提交 Google Code 模式检测，返回 8 项有效视频，无严重错误。此项验证的是标记，不等于上线后的抓取与视频收录。
 - [x] 首页及 10 个新增页面均指向真实 1200×630 PNG，Twitter card 为 `summary_large_image`，apple-touch-icon 仍为 favicon.svg。
-- [ ] 在 X/Twitter Card Validator 中看到上线卡片：入口实际重定向到 X 登录；正式站已部署，11 张公开分享图的 HTTP 响应和尺寸已验证；仍需负责人使用 X 登录会话确认平台卡片预览。
+- [x] X 官方 Card Validator：使用用户提供的已登录 Chrome 会话，首页和 10 个新增页全部返回 `Card loaded successfully`。验证器提示预览已迁移至撰写窗口；首页大图、品牌和标题已在该窗口实测确认，随后清空测试文本，没有发布帖子。
 - [x] sitemap 恰含 23 个 URL，各有 lastmod；首页/pricing/examples/effects 为 weekly，其余 monthly。
 - [x] 原有 13 个公开 URL 和 10 个新增 URL 全部 200；首页及新页面抽取到的 22 个内部目标均无 404。不存在的效果 URL 仍为 404。
 - [x] 本地首页 Lighthouse 13.5.0 SEO 改造前 100、改造后 100，均高于任务书给出的 93；无失败的计分 SEO 审计。
@@ -73,4 +73,15 @@ node scripts/audit-seo.mjs http://127.0.0.1:8790
 - 首页经过现有 Worker canonical 格式化后与发布构建一致，播放器脚本、470 条媒体映射及 llms-full 的 SHA-256 与构建产物一致。详见 [上线摘要](evidence/production-release.json)。
 - [正式首页截图](evidence/production-home.png)；[正式效果页截图](evidence/production-effect.png)。
 
-X 登录态下的卡片预览及任务书明确的人工 GSC 后续仍单独保留，不将部署成功等同于搜索引擎收录。
+X 登录态验证已在用户追加授权后完成；GSC 进度见下方记录，不将部署或请求成功等同于搜索引擎收录。
+
+## X 与 GSC 平台操作（2026-10-18）
+
+- X：全部 11 个目标 URL 的官方卡片验证成功，首页大图在撰写窗口确认；未发布帖子。
+- GSC 站点地图：`https://claudemotionvideo.com/sitemap.xml` 已处于“成功”状态，已发现 23 个网页；检查时已包含全部新增页面，无需重复提交相同地址。
+- 已成功请求索引：两个工具页、首页、Letter drop、Masked rise、Typewriter cursor、Stretch slide-in，共 7 页。每页均出现“已请求编入索引”，已加入优先抓取队列。
+- 待请求：Squash and stretch、Outline echo、Decode scramble、Skewed wipe，共 4 页。
+- 阻碍：GSC 两次显示“无法连接到 reCAPTCHA 服务”。登录仍有效，已保留当前页面并请用户恢复网络连接。没有绕过验证，也没有将未收到成功回执的页面记为完成。
+- 逐页状态见 [平台验证记录](evidence/platform-validation.json)。浏览器截图保存在原工作目录 `RECON/seo-platform-validation/`，没有上传账号页面截图到 GitHub。
+
+请求索引只代表 Google 接受抓取请求，实际收录仍由 Google 决定。

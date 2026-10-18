@@ -1,0 +1,106 @@
+{
+  "checkedAt": "2026-10-18T14:04:57.836759+00:00",
+  "x": {
+    "validatedPages": 11,
+    "composerPreviewVerified": true,
+    "publicPostPublished": false,
+    "pages": [
+      {
+        "url": "https://claudemotionvideo.com/",
+        "result": "Card loaded successfully",
+        "card": "summary_large_image"
+      },
+      {
+        "url": "https://claudemotionvideo.com/text-animation-generator",
+        "result": "Card loaded successfully",
+        "card": "summary_large_image"
+      },
+      {
+        "url": "https://claudemotionvideo.com/animated-title-generator",
+        "result": "INFO:  Card loaded successfully"
+      },
+      {
+        "url": "https://claudemotionvideo.com/effects/letter-drop-animation",
+        "result": "INFO:  Card loaded successfully"
+      },
+      {
+        "url": "https://claudemotionvideo.com/effects/masked-rise-animation",
+        "result": "INFO:  Card loaded successfully"
+      },
+      {
+        "url": "https://claudemotionvideo.com/effects/typewriter-cursor-animation",
+        "result": "INFO:  Card loaded successfully"
+      },
+      {
+        "url": "https://claudemotionvideo.com/effects/stretch-slide-in-animation",
+        "result": "INFO:  Card loaded successfully"
+      },
+      {
+        "url": "https://claudemotionvideo.com/effects/squash-and-stretch-animation",
+        "result": "INFO:  Card loaded successfully"
+      },
+      {
+        "url": "https://claudemotionvideo.com/effects/outline-echo-effect",
+        "result": "INFO:  Card loaded successfully"
+      },
+      {
+        "url": "https://claudemotionvideo.com/effects/decode-scramble-text-effect",
+        "result": "INFO:  Card loaded successfully"
+      },
+      {
+        "url": "https://claudemotionvideo.com/effects/skewed-wipe-transition",
+        "result": "INFO:  Card loaded successfully"
+      }
+    ]
+  },
+  "sitemap": {
+    "url": "https://claudemotionvideo.com/sitemap.xml",
+    "status": "成功",
+    "discoveredPages": 23,
+    "alreadySubmitted": true
+  },
+  "indexingRequests": [
+    {
+      "url": "https://claudemotionvideo.com/text-animation-generator",
+      "result": "已请求编入索引",
+      "checkedAt": "2026-10-18T13:58:31.133Z"
+    },
+    {
+      "url": "https://claudemotionvideo.com/animated-title-generator",
+      "result": "已请求编入索引",
+      "checkedAt": "2026-10-18T13:59:22.807Z"
+    },
+    {
+      "url": "https://claudemotionvideo.com/",
+      "result": "已请求编入索引",
+      "checkedAt": "2026-10-18T13:59:56.720Z"
+    },
+    {
+      "url": "https://claudemotionvideo.com/effects/letter-drop-animation",
+      "result": "已请求编入索引",
+      "checkedAt": "2026-10-18T14:00:22.756Z"
+    },
+    {
+      "url": "https://claudemotionvideo.com/effects/masked-rise-animation",
+      "result": "已请求编入索引",
+      "checkedAt": "2026-10-18T14:00:45.453Z"
+    },
+    {
+      "url": "https://claudemotionvideo.com/effects/typewriter-cursor-animation",
+      "result": "已请求编入索引",
+      "checkedAt": "2026-10-18T14:00:57.055Z"
+    },
+    {
+      "url": "https://claudemotionvideo.com/effects/stretch-slide-in-animation",
+      "result": "已请求编入索引",
+      "checkedAt": "2026-10-18T14:01:34.745Z"
+    }
+  ],
+  "pending": [
+    "https://claudemotionvideo.com/effects/squash-and-stretch-animation",
+    "https://claudemotionvideo.com/effects/outline-echo-effect",
+    "https://claudemotionvideo.com/effects/decode-scramble-text-effect",
+    "https://claudemotionvideo.com/effects/skewed-wipe-transition"
+  ],
+  "blocker": "GSC 连续两次提示无法连接到 reCAPTCHA 服务；等待用户恢复连接，未把未成功的请求记录为完成。"
+}
