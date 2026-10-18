@@ -1,4 +1,8 @@
 export const PUBLIC_PAGE_PATHS = new Set([
+  '/effects/letter-drop-animation', '/effects/masked-rise-animation',
+  '/effects/typewriter-cursor-animation', '/effects/stretch-slide-in-animation',
+  '/effects/squash-and-stretch-animation', '/effects/outline-echo-effect',
+  '/effects/decode-scramble-text-effect', '/effects/skewed-wipe-transition',
   '/text-animation-generator', '/animated-title-generator',
   '/', '/pricing', '/examples', '/effects', '/blogs', '/contact', '/terms', '/privacy', '/refunds',
   '/featured', '/opus-5-5-video-generator',

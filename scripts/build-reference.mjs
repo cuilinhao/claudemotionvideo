@@ -3,6 +3,9 @@ import path from 'node:path';
 import { transformHome } from './seo/home.mjs';
 import { toolPages } from './seo/tool-content.mjs';
 import { renderToolPage } from './seo/pages.mjs';
+import { effectRoutes } from './seo/effect-routes.mjs';
+import { effectContent } from './seo/effect-content.mjs';
+import { renderEffectPage } from './seo/effect-pages.mjs';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -98,11 +101,19 @@ async function build() {
     await writeFile(destination, injectAppTags(renderToolPage(homepageSource, page), tags));
   }
 
+  for (const route of effectRoutes) {
+    const content = effectContent.find(effect => effect.slug === route.slug);
+    if (!content) throw new Error(`Missing effect content for ${route.slug}`);
+    const destination = path.join(dist, 'effects', route.slug, 'index.html');
+    await mkdir(path.dirname(destination), { recursive: true });
+    await writeFile(destination, injectAppTags(renderEffectPage(homepageSource, { ...route, ...content }), tags));
+  }
+
   const alias = path.join(dist, 'refund', 'index.html');
   await mkdir(path.dirname(alias), { recursive: true });
   await writeFile(alias, '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/refunds"><link rel="canonical" href="https://claudemotionvideo.com/refunds"><title>Redirecting…</title></head><body><p>Redirecting to <a href="/refunds">Refund Policy</a>.</p><script>location.replace("/refunds"+location.search+location.hash)</script></body></html>\n');
   await unlink(referenceEntry);
-  console.log(`Built ${staticRoutes.length} reference pages, ${toolPages.length} tool pages, ${appRoutes.length} React route shells, and /refund redirect.`);
+  console.log(`Built ${staticRoutes.length} reference pages, ${toolPages.length} tool pages, ${effectRoutes.length} effect pages, ${appRoutes.length} React route shells, and /refund redirect.`);
 }
 
 build().catch((error) => {
