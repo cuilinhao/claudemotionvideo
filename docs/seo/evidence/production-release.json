@@ -1,0 +1,63 @@
+{
+  "checkedAt": "2026-10-18T13:33:16.938087+00:00",
+  "commit": "969a5f9ef95fd9a79a3fda9fd7d78f51d8ff0319",
+  "testedTree": "c9ad600a5f121f15f2a7c06958deeac23ce14c06",
+  "version": "eab5cc7e-627c-4963-9b16-1d630db1daea",
+  "previousVersion": "2936f267-537e-4218-b121-46a546d5ce07",
+  "tests": {
+    "files": 32,
+    "passed": 299,
+    "failed": 0
+  },
+  "typecheck": "passed",
+  "build": "passed",
+  "deployDryRun": "passed",
+  "seoScore": 100,
+  "video": {
+    "page": "/effects/letter-drop-animation",
+    "currentTime": 15.061333,
+    "ended": true,
+    "readyState": 4,
+    "videoWidth": 1280,
+    "error": null
+  },
+  "health": {
+    "me": 200,
+    "billingEnabled": true,
+    "emailEnabled": true,
+    "googleEnabled": true,
+    "unauthenticatedProjects": 401,
+    "studio": 200,
+    "wwwRedirect": 301
+  },
+  "assets": [
+    {
+      "path": "/",
+      "status": 200,
+      "sha256": "b63830f2d5e5ae2f364a862e161b2af8d024cf11043911e8ce2ced19b1d62027",
+      "matchesBuild": true,
+      "normalization": "Existing Worker canonical normalization"
+    },
+    {
+      "path": "/reference-assets/app.js",
+      "status": 200,
+      "sha256": "ad47af11f14844ed1cc68d31ffc0db455c4a32f078c766f95da4e34d6c3bbf58",
+      "matchesBuild": true,
+      "normalization": null
+    },
+    {
+      "path": "/reference-assets/data/example-media.json",
+      "status": 200,
+      "sha256": "6b4da179ea6d6df186a5c00af17b64536c386c8853690eef10bdc5ca54443193",
+      "matchesBuild": true,
+      "normalization": null
+    },
+    {
+      "path": "/llms-full.txt",
+      "status": 200,
+      "sha256": "1b6a7c114a0e728085ba37d38d8633ccd035fabcacea5e93407536ec171e1d57",
+      "matchesBuild": true,
+      "normalization": null
+    }
+  ]
+}

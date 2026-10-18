@@ -15,7 +15,7 @@
 - [x] FAQPage 的 8 个问答与可见文本逐字一致，首页及两个工具页均含 HowTo。Google 已撤下 FAQ/HowTo 富结果支持，因此它们不会出现在当前 Rich Results Test 的识别项目中；不能按旧任务书要求勾选“二者均被该工具展示”。
 - [x] 从 8 个生成页面读取的全部 VideoObject 联合提交 Google Code 模式检测，返回 8 项有效视频，无严重错误。此项验证的是标记，不等于上线后的抓取与视频收录。
 - [x] 首页及 10 个新增页面均指向真实 1200×630 PNG，Twitter card 为 `summary_large_image`，apple-touch-icon 仍为 favicon.svg。
-- [ ] 在 X/Twitter Card Validator 中看到上线卡片：入口实际重定向到 X 登录；本次代码尚未部署到正式域名，不能把本地图片验证冒充线上卡片预览。部署后由负责人使用登录会话复验。
+- [ ] 在 X/Twitter Card Validator 中看到上线卡片：入口实际重定向到 X 登录；正式站已部署，11 张公开分享图的 HTTP 响应和尺寸已验证；仍需负责人使用 X 登录会话确认平台卡片预览。
 - [x] sitemap 恰含 23 个 URL，各有 lastmod；首页/pricing/examples/effects 为 weekly，其余 monthly。
 - [x] 原有 13 个公开 URL 和 10 个新增 URL 全部 200；首页及新页面抽取到的 22 个内部目标均无 404。不存在的效果 URL 仍为 404。
 - [x] 本地首页 Lighthouse 13.5.0 SEO 改造前 100、改造后 100，均高于任务书给出的 93；无失败的计分 SEO 审计。
@@ -51,7 +51,7 @@ node scripts/audit-seo.mjs http://127.0.0.1:8790
 - 原效果库实际有 21 个演示；本次按任务书为指定的 8 个创建独立页，其他内容保留。
 - Google 的 [FAQ 更新记录](https://developers.google.com/search/updates) 与 [HowTo 停用说明](https://developers.google.com/search/blog/2023/08/howto-faq-changes) 已改变旧验收标准。保留请求的 Schema.org 类型，但不声称 Google 会展示已停止支持的富结果。
 - 首页中第三方社区原始投稿保持来源内容；新写的页面、产品文案及 llms 语料均为英文。
-- GSC 提交、请求收录、观察 2–4 周及外链分发仍是任务书明确划定的人工后续工作。本次不擅自合并或发布生产环境。
+- GSC 提交、请求收录、观察 2–4 周及外链分发仍是任务书明确划定的人工后续工作。用户随后明确授权测试、合并 GitHub 并上线，已按下方记录完成正式发布。
 
 ## 最终验证结果
 
@@ -60,3 +60,17 @@ node scripts/audit-seo.mjs http://127.0.0.1:8790
 - 干净构建产出全部 23 个公开文档、23 条 sitemap 记录和 11 张 1200×630 PNG。llms-full 的构建前、构建后、public/dist 和重复生成 SHA-256 均为 `1b6a7c114a0e728085ba37d38d8633ccd035fabcacea5e93407536ec171e1d57`。
 - 浏览器实测社区视频播放至 15.061 秒结束，readyState 4、1280 像素宽、无媒体错误；[效果页截图](evidence/effect-preview.png)。
 - 独立审查结论：referrer 依赖问题已修复，无未解决的可操作问题。
+
+## 正式发布验收（用户追加授权后）
+
+- GitHub PR #1 已合并到 `main`，部署代码提交为 `969a5f9ef95fd9a79a3fda9fd7d78f51d8ff0319`。
+- 将 SEO 分支与最新 `main`（含站内示例播放器）合并到独立干净目录后，`npm ci` 报告 0 漏洞；类型检查、32 个测试文件 / 299 个测试、生产构建和 Wrangler dry-run 全部通过。GitHub 合并后的树与已测试的树完全一致。
+- Cloudflare 正式版本：`eab5cc7e-627c-4963-9b16-1d630db1daea`；上一版本为 `2936f267-537e-4218-b121-46a546d5ce07`。继续使用既有域名、D1、R2、Workflow、定时任务及 Secrets。
+- [正式站](https://claudemotionvideo.com/) 上的 23 个公开页面全部 200；11 张分享图均为 1200×630；22 个内部链接无 404；两个 llms 文件返回 text/plain；robots 保持不变；不存在的效果页仍为 404。详见 [正式站 HTTP 审计](evidence/production-http-audit.json)。
+- 正式站 Lighthouse SEO 为 100，无失败的计分 SEO 审计。
+- 浏览器从首页点击进入 Letter drop 页面，实播社区视频至 15.061333 秒结束，readyState 4、宽 1280、无媒体错误。合并后的示例页弹窗也已复查。
+- `/api/me` 返回 200，支付及邮箱/Google 登录配置均已启用；未登录访问 `/api/projects` 正确返回 401；`/studio` 返回 200；www 正确 301 跳转主域名。这是非交易健康检查，未执行扣费或付费生成。
+- 首页经过现有 Worker canonical 格式化后与发布构建一致，播放器脚本、470 条媒体映射及 llms-full 的 SHA-256 与构建产物一致。详见 [上线摘要](evidence/production-release.json)。
+- [正式首页截图](evidence/production-home.png)；[正式效果页截图](evidence/production-effect.png)。
+
+X 登录态下的卡片预览及任务书明确的人工 GSC 后续仍单独保留，不将部署成功等同于搜索引擎收录。

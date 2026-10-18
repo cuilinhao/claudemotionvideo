@@ -11,5 +11,12 @@
     "date": "2026-10-18T13:16:59.674Z",
     "seo": 100
   },
-  "failedSeoAudits": []
+  "failedSeoAudits": [],
+  "production": {
+    "url": "https://claudemotionvideo.com/",
+    "version": "13.5.0",
+    "date": "2026-10-18T13:31:10.161Z",
+    "seo": 100,
+    "failedSeoAudits": []
+  }
 }
