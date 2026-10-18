@@ -7,6 +7,7 @@ import { effectRoutes } from './seo/effect-routes.mjs';
 import { effectContent } from './seo/effect-content.mjs';
 import { renderEffectPage } from './seo/effect-pages.mjs';
 import { generateLlmsFull } from './seo/llms.mjs';
+import { linkLibraryTool } from './seo/navigation.mjs';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -92,7 +93,8 @@ async function build() {
     }
     const destination = path.join(dist, route);
     await mkdir(path.dirname(destination), { recursive: true });
-    await writeFile(destination, injectAppTags(route === 'index.html' ? transformHome(html) : html, tags));
+    const output = route === 'index.html' ? transformHome(html) : ['examples/index.html', 'effects/index.html'].includes(route) ? linkLibraryTool(html) : html;
+    await writeFile(destination, injectAppTags(output, tags));
   }
 
   const homepageSource = await readFile(path.join(templates, 'index.html'), 'utf8');

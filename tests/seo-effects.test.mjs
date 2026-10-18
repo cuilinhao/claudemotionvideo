@@ -8,6 +8,11 @@ const source=readFileSync('reference/pages/index.html','utf8');
 const effects=readFileSync('reference/pages/effects/index.html','utf8');
 const examples=JSON.parse(readFileSync('public/reference-assets/data/examples.json','utf8'));
 describe('eight real effect pages',()=>{
+ it('keeps remote community videos playable without relying on uncommitted template changes',()=>{
+  const cleanSource=source.replace(/<meta\b(?=[^>]*name="referrer")[^>]*>/g,'');
+  const html=renderEffectPage(cleanSource,{...effectRoutes[0],...effectContent[0]});
+  expect(html).toContain('<meta name="referrer" content="same-origin">');
+ });
  it('has exactly the requested routes',()=>{expect(effectContent.map(x=>x.slug).sort()).toEqual(effectRoutes.map(x=>x.slug).sort());});
  it.each(effectRoutes)('renders source-backed $slug',route=>{
   const content=effectContent.find(x=>x.slug===route.slug), html=renderEffectPage(source,{...route,...content});

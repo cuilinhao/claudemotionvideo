@@ -62,7 +62,7 @@ Claude returns a storyboard and animation code, which your browser previews and 
 
 Ask for changes in plain words, select a shot to focus the edit, compare saved versions, and download a 1080p MP4.
 
-04 · Effects
+Explore the text animation generator → Create animated titles and intros → 04 · Effects
 
 Animated text and title effects you can ask for
 

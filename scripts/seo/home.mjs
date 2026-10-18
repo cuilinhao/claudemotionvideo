@@ -1,5 +1,6 @@
 import {plans} from '../../src/lib/content.ts';
 import {effectRoutes} from './effect-routes.mjs';
+import {linkHomeTools,socialImage} from './navigation.mjs';
 import {metadata, plainText, jsonLd, faqSchema, howToSchema, readFaqs, origin} from './shared.mjs';
 export const homeMetadata = {
   title:'Text Animation Generator — Animate Text & Titles With AI',
@@ -27,7 +28,7 @@ export function transformHome(source) {
     return section.replace(/<article\b/g, '<li').replace(/<\/article>/g,'</li>').replace(/<\/div><\/div><\/section>$/, '</ul></div></section>');
   });
   html = html.replace(/(<section\b[^>]*id="faq"[^>]*>[\s\S]*?<details>[\s\S]*?<h3>)[\s\S]*?<\/h3><\/summary><p>[\s\S]*?<\/p>/, `$1What is a text animation generator?</h3></summary><p>${firstAnswer}</p>`);
-  html = metadata(html, homeMetadata);
+  html = linkHomeTools(socialImage(metadata(html, homeMetadata), 'home', 'Claude Motion Video — Animate text and titles with AI'));
   const faqs = readFaqs(html);
   if (faqs.length !== 8) throw new Error('Expected exactly eight visible homepage FAQs');
   const how = html.match(/<section\b[^>]*id="how"[^>]*>([\s\S]*?)<\/section>/)?.[1] ?? '';

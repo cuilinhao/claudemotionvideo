@@ -30,3 +30,9 @@ Source: the user's supplied claudemotionvideo.com task brief. Execute all ten ta
 ## Progress
 
 - Baseline: thirteen public pages, eight homepage FAQs, 470 gallery examples. Original robots checksum captured.
+- Commit group 1 complete: 8d548a9 — homepage targeting and data-derived schemas; 3 focused tests passed.
+- Commit group 2 complete: 2409ef3 — two tool pages and indexable routes; 17 focused/route tests passed.
+- Commit group 3 complete: f2d40db — eight effect pages; 26 focused/route tests passed.
+- Commit group 4 complete: e961586 — llms entry points; corpus tests and build passed.
+- Commit group 5 complete: share images, sitemap, navigation, README/acceptance evidence, independent review and clean-build validation. Final exact snapshot: 267 tests pass; original working checkout including preserved work: 299 tests pass. HTTP 23/23, PNG 11/11, Lighthouse SEO 100 before and after. Google Code mode: home 1 valid app, 8/8 valid videos. X hosted-card preview awaits authenticated post-deployment validation.
+- Review ruling: generate same-origin referrer meta explicitly in every new page, because remote community video CDN otherwise returns 403 when the old committed template lacks the in-progress media-player policy.

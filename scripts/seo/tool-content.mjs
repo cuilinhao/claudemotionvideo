@@ -91,7 +91,7 @@ export const toolPages = [
       },
       {
         heading: "Change it, don't re-roll it",
-        text: 'A title revision should begin with the sequence you already have. Ask to replace a name, correct a chapter heading or shorten the final call to action while keeping the existing motion. Chat edits create a new saved version for review; once approved, export that version as the updated MP4.',
+        text: 'Change the title text without regenerating the whole video. Begin with the sequence you already have and ask to replace a name, correct a chapter heading or shorten the final call to action while keeping the existing motion. Chat edits create a new saved version for review; once approved, export that version as the updated MP4.',
       },
     ],
     faqs: [

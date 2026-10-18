@@ -119,7 +119,7 @@ Webhook 使用 Stripe API 版本 `2026-09-30.endive`，订阅事件：`checkout.
 - `.env.production` 只保存公开的 `VITE_GA_MEASUREMENT_ID`，由 Vite 在构建时内嵌；它不是服务端密钥。修改后必须重新构建部署，单独设置 Worker Secret 不会改变前端。置空可停用统计。
 - 只在生产构建的 HTTPS 正式域名加载 GA。首次访问及 SPA 路径切换手动发送 `page_view`，连续相同路径去重；本地开发、重置密码页和未知路径不统计。上报 URL 去掉查询参数与片段，标题来自固定页面列表，不传提示词、邮箱、项目内容或重置令牌。
 - GA4 网站数据流的**增强型衡量功能保持关闭**，避免自动历史事件重复计数，以及表单、下载、站内搜索自动采集参数。代码同时设置 `send_page_view: false`，关闭 Google signals 与广告个性化。
-- Sitemap：`https://claudemotionvideo.com/sitemap.xml`，包含 13 个现有公开页面。Worker 为各公开页面输出对应 canonical，为工作台、重置密码和未知 HTML 页面加 `X-Robots-Tag: noindex`。
+- Sitemap：`https://claudemotionvideo.com/sitemap.xml`，包含 23 个公开页面（13 个原页面及 10 个新 SEO 页面）。Worker 为各公开页面输出对应 canonical，为工作台、重置密码和未知 HTML 页面加 `X-Robots-Tag: noindex`。
 
 2026-10-18 已部署并验收：GSC 所有权验证成功，sitemap 显示成功并发现 13 个页面。正式站 GA 脚本返回 200，页面浏览采集返回 204；首页 → Pricing → Examples → 后退各记录一次浏览。携带测试 prompt/token 的 Studio URL 上报为不含参数的 `/studio`，直接访问重置密码页不加载 GA。部署前 19 个测试文件、161 个测试及类型检查/构建通过。对应 Cloudflare 版本 `bc6a0e69-43b8-4dfb-ad65-671a06694a78`，截图证据位于 `RECON/screenshots/gsc-*.png` 和 `RECON/screenshots/ga4-*.png`。Search Console 抓取成功不等同于全部网页已经收录。
 
@@ -148,3 +148,34 @@ npm run deploy
 - 付款退款、拒付的积分调整目前由运营人工处理；Webhook 不会自动撤销已发积分。
 
 更多实现记录见 [`NOTES.md`](NOTES.md)、[`TEARDOWN.md`](TEARDOWN.md)、[`CLONE_AUDIT.md`](CLONE_AUDIT.md) 和 [`REPLACE_GUIDE.md`](REPLACE_GUIDE.md)。
+
+## 文字动画 SEO / GEO 改造
+
+构建入口 `scripts/build-reference.mjs` 保留原来的 13 个静态页面，并通过 `scripts/seo/` 输出两个工具页与八个效果页。现有首页模板先保留，再在构建时应用文案、metadata 和结构化数据改动；正式输出在 `dist/`，使用本地 Worker 预览，不能只看原始模板判断上线内容。工具页和效果页无需 JavaScript 即可读到正文。
+
+- `scripts/seo/home.mjs` 从 `src/lib/content.ts` 读取真实 Starter / Max 月价，并从可见 FAQ 和步骤构建 JSON-LD。新工具页的结构化数据与可见正文使用同一份内容。
+- `scripts/seo/effect-content.mjs` 保存原样提示词、社区案例、作者链接和核实过的原帖日期。相关案例与精确效果预览有明确区分。外部视频 CDN 可用性需要定期人工复核。
+- `public/llms.txt` 是简版入口；`public/llms-full.txt` 在构建时从首页英文正文、八个效果说明与八条 FAQ 重新生成。第三方用户案例卡片的原始投稿不混入产品正文语料。
+- `public/og/` 的 11 张 PNG 随普通构建复制到 `dist/`。更新标题后可运行 `node scripts/generate-og.mjs`；需本地 Chrome/Chromium，可用 `CHROME_PATH` 指定。脚本使用现有字体，不新增依赖，也不属于部署构建步骤。
+- `public/sitemap.xml` 列出 23 个 URL；内容更新时维护对应 `lastmod`。首页、pricing、examples、effects 为 weekly，其余为 monthly。`robots.txt` 保持原样。
+
+复验：
+
+```sh
+npm run check
+npm test
+npm run build
+npx wrangler dev --local --port 8790 --inspector-port 9240
+# 另开终端
+node scripts/audit-seo.mjs http://127.0.0.1:8790
+```
+
+验收详情和外部测试限制见 [SEO 验收记录](docs/seo/acceptance.md)。Google Rich Results Test 的实际结果、Lighthouse 和 HTTP 结果分别记录，不能把 Schema.org 标记存在、搜索引擎展示资格和实际收录混为一谈。
+
+后续维护约束：
+
+- 不再擅自更改品牌或现有页面 slug。`Claude Motion Video` 与 Anthropic 的品牌重名风险属于产品决策，本次不处理；保留独立产品声明。
+- 不添加 hreflang 或空的多语言标签；当前站点仍为英文。
+- 不添加 noindex 之外的 robots meta，不更改现有允许抓取的 robots.txt。
+- 不把正文放入 aria-hidden 或隐藏 div 来伪装 AI 可读内容，不编造评分、评论数或用户数。
+- 合并并部署后，由负责人在 GSC 提交 sitemap、请求收录，再观察 2–4 周；本次代码交付不代替收录或排名验证。

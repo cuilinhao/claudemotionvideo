@@ -1,11 +1,15 @@
 import {escapeHtml as e, metadata, jsonLd, faqSchema, howToSchema} from './shared.mjs';
 import {effectRoutes} from './effect-routes.mjs';
+import {breadcrumb, socialImage} from './navigation.mjs';
 export function pageShell(source, page, body, schemas=[]) {
-  const main = `<main class="seo-page" id="main-content">${body}</main>`;
+  const crumbs = breadcrumb(page);
+  const main = `<main class="seo-page" id="main-content">${crumbs.html}${body}</main>`;
   let html = source.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, '').replace(/<main\b[^>]*>[\s\S]*?<\/main>/, main);
   if (!html.includes(main)) throw new Error('Page shell must contain a main element');
-  html = metadata(html, page);
-  return html.replace('</head>', `<link rel="stylesheet" href="/seo.css">${schemas.map(jsonLd).join('')}</head>`);
+  // Community video CDN rejects cross-origin Referer; preserve referrers within this site.
+  html = html.replace(/<meta\b(?=[^>]*name=["']referrer["'])[^>]*>/gi, '').replace('<head>', '<head><meta name="referrer" content="same-origin">');
+  html = socialImage(metadata(html, page), page.path.split('/').at(-1), page.h1);
+  return html.replace('</head>', `<link rel="stylesheet" href="/seo.css">${[...schemas,crumbs.schema].map(jsonLd).join('')}</head>`);
 }
 export const effectLinks = (exclude) => `<ul class="seo-effect-links">${effectRoutes.filter(x=>x.slug!==exclude).map(x=>`<li><a href="/effects/${x.slug}">${e(x.name)}</a></li>`).join('')}</ul>`;
 export function renderToolPage(source, page) {
