@@ -3,6 +3,7 @@ import { refillAnnualSubscribers } from './billing';
 import { recoverStaleJobs } from './workflow-runner';
 import { recoverStaleSpeech } from './audio';
 import type { Env } from './types';
+import { applyPageSeo } from './seo';
 export { GenerationWorkflow } from './workflow';
 
 export default {
@@ -13,7 +14,7 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
     if (url.pathname.startsWith('/api/')) return app.fetch(request, env, context);
-    const response = await env.ASSETS.fetch(request);
+    const response = await applyPageSeo(await env.ASSETS.fetch(request), url);
     const headers = new Headers(response.headers);
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');

@@ -1193,6 +1193,10 @@ export function LegalPage({
           "Your choices",
           "You can request account deletion or contact us with privacy questions. We use the minimum information needed to provide the service and maintain billing records.",
         ],
+        [
+          "Website analytics",
+          "We use Google Analytics to understand visits to our public pages and studio. Google Analytics uses cookies and processes device, browser and page-visit information. Our page-view tracking removes URL query strings and fragments and does not send your prompts, uploaded files, account email or password-reset tokens. Advertising personalization and Google signals are disabled. You can block analytics through your browser settings or extensions.",
+        ],
       ],
     },
     refund: {

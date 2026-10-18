@@ -112,6 +112,19 @@ Webhook 使用 Stripe API 版本 `2026-09-30.endive`，订阅事件：`checkout.
 
 ## 部署
 
+### Google Search Console 与 GA4
+
+- Google 管理账号：`cuilinhao2021@gmail.com`；GSC 使用网域资源 `sc-domain:claudemotionvideo.com`，通过 Cloudflare 根域 TXT 记录验证。保留 `google-site-verification` DNS 记录，不需要 HTML 验证标签。
+- GA4 媒体资源：`Claude Motion Video`（`559448575`）；网站数据流：`Claude Motion Video Web`（`16152482999`）；衡量 ID：`G-WCHJ4QL736`。报告时区为中国时间，币种为 USD。已与上述 GSC 网域资源建立关联。
+- `.env.production` 只保存公开的 `VITE_GA_MEASUREMENT_ID`，由 Vite 在构建时内嵌；它不是服务端密钥。修改后必须重新构建部署，单独设置 Worker Secret 不会改变前端。置空可停用统计。
+- 只在生产构建的 HTTPS 正式域名加载 GA。首次访问及 SPA 路径切换手动发送 `page_view`，连续相同路径去重；本地开发、重置密码页和未知路径不统计。上报 URL 去掉查询参数与片段，标题来自固定页面列表，不传提示词、邮箱、项目内容或重置令牌。
+- GA4 网站数据流的**增强型衡量功能保持关闭**，避免自动历史事件重复计数，以及表单、下载、站内搜索自动采集参数。代码同时设置 `send_page_view: false`，关闭 Google signals 与广告个性化。
+- Sitemap：`https://claudemotionvideo.com/sitemap.xml`，包含 13 个现有公开页面。Worker 为各公开页面输出对应 canonical，为工作台、重置密码和未知 HTML 页面加 `X-Robots-Tag: noindex`。
+
+2026-10-18 已部署并验收：GSC 所有权验证成功，sitemap 显示成功并发现 13 个页面。正式站 GA 脚本返回 200，页面浏览采集返回 204；首页 → Pricing → Examples → 后退各记录一次浏览。携带测试 prompt/token 的 Studio URL 上报为不含参数的 `/studio`，直接访问重置密码页不加载 GA。部署前 19 个测试文件、161 个测试及类型检查/构建通过。对应 Cloudflare 版本 `bc6a0e69-43b8-4dfb-ad65-671a06694a78`，截图证据位于 `RECON/screenshots/gsc-*.png` 和 `RECON/screenshots/ga4-*.png`。Search Console 抓取成功不等同于全部网页已经收录。
+
+### Cloudflare 发布
+
 先确认 Cloudflare 登录账号、D1/R2/Workflow 绑定、邮件发送权限、APIMart key、Stripe 环境和 Price ID 映射，再执行：
 
 ```sh

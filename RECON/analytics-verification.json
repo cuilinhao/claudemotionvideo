@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-18",
+  "site": "https://claudemotionvideo.com",
+  "googleAccount": "cuilinhao2021@gmail.com",
+  "ga4": {
+    "propertyId": "559448575",
+    "streamId": "16152482999",
+    "measurementId": "G-WCHJ4QL736",
+    "enhancedMeasurement": false,
+    "scriptStatus": 200,
+    "collectStatus": 204,
+    "observedPageViews": ["/", "/pricing", "/examples", "/pricing"],
+    "spaDuplicatePageViews": false,
+    "studioTestQueryAndHashLeaked": false,
+    "resetPasswordGoogleRequests": 0,
+    "realtimeVerified": { "activeUsers": 1, "pageViews": 6, "traffic": "integration verification visits" },
+    "searchConsoleLinked": true
+  },
+  "gsc": {
+    "property": "sc-domain:claudemotionvideo.com",
+    "ownershipVerification": "verified via DNS TXT",
+    "sitemap": "https://claudemotionvideo.com/sitemap.xml",
+    "sitemapStatus": "success",
+    "discoveredPages": 13,
+    "indexingStatus": "not yet verified"
+  },
+  "deployment": {
+    "versionId": "bc6a0e69-43b8-4dfb-ad65-671a06694a78",
+    "preDeploymentTests": { "files": 19, "passed": 161 },
+    "typeCheck": "passed",
+    "build": "passed"
+  },
+  "httpChecks": {
+    "pricingCanonical": "https://claudemotionvideo.com/pricing",
+    "blogCanonical": "https://claudemotionvideo.com/blogs/writing-a-motion-brief",
+    "studioRobotsHeader": "noindex",
+    "resetPasswordRobotsHeader": "noindex",
+    "sitemapStatus": 200,
+    "sitemapUrls": 13
+  }
+}

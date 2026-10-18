@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /studio
-Disallow: /reset-password
+# Private app routes return X-Robots-Tag: noindex; allow crawlers to read it.
 Sitemap: https://claudemotionvideo.com/sitemap.xml
