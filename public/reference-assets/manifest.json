@@ -5,8 +5,9 @@
     {
       "path": "/reference-assets/app.js",
       "sourceUrl": "https://tellcut.app/app.js",
-      "bytes": 6371,
-      "sha256": "1eb8ff8a463216d758534e210d58793b97a510147d211952b39bd9ba2d1af4e7"
+      "bytes": 11630,
+      "sha256": "ad47af11f14844ed1cc68d31ffc0db455c4a32f078c766f95da4e34d6c3bbf58",
+      "localChanges": "Native inline example player, cached media map, request and playback lifecycle handling."
     },
     {
       "path": "/reference-assets/data/examples.json",
@@ -3403,6 +3404,12 @@
       "sourceUrl": "https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark",
       "bytes": 32790,
       "sha256": "9ee5769aae73b63f361f8da4cdbb96847b90d16967cee261a708cb0064d008cf"
+    },
+    {
+      "path": "/reference-assets/data/example-media.json",
+      "generatedFrom": "https://api.fxtwitter.com/2/status/{exampleId}",
+      "bytes": 99553,
+      "sha256": "6b4da179ea6d6df186a5c00af17b64536c386c8853690eef10bdc5ca54443193"
     }
   ],
   "urlMap": {
@@ -3974,7 +3981,7 @@
     "https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap": "/reference-assets/fonts/baloo-2.css",
     "https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=launched&theme=dark": "/reference-assets/external/fazier.com/api/v1/public/badges/launch_badges--537d069825.svg"
   },
-  "externalAuthorAttribution": "Preserved in data/examples.json; every example links to its original creator on X.",
+  "externalAuthorAttribution": "Creator names and original X post links are preserved; public examples play in the site via the original video CDN.",
   "excludedBusinessBundles": [
     "AccountMenu",
     "account",

@@ -194,6 +194,31 @@ html:root .site-body .cmv-account-page .panel { border-radius: 16px; padding: 28
 dialog.modal, html:root .site-body dialog.modal, .signin-page { border-radius: 16px; background: var(--bg); border-color: var(--line); box-shadow: 0 24px 100px #14141330; }
 dialog.modal::backdrop, dialog.small-dialog::backdrop { background: #171713b0; }
 html:root .site-body .modal-close { border-radius: 50%; background: var(--bg); }
+/* Inline example playback keeps the media ratio and controls inside the dialog. */
+#example-dlg .ex-video { flex-shrink: 0; }
+#example-dlg .ex-player { color-scheme: dark; }
+#example-dlg .ex-player-status,
+#example-dlg .ex-player-error {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 12px;
+  min-height: 160px;
+  padding: 24px;
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-2);
+  text-align: center;
+  font: 400 15px/1.5 var(--display);
+}
+#example-dlg .ex-player-status[hidden],
+#example-dlg .ex-player-error[hidden] { display: none; }
+#example-dlg .ex-video > :is(.ex-player-status, .ex-player-error) {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+}
+#example-dlg .ex-player-error .btn { background: var(--ink); color: var(--bg); }
 .signin-form .signin-title { font: 400 36px/1.15 var(--serif); letter-spacing: -.03em; }
 html:root .site-body .signin-email input, html:root .site-body .chat-email, html:root .site-body .chat-label textarea { border-radius: 8px; background: var(--bg); border: 1px solid var(--line); }
 html:root .site-body .signin-email input { padding: 12px 14px; }

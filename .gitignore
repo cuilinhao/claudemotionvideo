@@ -11,3 +11,4 @@ RECON/source/
 .DS_Store
 *.tsbuildinfo
 RECON/private/
+RECON/example-media-cache/

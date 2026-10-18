@@ -105,6 +105,9 @@ async function inspectJsSource(text, file) {
 
 async function inspectHtml(file, route) {
   const html = await readFile(file, 'utf8');
+  if (/data-id="\d+"/.test(html) && !/<meta\b[^>]*name="referrer"[^>]*content="(?:same-origin|no-referrer)"/i.test(html)) {
+    fail(`${route}: inline video pages must omit the cross-origin Referer required by the media CDN`);
+  }
   if (/umami\.mcpgood\.com|G-Z658WTJCB4|90324e5e-d536-4777-aeab-c43672adf0e9/i.test(html)) {
     fail(`${route}: original Umami/Google tracking remains`);
   }
@@ -241,6 +244,26 @@ async function checkExamplesAndEffects() {
     try { await stat(localFile(example.poster)); }
     catch { fail(`Example ${example.id ?? '(unknown)'} poster file is missing: ${example.poster}`); }
   }
+
+  // Playback is resolved ahead of time; visitors only fetch this same-origin map.
+  let media = {};
+  try { media = JSON.parse(await readFile(path.join(dist, 'reference-assets/data/example-media.json'), 'utf8')); }
+  catch { fail('Missing or invalid reference-assets/data/example-media.json'); }
+  for (const [id, item] of Object.entries(media)) {
+    if (!Object.hasOwn(exampleData, id)) fail(`Video source has no matching example: ${id}`);
+    try {
+      const url = new URL(item.url);
+      if (url.protocol !== 'https:' || url.hostname !== 'video.twimg.com' || url.port || url.username || url.password || !url.pathname.endsWith('.mp4') || item.type !== 'video/mp4') {
+        fail(`Example ${id} has an unsupported video source`);
+      }
+    } catch { fail(`Example ${id} has an invalid video source URL`); }
+    if (!(Number.isFinite(item.width) && item.width > 0 && Number.isFinite(item.height) && item.height > 0)) {
+      fail(`Example ${id} has invalid video dimensions`);
+    }
+  }
+  const missingMedia = examples.filter(example => !Object.hasOwn(media, example.id));
+  if (missingMedia.length) fail(`Missing inline video sources for ${missingMedia.length} examples: ${missingMedia.map(example => example.id).join(', ')}`);
+  console.log(`Inline video sources: ${Object.keys(media).length}/${examples.length} examples.`);
 
   let ticker;
   const assets = path.join(dist, 'reference-assets/_astro');

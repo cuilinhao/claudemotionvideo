@@ -1,5 +1,15 @@
 # Claude Motion Video — 界面与发布记录
 
+## 2026-10-18：示例视频站内播放
+
+- 用户要求示例点击后在本站观看。首页、Examples 和 Opus 5.5 专题页共用的弹窗已改为原生 MP4 播放器，提供播放/暂停、进度、声音和全屏控件，保留提示词、复制、创作入口及作者署名。
+- 470 条示例对应的视频源清单位于 `public/reference-assets/data/example-media.json`。视频按需直接从作者原视频 CDN `video.twimg.com` 加载，不打开 X 页面、不加载 X iframe；这些视频没有复制进本站 R2。访客不依赖实时第三方解析请求。
+- 来源由 FxEmbed 公共 API v2 解析，按海报 media ID 匹配对应视频，选 H.264 MP4、优先短边不超过 720px。维护命令：`node scripts/sync-example-media.mjs`；`--refresh` 强制刷新全部来源，`--retry-failed` 重试失败项。解析缓存仅保存在 git 忽略的 `RECON/example-media-cache/`。
+- 实播发现源 CDN 对带本站 Referer 的 GET 返回 403，而不带 Referer 的 Range GET 返回 206。仅三个有示例卡片的模板采用 `meta referrer=same-origin`，保持同源来源信息、对外不发送 Referer；未修改 worker 或 CSP。
+- 关闭、Esc 和离开页面均暂停并卸载播放源；加载失败可站内重试；异步响应及播放 promise 不会复活已关闭的旧视频。优先尝试带声音播放，浏览器拒绝自动播放时保留原生播放控件，不强制静音。
+- 已完成类型检查、268 项测试（含 18 项播放器行为回归与 14 项来源同步回归）及构建审计。审计要求 470 个视频源全部存在、URL 和尺寸有效，且播放页面使用兼容 CDN 的 referrer 策略。
+- 浏览器已实播横屏、方形、竖屏及 306 秒带 AAC 音轨的示例；验证暂停、关闭/Esc 清理、手机 390px 无横向溢出及首页/列表页面不发生站外导航。证据位于 `RECON/screenshots/inline-examples/`，来源实际 Range 请求结果见 `RECON/example-media-sync.json`。
+
 ## 2026-10-18：Claude Motion 视觉主题
 
 - 用户要求参考 `https://claudemontiondesignskills.org/`，并先查看 `/Users/pgy/Desktop/claudemotion` 源码；保留本站功能、品牌、页面内容和视频素材。
