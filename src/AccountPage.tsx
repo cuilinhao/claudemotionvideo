@@ -1,0 +1,23 @@
+import { useEffect, useRef, useState } from 'react';
+import { api, type User } from './lib/api';
+
+export function AccountPage({user, onAuth}: {user: User|null; onAuth:()=>void}) {
+  const paid = ['starter','pro','max'].includes(user?.plan ?? '');
+  const [ledger,setLedger]=useState<{amount:number;reason:string;createdAt:string}[]>([]);
+  const [ledgerOwner,setLedgerOwner]=useState('');
+  const visibleLedger=user?.id===ledgerOwner?ledger:[];
+  const [error,setError]=useState('');const [busy,setBusy]=useState(false);
+  useEffect(()=>{let live=true;setLedger([]);setError('');setLedgerOwner('');if(user)void api.credits().then(r=>{if(live){setLedger(r.ledger);setLedgerOwner(user.id);}}).catch(e=>{if(live){setError(e.message);setLedgerOwner(user.id);}});return()=>{live=false;};},[user?.id]);
+  async function portal(){setBusy(true);setError('');try{location.assign((await api.portal()).url);}catch(e){setError(e instanceof Error?e.message:'Could not open billing.');setBusy(false);}}
+  return <main className="wrap account cmv-account-page"><div className="page-head"><h1>Account and credits</h1><p>Your plan, credits and billing, all in one place.</p></div>{user?<><div className="acct-cards"><section className="panel"><p className="mono muted">Account</p><h2 style={{fontSize:20,overflowWrap:'anywhere'}}>{user.email}</h2><p className="muted">{paid?`${user.plan!.charAt(0).toUpperCase()}${user.plan!.slice(1)} plan`:'No plan yet'}</p><div className="acct-actions">{paid?<button className="btn small" disabled={busy} onClick={()=>void portal()}>{busy?'Opening…':'Manage billing'}</button>:<a className="btn small primary" href="/pricing">Choose a plan</a>}<a className="btn small" href="/my-videos">My videos</a></div></section><section className="panel"><p className="mono muted">Credits available</p><div className="number">{user.credits.toLocaleString('en-US')}</div><p className="muted">Credits are used when you generate or edit a video.</p><div className="acct-actions"><a className="btn small primary" href="/studio">Make a video</a><a className="btn small" href="/pricing">View plans</a></div></section></div><section className="account-history"><h2>Credit history</h2>{ledgerOwner!==user.id?<p className="muted">Loading credit history…</p>:visibleLedger.length?<table className="log"><thead><tr><th>Date</th><th>Activity</th><th>Credits</th></tr></thead><tbody>{visibleLedger.map((entry,i)=><tr key={`${entry.createdAt}-${i}`}><td>{new Date(entry.createdAt).toLocaleDateString('en-US')}</td><td>{entry.reason.replace(/_/g,' ')}</td><td>{entry.amount>0?'+':''}{entry.amount.toLocaleString('en-US')}</td></tr>)}</tbody></table>:<p className="muted">No credit activity yet.</p>}</section></>:<div className="videos-empty"><p>Sign in to see your account and credits.</p><button className="btn primary" onClick={onAuth}>Sign in</button></div>}{error&&<p className="error" role="alert">{error}</p>}</main>;
+}
+
+export function MagicLinkPage({onDone,onAuth}: {onDone:(user:User)=>void;onAuth:()=>void}) {
+  const started=useRef(false);const [message,setMessage]=useState('Signing you in…');
+  useEffect(()=>{if(started.current)return;started.current=true;const token=new URLSearchParams(location.hash.slice(1)).get('token');
+    if(!token){setMessage('Sign in to keep your credits and pick up where you left off.');onAuth();return;}
+    history.replaceState(null,'',location.pathname);
+    void api.consumeMagicLink(token).then(result=>{onDone(result.user);const path=result.redirect;location.assign(path.startsWith('/')&&!path.startsWith('//')?path:'/studio');}).catch(e=>setMessage(e instanceof Error?e.message:'This sign-in link could not be used.'));
+  },[onDone,onAuth]);
+  return <main className="wrap"><div className="page-head"><h1>Sign in</h1><p role="status">{message}</p><button type="button" className="btn primary" onClick={onAuth}>Sign in</button></div></main>;
+}

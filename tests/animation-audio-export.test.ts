@@ -81,4 +81,15 @@ describe('MP4 audio export', () => {
     const { iframe, audio } = fixture();
     await expect(exportMp4(iframe, { channel: 'test-channel', duration: 10, aspect: '16:9', audio })).rejects.toThrow(/audio.*duration|prepare.*audio/i);
   });
+  it('stops an export on request, cancels its muxer, and allows the same preview to export again', async () => {
+    const { iframe } = fixture();
+    const controller = new AbortController();
+    await expect(exportMp4(iframe, { channel: 'test-channel', duration: .1, aspect: '16:9', signal: controller.signal,
+      onProgress: progress => { if (progress > 0) controller.abort(); },
+    })).rejects.toThrow(/stop|abort/i);
+    expect(state.events).toContain('cancel');
+    expect(state.events).not.toContain('finalize');
+    expect(state.events.filter(event => event.startsWith('video:'))).toHaveLength(1);
+    await expect(exportMp4(iframe, { channel: 'test-channel', duration: .1, aspect: '16:9' })).resolves.toBeInstanceOf(Blob);
+  });
 });

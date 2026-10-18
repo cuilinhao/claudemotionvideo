@@ -4,6 +4,12 @@ export function isPreviewMessage(event: MessageEvent, source: Window | null, cha
     && event.data.channel === channel && typeof event.data.type === 'string' && event.data.type.startsWith('cmv:');
 }
 
+/** Source is data for a text editor. Never package model code as a top-level
+ * executable HTML download or inject the user's private preview asset bytes. */
+export function createAnimationSourceDownload(html: string): { blob: Blob; filename: string } {
+  return { blob: new Blob([html], { type: 'text/plain;charset=utf-8' }), filename: 'claude-motion-video-source.txt' };
+}
+
 export function videoDimensions(aspect: string): { width: number; height: number } {
   if (aspect === '16:9') return { width: 1920, height: 1080 };
   if (aspect === '9:16') return { width: 1080, height: 1920 };
@@ -24,8 +30,21 @@ function scriptJson(value: unknown): string {
  * access to the application's origin, cookies, storage or network resources.
  */
 export function buildPreviewDocument(html: string, assets: Record<string, string>, channel: string): string {
+  return buildIsolatedDocument(html, assets, channel, 4, 180_000);
+}
+
+/** Only the bundled, source-audited example may use its six fixed cutout assets. */
+export function buildTrustedDemoDocument(html: string, assets: Record<string, string>, channel: string): string {
+  const ids = ['a1', 'a1_title', 'a1_wheel', 'a1_pointer_hub', 'a1_free_spin_btn', 'a1_coin_counter'];
+  if (Object.keys(assets).length !== ids.length || ids.some(id => !Object.hasOwn(assets, id))) {
+    throw new Error('The example assets are incomplete or invalid.');
+  }
+  return buildIsolatedDocument(html, assets, channel, 6, 1_500_000);
+}
+
+function buildIsolatedDocument(html: string, assets: Record<string, string>, channel: string, maxAssets: number, maxHtml: number): string {
   if (!/^[\w-]{8,128}$/.test(channel)) throw new Error('Invalid preview channel.');
-  if (typeof html !== 'string' || html.length > 180_000 || !/<canvas\b[^>]*\bid\s*=\s*["']stage["']/i.test(html)) {
+  if (typeof html !== 'string' || html.length > maxHtml || !/<canvas\b[^>]*\bid\s*=\s*["']stage["']/i.test(html)) {
     throw new Error('This version does not contain a valid animation canvas.');
   }
   if (/<(?:iframe|object|embed|base|form|link)\b/i.test(html) || /<script\b[^>]*\bsrc\s*=/i.test(html)
@@ -34,7 +53,7 @@ export function buildPreviewDocument(html: string, assets: Record<string, string
     throw new Error('This animation contains unsupported external resources.');
   }
   const safeAssets: Record<string, string> = Object.create(null);
-  if (Object.keys(assets).length > 4) throw new Error('Too many preview assets.');
+  if (Object.keys(assets).length > maxAssets) throw new Error('Too many preview assets.');
   for (const [id, url] of Object.entries(assets)) {
     if (!/^[\w-]{1,128}$/.test(id) || typeof url !== 'string' || url.length > 11_200_000
       || !/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(url)) {
@@ -142,8 +161,10 @@ function requestFrame(iframe: HTMLIFrameElement, channel: string, exportId: stri
 
 /** Render exact video timestamps and optionally mux the prepared preview mix as AAC. */
 export async function exportMp4(iframe: HTMLIFrameElement, options: {
-  channel: string; duration: number; aspect: string; audio?: AudioBuffer; onProgress?: (progress: number) => void;
+  channel: string; duration: number; aspect: string; audio?: AudioBuffer; signal?: AbortSignal; onProgress?: (progress: number) => void;
 }): Promise<Blob> {
+  const checkStopped = () => { if (options.signal?.aborted) throw new DOMException('Video export stopped.', 'AbortError'); };
+  checkStopped();
   if (!Number.isFinite(options.duration) || options.duration <= 0 || options.duration > 30) throw new Error('Invalid video duration.');
   if (!iframe.sandbox.contains('allow-scripts') || iframe.sandbox.contains('allow-same-origin')) {
     throw new Error('The animation preview must run in an isolated sandbox.');
@@ -167,6 +188,7 @@ export async function exportMp4(iframe: HTMLIFrameElement, options: {
   if (audio && !await canEncodeAudio('aac', { numberOfChannels: audio.numberOfChannels, sampleRate: audio.sampleRate, quality: audioQuality })) {
     throw new Error('This browser cannot encode AAC audio for MP4. Try the latest Chrome or Edge on a device with AAC encoding support.');
   }
+  checkStopped();
   const canvas = document.createElement('canvas');
   canvas.width = width; canvas.height = height;
   const context = canvas.getContext('2d', { alpha: false });
@@ -186,6 +208,7 @@ export async function exportMp4(iframe: HTMLIFrameElement, options: {
   try {
     options.onProgress?.(0);
     await output.start();
+    checkStopped();
     if (audioSource && audio) {
       // AudioBufferSource starts at timestamp zero. Closing the whole short track
       // lets the muxer flush it as frames arrive, without recording in real time.
@@ -194,10 +217,12 @@ export async function exportMp4(iframe: HTMLIFrameElement, options: {
     }
     const count = Math.round(options.duration * 30);
     for (let index = 0; index < count; index++) {
+      checkStopped();
       if (!iframe.isConnected) throw new Error('The preview was closed during export.');
       const frame = await requestFrame(iframe, options.channel, exportId, index / 30);
       context.fillStyle = '#08090b'; context.fillRect(0, 0, width, height);
       try {
+        checkStopped();
         if (frame.bitmap) {
           context.drawImage(frame.bitmap, 0, 0, width, height);
         } else if (frame.pixels instanceof Uint8ClampedArray && frame.pixels.length === frame.width * frame.height * 4) {
@@ -212,6 +237,7 @@ export async function exportMp4(iframe: HTMLIFrameElement, options: {
       } finally { frame.bitmap?.close(); }
       options.onProgress?.((index + 1) / count * 0.97);
     }
+    checkStopped();
     video.close();
     await output.finalize();
     if (!target.buffer?.byteLength) throw new Error('No MP4 data was produced.');

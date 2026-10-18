@@ -28,8 +28,8 @@ export async function resetPassword(db: D1Database, token: string, password: str
   if (!/^[a-f0-9]{64}$/.test(token) || password.length < 10 || password.length > 128) throw new ApiError(400, 'Enter a valid reset token and a password between 10 and 128 characters.');
   const tokenHash = await digest(token); const hash = await hashPassword(password);
   const results = await db.batch([
-    db.prepare('UPDATE users SET password_hash=? WHERE id=(SELECT user_id FROM password_resets WHERE token_hash=? AND expires_at>? AND consumed_at IS NULL)')
-      .bind(hash, tokenHash, now),
+    db.prepare('UPDATE users SET password_hash=?,email_verified_at=COALESCE(email_verified_at,?) WHERE id=(SELECT user_id FROM password_resets WHERE token_hash=? AND expires_at>? AND consumed_at IS NULL)')
+      .bind(hash, now, tokenHash, now),
     db.prepare('DELETE FROM sessions WHERE user_id=(SELECT user_id FROM password_resets WHERE token_hash=? AND expires_at>? AND consumed_at IS NULL)')
       .bind(tokenHash, now),
     db.prepare('UPDATE password_resets SET consumed_at=? WHERE user_id=(SELECT user_id FROM password_resets WHERE token_hash=? AND expires_at>? AND consumed_at IS NULL) AND consumed_at IS NULL')

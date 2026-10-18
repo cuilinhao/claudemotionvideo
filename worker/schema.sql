@@ -1,7 +1,7 @@
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS users (
-  id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE COLLATE NOCASE, password_hash TEXT NOT NULL,
+  id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE COLLATE NOCASE, password_hash TEXT NOT NULL, email_verified_at INTEGER,
   credits INTEGER NOT NULL DEFAULT 0 CHECK(credits >= 0), plan TEXT NOT NULL DEFAULT 'free',
   monthly_credits INTEGER NOT NULL DEFAULT 0, subscription_status TEXT NOT NULL DEFAULT 'none',
   stripe_customer_id TEXT UNIQUE, subscription_id TEXT, subscription_interval TEXT,
@@ -94,3 +94,27 @@ CREATE INDEX IF NOT EXISTS speech_requests_status ON speech_requests(status,upda
 CREATE TRIGGER IF NOT EXISTS speech_project_guard BEFORE INSERT ON speech_requests
 WHEN NOT EXISTS(SELECT 1 FROM projects WHERE id=NEW.project_id AND user_id=NEW.user_id)
 BEGIN SELECT RAISE(ABORT, 'PROJECT_NOT_FOUND'); END;
+CREATE TABLE IF NOT EXISTS magic_links (
+  token_hash TEXT PRIMARY KEY, email TEXT NOT NULL COLLATE NOCASE,
+  callback_path TEXT NOT NULL, expires_at INTEGER NOT NULL,
+  consumed_at INTEGER, created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS magic_links_expiry ON magic_links(expires_at);
+CREATE TABLE IF NOT EXISTS support_messages (
+  id TEXT PRIMARY KEY, user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  email TEXT NOT NULL, body TEXT NOT NULL, page TEXT NOT NULL,
+  status TEXT NOT NULL CHECK(status IN ('pending','sent','failed')),
+  provider_message_id TEXT, created_at TEXT NOT NULL, sent_at TEXT
+);
+CREATE INDEX IF NOT EXISTS support_messages_created ON support_messages(created_at);
+CREATE TABLE IF NOT EXISTS google_oauth_states (
+  state_hash TEXT PRIMARY KEY, code_verifier TEXT NOT NULL, nonce TEXT NOT NULL, callback_path TEXT NOT NULL,
+  expires_at INTEGER NOT NULL, consumed_at INTEGER, created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS google_oauth_states_expiry ON google_oauth_states(expires_at);
+CREATE TABLE IF NOT EXISTS oauth_identities (
+  provider TEXT NOT NULL, provider_subject TEXT NOT NULL,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at INTEGER NOT NULL, PRIMARY KEY(provider,provider_subject), UNIQUE(provider,user_id)
+);
+CREATE INDEX IF NOT EXISTS oauth_identities_user ON oauth_identities(user_id);

@@ -1,0 +1,148 @@
+{
+  "tablet": [
+    {
+      "route": "/pricing",
+      "broken": 0,
+      "h1": "Pricing",
+      "scrollWidth": 768,
+      "title": "Opus 5.5 Video Generator Pricing: Plans and Credits",
+      "width": 768
+    },
+    {
+      "route": "/effects",
+      "broken": 0,
+      "h1": "Opus 5.5 video effects",
+      "scrollWidth": 768,
+      "title": "Opus 5.5 Video Effects: 21 Motion Effects and the Prompts That Get Them",
+      "width": 768
+    },
+    {
+      "route": "/blogs",
+      "broken": 0,
+      "h1": "Making videos with Claude Opus 5.5",
+      "scrollWidth": 768,
+      "title": "Blog: Guides and Notes on Making Videos with Claude Opus 5.5 · Claude Motion Video",
+      "width": 768
+    },
+    {
+      "route": "/blogs/opus-5-5-video-prompt-guide",
+      "broken": 0,
+      "h1": "How to Write Opus 5.5 Video Prompts That Don't Look Generic",
+      "scrollWidth": 768,
+      "title": "How to Write Opus 5.5 Video Prompts That Don't Look Generic · Claude Motion Video",
+      "width": 768
+    },
+    {
+      "route": "/blogs/opus-5-5-video-examples",
+      "broken": 0,
+      "h1": "Opus 5.5 Video Examples: 13 Real Videos and the Prompts Behind Them",
+      "scrollWidth": 768,
+      "title": "Opus 5.5 Video Examples: 13 Real Videos and the Prompts Behind Them · Claude Motion Video",
+      "width": 768
+    },
+    {
+      "route": "/opus-5-5-video-generator",
+      "broken": 0,
+      "h1": "Opus 5.5 Video Generator",
+      "scrollWidth": 768,
+      "title": "Opus 5.5 Video Generator: Make Videos with Claude Opus 5.5 | Claude Motion Video",
+      "width": 768
+    },
+    {
+      "route": "/featured",
+      "broken": 0,
+      "h1": "Featured on",
+      "scrollWidth": 768,
+      "title": "Featured On · Claude Motion Video",
+      "width": 768
+    },
+    {
+      "route": "/contact",
+      "broken": 0,
+      "h1": "Contact us",
+      "scrollWidth": 768,
+      "title": "Contact Us · Claude Motion Video",
+      "width": 768
+    },
+    {
+      "route": "/terms",
+      "broken": 0,
+      "h1": "Terms of Service",
+      "scrollWidth": 768,
+      "title": "Terms of Service · Claude Motion Video",
+      "width": 768
+    },
+    {
+      "route": "/privacy",
+      "broken": 0,
+      "h1": "Privacy Policy",
+      "scrollWidth": 768,
+      "title": "Privacy Policy · Claude Motion Video",
+      "width": 768
+    },
+    {
+      "route": "/refunds",
+      "broken": 0,
+      "h1": "Refund Policy",
+      "scrollWidth": 768,
+      "title": "Refund Policy · Claude Motion Video",
+      "width": 768
+    }
+  ],
+  "mobile": [
+    {
+      "route": "/",
+      "broken": 0,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "route": "/pricing",
+      "broken": 0,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "route": "/examples",
+      "broken": 0,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "route": "/effects",
+      "broken": 0,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "route": "/blogs",
+      "broken": 0,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "route": "/contact",
+      "broken": 0,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "route": "/terms",
+      "broken": 0,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "route": "/privacy",
+      "broken": 0,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "route": "/refunds",
+      "broken": 0,
+      "scrollWidth": 390,
+      "width": 390
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+globalThis.process??={},globalThis.process.env??={};import{t as e}from"./effect-ticker.CCyLZTl6.js";document.querySelectorAll(`canvas[data-fx]`).forEach(t=>e(t,t.dataset.fx));

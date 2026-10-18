@@ -1,149 +1,95 @@
-import { useCallback, useEffect, useState } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
-import { AuthModal } from "./AuthModal";
-import {
-  ArticlePage,
-  BlogsPage,
-  EffectsPage,
-  ExamplesPage,
-  HomePage,
-  LegalPage,
-  NotFound,
-  PricingPage,
-  SiteLayout,
-} from "./Marketing";
-import { api, type User } from "./lib/api";
-import type { AuthMode } from "./lib/ui-types";
-import { StudioPage } from "./Studio";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import { AuthModal } from './AuthModal';
+import { FidelityLayout, SupportChat } from './FidelityChrome';
+import { AccountPage, MagicLinkPage } from './AccountPage';
+import { MyVideosPage } from './MyVideosPage';
+import { api, type User } from './lib/api';
+import type { AuthMode } from './lib/ui-types';
+import { StudioPage } from './Studio';
 
 export default function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [billingEnabled, setBillingEnabled] = useState(false);
-  const [authMode, setAuthMode] = useState<AuthMode | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [notice, setNotice] = useState("");
+  const [user,setUser] = useState<User|null>(null);
+  const [authMode,setAuthMode] = useState<AuthMode|null>(null);
+  const [notice,setNotice] = useState('');
+  const mounted = useRef(false);
+  const authEpoch = useRef(0);
+  const refreshRequest = useRef(0);
+  const logoutPending = useRef(false);
+  const noticeTimer = useRef<ReturnType<typeof setTimeout>|null>(null);
   const location = useLocation();
-
-  const refreshMe = useCallback(
-    () =>
-      api
-        .me()
-        .then((result) => {
-          setUser(result.user);
-          setBillingEnabled(result.billingEnabled);
-        })
-        .catch(() => {
-          setUser(null);
-          setBillingEnabled(false);
-        })
-        .finally(() => setLoading(false)),
-    [],
-  );
-
-  useEffect(() => {
+  const refreshMe = useCallback(async () => {
+    if (!mounted.current || logoutPending.current) return;
+    const epoch = authEpoch.current, request = ++refreshRequest.current;
+    try {
+      const result = await api.me();
+      if (mounted.current && epoch === authEpoch.current && request === refreshRequest.current) setUser(result.user);
+    } catch { /* Keep the last known account when the session cannot be checked. */ }
+  },[]);
+  const openAuth = useCallback(() => setAuthMode('login'),[]);
+  const signedIn = useCallback((next:User) => {
+    if (!mounted.current) return;
+    authEpoch.current++;
+    refreshRequest.current++;
+    logoutPending.current = false;
+    setUser(next);
     void refreshMe();
-  }, [refreshMe]);
-
+  },[refreshMe]);
   useEffect(() => {
-    function onKey(event: KeyboardEvent) {
-      if (
-        (event.metaKey || event.ctrlKey) &&
-        event.key.toLowerCase() === "n" &&
-        location.pathname === "/studio"
-      ) {
-        event.preventDefault();
-        window.dispatchEvent(new Event("cmv:new-project"));
-      }
-      if (event.key === "Escape") setAuthMode(null);
+    mounted.current = true;
+    void refreshMe();
+    const focus=()=>void refreshMe();
+    window.addEventListener('focus',focus);
+    return()=>{
+      mounted.current = false;
+      authEpoch.current++;
+      refreshRequest.current++;
+      logoutPending.current = false;
+      if (noticeTimer.current) clearTimeout(noticeTimer.current);
+      window.removeEventListener('focus',focus);
+    };
+  },[refreshMe]);
+  useEffect(() => {
+    document.body.classList.toggle('site-body',!location.pathname.startsWith('/studio'));
+    function onKey(event:KeyboardEvent) {
+      if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='n'&&location.pathname.startsWith('/studio')){event.preventDefault();window.dispatchEvent(new Event('cmv:new-project'));}
     }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (location.pathname === "/reset-password") setAuthMode("reset");
-  }, [location.pathname, location.hash]);
-
+    window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey);
+  },[location.pathname]);
+  useEffect(()=>{if(location.pathname==='/reset-password')setAuthMode('reset');},[location.pathname]);
   async function logout() {
+    if (!mounted.current || logoutPending.current) return;
+    const epoch = ++authEpoch.current;
+    refreshRequest.current++;
+    logoutPending.current = true;
     try {
       await api.logout();
-      setUser(null);
-      setNotice("You are signed out.");
+      if (mounted.current && epoch === authEpoch.current) setUser(null);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Could not sign out.");
+      if (!mounted.current || epoch !== authEpoch.current) return;
+      setNotice(error instanceof Error ? error.message : 'Could not sign out.');
+      if (noticeTimer.current) clearTimeout(noticeTimer.current);
+      noticeTimer.current = setTimeout(()=>setNotice(''),5000);
+      logoutPending.current = false;
+      void refreshMe();
+    } finally {
+      if (epoch === authEpoch.current) logoutPending.current = false;
     }
-    setTimeout(() => setNotice(""), 2500);
   }
-
-  const auth = (mode: AuthMode) => setAuthMode(mode);
-  const layout = (children: React.ReactNode) => (
-    <SiteLayout user={user} onAuth={auth} onLogout={() => void logout()}>
-      {children}
-    </SiteLayout>
-  );
-
-  return (
-    <div className="app-root">
-      {loading && (
-        <div className="boot-screen">
-          <span className="brand-mark">
-            <span />
-          </span>
-          <span>CLAUDE MOTION VIDEO</span>
-        </div>
-      )}
-      <Routes>
-        <Route
-          path="/"
-          element={layout(<HomePage user={user} onAuth={auth} />)}
-        />
-        <Route
-          path="/pricing"
-          element={layout(
-            <PricingPage
-              user={user}
-              onAuth={auth}
-              billingEnabled={billingEnabled}
-            />,
-          )}
-        />
-        <Route path="/examples" element={layout(<ExamplesPage />)} />
-        <Route path="/effects" element={layout(<EffectsPage />)} />
-        <Route path="/blogs" element={layout(<BlogsPage />)} />
-        <Route path="/blogs/:slug" element={layout(<ArticlePage />)} />
-        <Route
-          path="/studio"
-          element={
-            <StudioPage
-              user={user}
-              onAuth={auth}
-              onCredits={() => void refreshMe()}
-              onLogout={() => void logout()}
-            />
-          }
-        />
-        <Route path="/terms" element={layout(<LegalPage kind="terms" />)} />
-        <Route path="/privacy" element={layout(<LegalPage kind="privacy" />)} />
-        <Route path="/refund" element={layout(<LegalPage kind="refund" />)} />
-        <Route path="/contact" element={layout(<LegalPage kind="contact" />)} />
-        <Route
-          path="/reset-password"
-          element={layout(<HomePage user={user} onAuth={auth} />)}
-        />
-        <Route path="*" element={layout(<NotFound />)} />
-      </Routes>
-      {authMode && (
-        <AuthModal
-          mode={authMode}
-          onMode={setAuthMode}
-          onClose={() => setAuthMode(null)}
-          onDone={(nextUser) => {
-            setUser(nextUser);
-            void refreshMe();
-          }}
-        />
-      )}
-      {notice && <div className="toast">{notice}</div>}
-    </div>
-  );
+  const layout=(children:React.ReactNode)=><FidelityLayout user={user} onAuth={openAuth} onLogout={()=>void logout()}>{children}</FidelityLayout>;
+  const studio=<StudioPage user={user} onAuth={setAuthMode} onCredits={()=>void refreshMe()} onLogout={()=>void logout()}/>;
+  return <>
+    <Routes>
+      <Route path="/studio" element={studio}/>
+      <Route path="/studio/v/:id" element={studio}/>
+      <Route path="/my-videos" element={layout(<MyVideosPage user={user} onAuth={openAuth}/>)}/>
+      <Route path="/account" element={layout(<AccountPage user={user} onAuth={openAuth}/>)}/>
+      <Route path="/sign-in" element={layout(<MagicLinkPage onDone={signedIn} onAuth={openAuth}/>)}/>
+      <Route path="/reset-password" element={layout(<main className="wrap"><div className="page-head"><h1>Reset your password</h1><button className="btn primary" onClick={()=>setAuthMode('reset')}>Update password</button></div></main>)}/>
+      <Route path="*" element={layout(<main className="wrap"><div className="page-head"><p className="mono muted">404</p><h1>Page not found</h1><p>This page doesn't exist. Head back to the Studio to make something new.</p><a className="btn primary" href="/">Back home</a></div></main>)}/>
+    </Routes>
+    {authMode&&<AuthModal mode={authMode} onMode={setAuthMode} onClose={()=>setAuthMode(null)} onDone={signedIn}/>}
+    <SupportChat user={user}/>
+    {notice&&<div className="cmv-notice" role="status">{notice}</div>}
+  </>;
 }

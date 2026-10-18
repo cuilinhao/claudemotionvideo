@@ -31,6 +31,28 @@ describe('authenticated resource boundaries and durable job creation', () => {
     expect((await request('/api/auth/logout', { method: 'POST', headers: { Origin: 'https://evil.test' } })).status).toBe(403);
     expect((await request('/api/me')).status).toBe(200);
   });
+  it('renames only owned projects and rejects empty, oversized, or extra fields', async () => {
+    await env.DB.prepare("INSERT INTO projects (id,user_id,title,aspect,duration,created_at,updated_at) VALUES ('mine','alice','Old name','16:9',15,'2026-01-01','2026-01-01')").run();
+    const renamed = await request('/api/projects/mine', { method: 'PATCH', body: JSON.stringify({ title: '  New title  ' }) });
+    expect(renamed.status).toBe(200);
+    expect((await renamed.json()).project).toMatchObject({ id: 'mine', title: 'New title', aspect: '16:9', duration: 15 });
+    expect(await env.DB.prepare("SELECT updated_at FROM projects WHERE id='mine'").first('updated_at')).not.toBe('2026-01-01');
+    expect((await request('/api/projects/bobs', { method: 'PATCH', body: JSON.stringify({ title: 'Hijacked' }) })).status).toBe(404);
+    for (const body of [{ title: ' ' }, { title: 'x'.repeat(121) }, { title: 'Changed', user_id: 'bob' }, { title: 'Changed', duration: 30 }]) {
+      expect((await request('/api/projects/mine', { method: 'PATCH', body: JSON.stringify(body) })).status).toBe(400);
+    }
+    expect(await env.DB.prepare("SELECT title FROM projects WHERE id='mine'").first('title')).toBe('New title');
+    expect(await env.DB.prepare("SELECT title FROM projects WHERE id='bobs'").first('title')).toBe('Private');
+  });
+  it('lists the real version count and only marks an export on the latest version', async () => {
+    await env.DB.prepare("INSERT INTO projects (id,user_id,title,aspect,duration,latest_version_id,created_at,updated_at) VALUES ('mine','alice','Demo','16:9',15,'latest','2026-01-01','2026-01-01')").run();
+    await env.DB.prepare("INSERT INTO versions (id,project_id,user_id,html,storyboard,prompt,asset_ids,mp4_key,created_at) VALUES ('older','mine','alice','html','[]','old','[]','old.mp4','2026-01-01'),('latest','mine','alice','html','[]','new','[]',NULL,'2026-01-02')").run();
+    const first = await (await request('/api/projects')).json();
+    expect(first.projects).toHaveLength(1);
+    expect(first.projects[0]).toMatchObject({ id: 'mine', title: 'Demo', versionCount: 2, hasMp4: false, latestVersionId: 'latest' });
+    await env.DB.prepare("UPDATE versions SET mp4_key='latest.mp4' WHERE id='latest'").run();
+    expect((await (await request('/api/projects')).json()).projects[0].hasMp4).toBe(true);
+  });
   it('creates one job and one debit across a retry with an exhausted balance', async () => {
     const body = JSON.stringify({ prompt: 'Make a sunrise', aspect: '16:9', duration: 10, assetIds: [], idempotencyKey: 'same-request-key' });
     const first = await request('/api/jobs', { method: 'POST', body });

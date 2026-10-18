@@ -9,13 +9,15 @@ export interface Env {
   STRIPE_WEBHOOK_SECRET?: string;
   STRIPE_PRICES?: string;
   STRIPE_PORTAL_CONFIGURATION?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
   APP_URL: string;
   EMAIL?: SendEmail;
   EMAIL_FROM?: string;
 }
 
 export interface UserRow {
-  id: string; email: string; password_hash: string; credits: number; plan: string;
+  id: string; email: string; password_hash: string; email_verified_at: number | null; credits: number; plan: string;
   monthly_credits: number; subscription_status: string; stripe_customer_id: string | null;
   subscription_id: string | null; subscription_interval: 'month' | 'year' | null;
   trial_used: number; period_start: number | null; period_end: number | null;

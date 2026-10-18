@@ -7,6 +7,7 @@ export type User = {
   plan: string | null;
   subscriptionStatus: string | null;
 };
+export type AuthProviders = { email: boolean; google: boolean };
 export type Project = {
   id: string;
   title: string;
@@ -15,6 +16,8 @@ export type Project = {
   createdAt: string;
   updatedAt: string;
   latestVersionId?: string;
+  versionCount?: number;
+  hasMp4?: boolean;
 };
 export type Version = {
   id: string;
@@ -67,7 +70,23 @@ async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
-  me: () => request<{ user: User | null; billingEnabled: boolean }>("/api/me"),
+  me: () => request<{ user: User | null; billingEnabled: boolean; providers: AuthProviders }>("/api/me"),
+  socialSignIn: (provider: "google", callbackURL: string) =>
+    request<{ url: string }>("/api/auth/sign-in/social", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider, callbackURL }),
+    }),
+  magicLink: (email: string, callbackURL: string) =>
+    request<{ ok: true }>("/api/auth/sign-in/magic-link", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, callbackURL }),
+    }),
+  consumeMagicLink: (token: string) =>
+    request<{ user: User; redirect: string }>("/api/auth/magic-link/consume", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ token }),
+    }),
+  support: (email: string, body: string, page: string) =>
+    request<{ ok: true }>("/api/support", {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, body, page }),
+    }),
   auth: (mode: "register" | "login", email: string, password: string) =>
     request<{ user: User }>(`/api/auth/${mode}`, {
       method: "POST",
@@ -95,6 +114,10 @@ export const api = {
   deleteProject: (id: string) =>
     request<{ ok: true }>(`/api/projects/${encodeURIComponent(id)}`, {
       method: "DELETE",
+    }),
+  renameProject: (id: string, title: string) =>
+    request<{ project: Project }>(`/api/projects/${encodeURIComponent(id)}`, {
+      method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ title }),
     }),
   upload: (file: File) => {
     const data = new FormData();

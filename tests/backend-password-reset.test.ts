@@ -18,6 +18,7 @@ describe('password reset tokens', () => {
     await resetPassword(db, token, 'new sufficiently long password', 101);
     const hash = await db.prepare("SELECT password_hash FROM users WHERE id='alice'").first<string>('password_hash');
     expect(await verifyPassword('new sufficiently long password', hash!)).toBe(true);
+    expect(await db.prepare("SELECT email_verified_at FROM users WHERE id='alice'").first('email_verified_at')).toBe(101);
     expect(await db.prepare('SELECT COUNT(*) AS n FROM sessions').first('n')).toBe(0);
     await expect(resetPassword(db, token, 'another sufficiently long password', 102)).rejects.toThrow(/expired|used/i);
   });

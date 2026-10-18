@@ -14,8 +14,8 @@ describe('HTML crawl metadata', () => {
   });
 
   it.each([
-    '/blogs/writing-a-motion-brief', '/blogs/from-screen-to-story',
-    '/blogs/small-movements', '/blogs/social-formats', '/terms', '/privacy', '/refund',
+    '/blogs/opus-5-5-video-prompt-guide', '/blogs/opus-5-5-video-examples',
+    '/opus-5-5-video-generator', '/featured', '/terms', '/privacy', '/refunds',
   ])('allows the existing public page %s to be indexed', async (path) => {
     const response = await applyPageSeo(htmlResponse(), new URL(`https://claudemotionvideo.com${path}`));
     expect(await response.text()).toContain(`href="https://claudemotionvideo.com${path}"`);

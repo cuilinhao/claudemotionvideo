@@ -1,0 +1,14 @@
+.cmv-auth-options{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px}
+[hidden]{display:none!important}
+.cmv-auth-options button{border:0;padding:0;background:none;color:var(--text-3);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.cmv-auth-options button:hover{color:var(--text)}
+.cmv-notice{position:fixed;z-index:150;left:50%;bottom:24px;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 40px);padding:12px 20px;background:var(--text);color:var(--bg);box-shadow:0 8px 30px #0007;font-size:14px}
+.cmv-brand-icon{width:28px;height:28px;flex:none}
+.cmv-loading{min-height:100dvh;display:grid;place-content:center;gap:12px;text-align:center}
+.cmv-account-page .log{width:100%;border-collapse:collapse}
+.cmv-account-page .log th,.cmv-account-page .log td{text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:13px}
+.cmv-account-page .panel{padding:22px;border:1px solid var(--line);background:var(--bg-2)}
+.cmv-account-page .number{font-size:40px;font-weight:700;line-height:1.2}
+.cmv-account-page .account-history{overflow:auto;margin:24px 0 50px}
+.cmv-account-page .account-title{font-family:var(--headline);text-transform:uppercase;font-size:clamp(44px,6vw,80px);line-height:1.05;margin:56px 0 30px}
+@media(max-width:560px){.top .logo-word{font-size:14px;white-space:nowrap;letter-spacing:-.035em}.top .logo{gap:6px}.top .logo-mark{width:24px;height:24px}}

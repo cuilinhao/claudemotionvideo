@@ -8,6 +8,9 @@ import { ApiError } from './errors';
 import { createJob, jobInputSchema, publicJob } from './jobs';
 import { billingEnabled, createBillingPortal, createCheckout, processStripeEvent, verifyStripeEvent } from './billing';
 import { requestPasswordReset, resetPassword } from './password-reset';
+import { consumeMagicLink, magicLinkInput, requestMagicLink } from './magic-link';
+import { beginGoogleOAuth, completeGoogleOAuth, googleOAuthEnabled, googleSignInInput, GOOGLE_STATE_AGE, GOOGLE_STATE_COOKIE } from './google-auth';
+import { submitSupport, supportInput } from './support';
 import { publicUser, type ApiEnv, type AssetRow, type JobRow, type ProjectRow, type UserRow, type VersionRow } from './types';
 
 export const app = new Hono<ApiEnv>();
@@ -18,12 +21,67 @@ app.use('/api/*', async (c, next) => {
   }
   const user = c.req.path === '/api/billing/webhook' ? null : await getSessionUser(c.env.DB, getCookie(c, SESSION_COOKIE));
   c.set('user', user);
-  if (!user && c.req.path !== '/api/me' && !c.req.path.startsWith('/api/auth/') && c.req.path !== '/api/billing/webhook') throw new ApiError(401, 'Please sign in to continue.', 'AUTH_REQUIRED');
+  if (!user && c.req.path !== '/api/me' && c.req.path !== '/api/support' && !c.req.path.startsWith('/api/auth/') && c.req.path !== '/api/billing/webhook') throw new ApiError(401, 'Please sign in to continue.', 'AUTH_REQUIRED');
   await next();
 });
 app.use('/api/auth/*', bodyLimit({ maxSize: 4096, onError: c => c.json({ error: 'Request too large.' }, 413) }));
 app.use('/api/jobs', bodyLimit({ maxSize: 32_768, onError: c => c.json({ error: 'Request too large.' }, 413) }));
-app.get('/api/me', c => c.json({ user: c.get('user') ? publicUser(c.get('user')!) : null, billingEnabled: billingEnabled(c.env) }));
+app.get('/api/me', c => c.json({ user: c.get('user') ? publicUser(c.get('user')!) : null, billingEnabled: billingEnabled(c.env), providers: { email: !!(c.env.EMAIL && c.env.EMAIL_FROM), google: googleOAuthEnabled(c.env) } }));
+
+app.post('/api/auth/sign-in/magic-link', async c => {
+  const ip = c.req.header('CF-Connecting-IP') ?? 'local';
+  if (!await rateLimit(c.env.DB, `magic:ip:${await digest(ip)}`, 10, 900)) throw new ApiError(429, 'Too many sign-in requests. Try again in 15 minutes.', 'RATE_LIMITED');
+  const parsed = magicLinkInput.safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) throw new ApiError(400, 'Enter a valid email address and a callback path on this website.', 'INVALID_INPUT');
+  if (!await rateLimit(c.env.DB, `magic:email:${await digest(parsed.data.email)}`, 3, 900)) throw new ApiError(429, 'Too many sign-in requests. Try again in 15 minutes.', 'RATE_LIMITED');
+  return c.json(await requestMagicLink(c.env, parsed.data));
+});
+app.post('/api/auth/magic-link/consume', async c => {
+  const ip = c.req.header('CF-Connecting-IP') ?? 'local';
+  if (!await rateLimit(c.env.DB, `magic:consume:${await digest(ip)}`, 25, 900)) throw new ApiError(429, 'Too many sign-in attempts. Try again in 15 minutes.', 'RATE_LIMITED');
+  const parsed = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/) }).strict().safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) throw new ApiError(400, 'This sign-in link is invalid. Request a new link.', 'INVALID_INPUT');
+  const result = await consumeMagicLink(c.env, parsed.data.token);
+  setCookie(c, SESSION_COOKIE, result.session, { httpOnly: true, secure: new URL(c.env.APP_URL).protocol === 'https:', sameSite: 'Lax', path: '/', maxAge: SESSION_AGE });
+  return c.json({ user: publicUser(result.user), redirect: result.redirect });
+});
+app.post('/api/auth/sign-in/social', async c => {
+  const ip = c.req.header('CF-Connecting-IP') ?? 'local';
+  if (!await rateLimit(c.env.DB, `google:start:${await digest(ip)}`, 10, 900)) throw new ApiError(429, 'Too many sign-in attempts. Try again in 15 minutes.', 'RATE_LIMITED');
+  const parsed = googleSignInInput.safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) throw new ApiError(400, 'Choose Google and a page on this website to return to.', 'INVALID_INPUT');
+  const result = await beginGoogleOAuth(c.env, parsed.data.callbackURL);
+  setCookie(c, GOOGLE_STATE_COOKIE, result.state, { httpOnly: true, secure: new URL(c.env.APP_URL).protocol === 'https:', sameSite: 'Lax', path: '/api/auth/google/callback', maxAge: GOOGLE_STATE_AGE });
+  return c.json({ url: result.url });
+});
+app.get('/api/auth/google/callback', async c => {
+  const stateCookieOptions = { httpOnly: true, secure: new URL(c.env.APP_URL).protocol === 'https:', sameSite: 'Lax' as const, path: '/api/auth/google/callback' };
+  try {
+    if (c.req.query('error')) throw new ApiError(400, 'Google sign-in was cancelled. Please try again.', 'GOOGLE_CANCELLED');
+    const code = c.req.query('code'); const state = c.req.query('state');
+    if (!code || !state) throw new ApiError(400, 'This Google sign-in has expired or is invalid. Please start again.', 'GOOGLE_STATE_INVALID');
+    const result = await completeGoogleOAuth(c.env, { code, state, cookieState: getCookie(c, GOOGLE_STATE_COOKIE) });
+    setCookie(c, SESSION_COOKIE, result.session, { httpOnly: true, secure: new URL(c.env.APP_URL).protocol === 'https:', sameSite: 'Lax', path: '/', maxAge: SESSION_AGE });
+    deleteCookie(c, GOOGLE_STATE_COOKIE, stateCookieOptions);
+    return c.redirect(new URL(result.redirect, c.env.APP_URL).href, 302);
+  } catch (error) {
+    deleteCookie(c, GOOGLE_STATE_COOKIE, stateCookieOptions);
+    const googleError = error instanceof ApiError && error.code === 'GOOGLE_EMAIL_NEEDS_VERIFICATION'
+      ? 'email_link'
+      : error instanceof ApiError && error.code === 'GOOGLE_CANCELLED' ? 'cancelled' : 'failed';
+    const signIn = new URL('/sign-in', c.env.APP_URL);
+    signIn.searchParams.set('google_error', googleError);
+    return c.redirect(signIn.href, 302);
+  }
+});
+app.post('/api/support', bodyLimit({ maxSize: 16_384, onError: c => c.json({ error: 'Your message is too large.' }, 413) }), async c => {
+  const ip = c.req.header('CF-Connecting-IP') ?? 'local';
+  if (!await rateLimit(c.env.DB, `support:ip:${await digest(ip)}`, 5, 900)) throw new ApiError(429, 'Too many messages. Try again in 15 minutes.', 'RATE_LIMITED');
+  const parsed = supportInput.safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) throw new ApiError(400, 'Enter a valid email and a message of up to 2,000 characters.', 'INVALID_INPUT');
+  if (!await rateLimit(c.env.DB, `support:email:${await digest(parsed.data.email)}`, 3, 900)) throw new ApiError(429, 'Too many messages. Try again in 15 minutes.', 'RATE_LIMITED');
+  return c.json(await submitSupport(c.env, parsed.data, c.get('user')?.id ?? null));
+});
 
 const credentials = z.object({ email: z.string().trim().toLowerCase().email().max(254), password: z.string().min(10).max(128) });
 for (const action of ['register', 'login'] as const) {
@@ -47,7 +105,7 @@ for (const action of ['register', 'login'] as const) {
       if (!valid) throw new ApiError(401, 'Email or password is incorrect.', 'INVALID_CREDENTIALS');
     }
     if (!user) throw new Error('Account creation failed');
-    const token = await createSession(c.env.DB, user.id);
+    const token = await createSession(c.env.DB, user.id, undefined, user.password_hash);
     setCookie(c, SESSION_COOKIE, token, { httpOnly: true, secure: new URL(c.env.APP_URL).protocol === 'https:', sameSite: 'Lax', path: '/', maxAge: SESSION_AGE });
     return c.json({ user: publicUser(user) }, action === 'register' ? 201 : 200);
   });
@@ -76,8 +134,12 @@ app.post('/api/auth/reset-password', async c => {
 
 const publicProject = (project: ProjectRow) => ({ id: project.id, title: project.title, aspect: project.aspect, duration: project.duration, createdAt: project.created_at, updatedAt: project.updated_at, ...(project.latest_version_id ? { latestVersionId: project.latest_version_id } : {}) });
 app.get('/api/projects', async c => {
-  const rows = await c.env.DB.prepare('SELECT * FROM projects WHERE user_id=? ORDER BY updated_at DESC LIMIT 200').bind(c.get('user')!.id).all<ProjectRow>();
-  return c.json({ projects: rows.results.map(publicProject) });
+  const rows = await c.env.DB.prepare(`SELECT projects.*,
+    (SELECT COUNT(*) FROM versions WHERE versions.project_id=projects.id AND versions.user_id=projects.user_id) AS version_count,
+    EXISTS(SELECT 1 FROM versions WHERE versions.id=projects.latest_version_id AND versions.project_id=projects.id AND versions.user_id=projects.user_id AND versions.mp4_key IS NOT NULL) AS has_mp4
+    FROM projects WHERE user_id=? ORDER BY updated_at DESC LIMIT 200`)
+    .bind(c.get('user')!.id).all<ProjectRow & { version_count: number; has_mp4: number }>();
+  return c.json({ projects: rows.results.map(project => ({ ...publicProject(project), versionCount: project.version_count, hasMp4: !!project.has_mp4 })) });
 });
 app.get('/api/projects/:id', async c => {
   const userId = c.get('user')!.id;
@@ -88,6 +150,17 @@ app.get('/api/projects/:id', async c => {
     c.env.DB.prepare('SELECT * FROM jobs WHERE project_id=? AND user_id=? ORDER BY created_at DESC LIMIT 30').bind(project.id, userId).all<JobRow>(),
   ]);
   return c.json({ project: publicProject(project), versions: versions.results.map(v => ({ id: v.id, html: v.html, storyboard: v.storyboard, prompt: v.prompt, createdAt: v.created_at, assetIds: JSON.parse(v.asset_ids) as string[] })), jobs: jobs.results.map(publicJob) });
+});
+app.patch('/api/projects/:id', bodyLimit({ maxSize: 4096, onError: c => c.json({ error: 'Request too large.' }, 413) }), async c => {
+  const parsed = z.object({ title: z.string().trim().min(1).max(120) }).strict().safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) throw new ApiError(400, 'Enter a title between 1 and 120 characters.', 'INVALID_INPUT');
+  const userId = c.get('user')!.id;
+  const updated = await c.env.DB.prepare('UPDATE projects SET title=?,updated_at=? WHERE id=? AND user_id=?')
+    .bind(parsed.data.title, new Date().toISOString(), c.req.param('id'), userId).run();
+  if (!updated.meta.changes) throw new ApiError(404, 'Project not found.');
+  const project = await c.env.DB.prepare('SELECT * FROM projects WHERE id=? AND user_id=?').bind(c.req.param('id'), userId).first<ProjectRow>();
+  if (!project) throw new ApiError(404, 'Project not found.');
+  return c.json({ project: publicProject(project) });
 });
 app.delete('/api/projects/:id', async c => {
   const userId = c.get('user')!.id;

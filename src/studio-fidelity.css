@@ -1,0 +1,59 @@
+/* Source layout comes from the unmodified reference Base CSS. These rules only
+   adapt our brand, trusted iframe boundary and the existing audio controls. */
+body.shell-body { margin: 0; }
+.studio-shell .shell-logo { min-width: 0; gap: 8px; }
+.studio-shell .shell-logo .logo-word { font-size: 14px; letter-spacing: -.045em; line-height: 1.1; white-space: nowrap; }
+.studio-shell .shell-fold { flex: none; }
+.studio-shell .ed-title { cursor: default; max-width: 24ch; }
+.studio-shell .ed-screen { position: relative; overflow: hidden; background: #08090b; }
+.studio-shell .ed-screen iframe { border: 0; width: 100%; height: 100%; position: absolute; inset: 0; }
+.studio-shell .ed-tools { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; }
+.studio-shell .ed-tool { display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+.studio-shell .ed-tool .pulse { width: 6px; height: 6px; }
+.studio-shell .cmv-edit-cost { font-size: 10px; margin-left: auto; }
+.studio-shell .cmv-save-state { font-size: 10px; }
+.studio-shell .cmv-preview-busy { position: absolute; inset: 0; display: flex; gap: 10px; align-items: center; justify-content: center; background: #08090bad; font-size: 13px; }
+.studio-shell .spin { animation: spin 1s linear infinite; }
+.cmv-aspect-icon { display: inline-block; height: 14px; max-width: 24px; border: 1.5px solid currentColor; border-radius: 2px; }
+.cmv-floating { z-index: 120; display: flex; flex-direction: column; overflow: auto; }
+.cmv-floating .fx-pick { min-height: 80px; overflow: auto; }
+.cmv-floating .pop-head, .cmv-floating .pop-foot { flex-shrink: 0; }
+.studio-shell .demo-wait { text-align: center; padding: 16px; background: #08090be6; }
+.studio-shell .demo-wait p { font-size: 12px; }
+.studio-shell .cmv-audio-overlay { position: fixed; inset: 0; z-index: 150; background: #0008; display: grid; place-items: center; padding: 24px; }
+.studio-shell .cmv-audio-overlay[hidden] { display: none; }
+.cmv-audio-dialog, .cmv-images-dialog { position: relative; width: min(540px, 100%); max-height: calc(100dvh - 48px); overflow: auto; border: 1px solid var(--line-2); border-radius: 18px; background: var(--bg); box-shadow: var(--shadow); padding: 24px; }
+.cmv-audio-dialog { position: fixed; inset: 0; margin: auto; width: min(540px, calc(100% - 48px)); height: max-content; color: var(--text); }
+.cmv-audio-dialog::backdrop { background: #0008; }
+.cmv-dialog-close { position: absolute; top: 14px; right: 14px; border: 0; background: transparent; color: var(--text-2); cursor: pointer; }
+.cmv-images-dialog .refs-head { margin-bottom: 18px; }
+.cmv-images-dialog .refs-head > div { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.cmv-toast { position: fixed; z-index: 160; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; align-items: center; background: var(--bg-3); color: var(--text); border: 1px solid var(--line-2); padding: 12px 20px; border-radius: 12px; box-shadow: var(--shadow); font-size: 13px; }
+/* Keep AudioPanel mounted, including when this dialog is closed, so hydration,
+   revisions and prepared audio remain exactly the same as export's state. */
+.cmv-audio-dialog .audio-panel { display: flex; flex-direction: column; gap: 15px; font-size: 13px; }
+.cmv-audio-dialog .audio-panel-heading { display: flex; justify-content: space-between; align-items: center; padding-right: 24px; }
+.cmv-audio-dialog .panel-kicker { font: 10px var(--mono); color: var(--text-3); }
+.cmv-audio-dialog h3 { display: flex; align-items: center; gap: 7px; margin: 4px 0 0; font-size: 17px; }
+.cmv-audio-dialog .audio-saving, .cmv-audio-dialog .audio-notice, .cmv-audio-dialog .audio-duration, .cmv-audio-dialog small { color: var(--text-3); font-size: 11px; }
+.cmv-audio-dialog .audio-field, .cmv-audio-dialog .audio-voice-heading, .cmv-audio-dialog .audio-upload-row, .cmv-audio-dialog .audio-voice-file, .cmv-audio-dialog .audio-custom-name, .cmv-audio-dialog .audio-voice-controls { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.cmv-audio-dialog .audio-field { flex-wrap: wrap; }
+.cmv-audio-dialog .audio-custom-name { flex: 1 1 100%; min-width: 0; }
+.cmv-audio-dialog .audio-voice-heading > div { min-width: 0; }
+.cmv-audio-dialog .audio-file-name, .cmv-audio-dialog .audio-voice-heading small { min-width: 0; overflow-wrap: anywhere; }
+.cmv-audio-dialog .audio-custom-name .audio-remove { flex: none; }
+.cmv-audio-dialog .audio-voice-heading > div { display: flex; flex-direction: column; gap: 4px; }
+.cmv-audio-dialog select, .cmv-audio-dialog textarea { border: 1px solid var(--line-2); border-radius: 8px; background: var(--bg-2); color: var(--text); padding: 8px; font: inherit; }
+.cmv-audio-dialog textarea { width: 100%; resize: vertical; min-height: 80px; }
+.cmv-audio-dialog .audio-volume { display: grid; grid-template-columns: 110px 1fr 35px; align-items: center; gap: 8px; }
+.cmv-audio-dialog .audio-volume span { display: flex; align-items: center; gap: 5px; }
+.cmv-audio-dialog input[type=range] { width: 100%; accent-color: var(--coral); }
+.cmv-audio-dialog .audio-separator { height: 1px; background: var(--line); }
+.cmv-audio-dialog .button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--line-2); border-radius: 8px; color: var(--text); background: var(--bg-2); cursor: pointer; padding: 7px 10px; font: inherit; font-size: 11px; }
+.cmv-audio-dialog .button-primary { background: var(--coral); color: #fff; border-color: var(--coral); }
+.cmv-audio-dialog button:disabled, .cmv-audio-dialog select:disabled { opacity: .5; cursor: default; }
+.cmv-audio-dialog .audio-remove { border: 0; background: transparent; color: var(--text-2); cursor: pointer; text-decoration: underline; font: inherit; font-size: 11px; }
+.cmv-audio-dialog .audio-error, .cmv-audio-dialog .audio-duration-warning { color: var(--coral); font-size: 12px; margin: 0; }
+.cmv-audio-dialog .audio-character-count { font-size: 10px; color: var(--text-3); }
+@media (max-width: 900px) { .studio-shell .shell-logo .logo-word { max-width: none; } .studio-shell .ed-frame { min-height: 45vh; } }
+@media (max-width: 560px) { .cmv-audio-dialog, .cmv-images-dialog { padding: 20px 14px; } .cmv-audio-dialog .audio-voice-controls { flex-wrap: wrap; } .studio-shell .shell-logo .logo-word { font-size: 12px; white-space: normal; max-width: 85px; } .studio-shell .shell-logo { gap: 5px; } .studio-shell .shell-logo .logo-mark { width: 20px; height: 20px; } .studio-shell .ed-tools { gap: 5px; } }

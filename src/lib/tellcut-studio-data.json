@@ -1,0 +1,511 @@
+{
+  "scenarios": [
+    {
+      "id": "launch",
+      "example": "App launch",
+      "name": "App launch video",
+      "blurb": "Hook, product reveal, three features, call to action.",
+      "aspect": "16:9",
+      "duration": 15,
+      "look": "bold",
+      "starter": "Launch video for Orbit, a calendar app that plans your week for you. Hook: \"Your week, planned in seconds.\" A messy to-do list snaps into a clean weekly calendar, then three quick feature beats: smart time blocking, focus mode, team availability. End card: \"Orbit. Get your week back.\" with orbit.app.",
+      "structure": "hook in the first 10%, product name reveal, one beat per feature with a simple UI-like illustration, end card with the call to action held for the last 15%",
+      "effects": [
+        "mask-rise",
+        "ui-cards",
+        "iris"
+      ],
+      "effectCats": [
+        "Text",
+        "UI",
+        "Transition"
+      ]
+    },
+    {
+      "id": "ui-demo",
+      "example": "Product walkthrough",
+      "name": "Product walkthrough",
+      "blurb": "A cursor clicks through your app's screenshot.",
+      "image": "a screenshot of your app",
+      "aspect": "16:9",
+      "duration": 15,
+      "look": "auto",
+      "starter": "A product walkthrough of this dashboard: a cursor clicks \"+ New task\", a new card \"Launch party\" drops into the To do column, then the cursor drags \"Checkout flow\" to Done, the Done count goes from 58 to 59 and the last bar of the chart grows. End with a caption \"Kanbo. Ship projects on time.\"",
+      "structure": "the screenshot shown in a browser window; the camera zooms to each action while an animated cursor clicks, drags and types; the UI updates on screen (new items, moved cards, numbers changing); end zoomed out with the product name and tagline",
+      "effects": [
+        "cursor-click",
+        "ui-cards",
+        "count-up"
+      ],
+      "effectCats": [
+        "UI",
+        "Data",
+        "Transition"
+      ]
+    },
+    {
+      "id": "game",
+      "example": "Mobile game ad",
+      "name": "Mobile game ad",
+      "blurb": "Your game screen comes alive: a spin, a reveal, the reward.",
+      "image": "a screenshot of your game",
+      "aspect": "9:16",
+      "duration": 10,
+      "look": "auto",
+      "starter": "Tap Free Spin, spin the wheel and land on 1000",
+      "structure": "anticipation (a tap, a wind-up), the action from the screenshot moving for real, the reward shown clearly with a burst, then the result held",
+      "effects": [
+        "card-reveal",
+        "confetti",
+        "count-up"
+      ],
+      "effectCats": [
+        "Game",
+        "3D",
+        "Data"
+      ]
+    },
+    {
+      "id": "ecommerce",
+      "example": "Flash-sale ad",
+      "name": "Flash-sale ad",
+      "blurb": "Product, discount, price drop, countdown, shop now.",
+      "aspect": "9:16",
+      "duration": 10,
+      "look": "bold",
+      "starter": "A vertical flash-sale ad for Aero Runner, a lightweight running shoe: the shoe (drawn as a bold flat illustration) slides in with speed lines, a \"40% OFF\" badge stamps on, the price drops from $129 to $77, a 3-2-1 countdown \"Ends tonight\", then \"Shop now\" with aerorunner.com.",
+      "structure": "the product slams in, the discount badge stamps on, the old price is struck through and the new price counts down, a short countdown for urgency, then a shop-now card; big type for a phone",
+      "effects": [
+        "stretch-slide",
+        "squash-bounce",
+        "count-up"
+      ],
+      "effectCats": [
+        "Text",
+        "Game",
+        "Data"
+      ]
+    },
+    {
+      "id": "social",
+      "example": "Vertical drink ad",
+      "name": "Social ad 9:16",
+      "blurb": "Vertical, punchy, hook in the first second.",
+      "aspect": "9:16",
+      "duration": 10,
+      "look": "auto",
+      "starter": "A punchy vertical ad for Fizz, a sparkling yuzu soda: hook \"Tired of boring water?\" in the first second, a can bursts through bubbles, three words pop in time with cuts: Zesty. Fizzy. Zero sugar. End with the can, \"Fizz. Taste the spark.\" and fizzdrinks.com. Bright yellow and green.",
+      "structure": "a hook in the first second, 3–4 quick beats with big centred type, a final call-to-action card; designed for a phone screen",
+      "effects": [
+        "stretch-slide",
+        "squash-bounce",
+        "confetti"
+      ],
+      "effectCats": [
+        "Text",
+        "Game",
+        "Transition"
+      ]
+    },
+    {
+      "id": "poster",
+      "example": "Poster come alive",
+      "name": "Poster come alive",
+      "blurb": "Your poster or flyer, lit up and moving.",
+      "image": "your poster",
+      "aspect": "9:16",
+      "duration": 10,
+      "look": "auto",
+      "starter": "Make this festival poster come alive: the sun glows, the sea lines ripple, the title NEON TIDES flickers on like neon, the line-up names light up one by one, and the GET TICKETS button pulses at the end.",
+      "structure": "the poster stays exactly as designed while its parts move: glows, ripples, lights switching on in turn, a slow push-in, and the call to action pulsing at the end",
+      "effects": [
+        "aurora",
+        "confetti",
+        "iris"
+      ],
+      "effectCats": [
+        "Background",
+        "Text",
+        "Game"
+      ]
+    },
+    {
+      "id": "logo",
+      "example": "Logo reveal",
+      "name": "Logo reveal",
+      "blurb": "An abstract build-up that resolves into your wordmark.",
+      "aspect": "16:9",
+      "duration": 10,
+      "look": "cinematic",
+      "starter": "A logo reveal for Northwind, an outdoor gear brand: thin lines of light sweep across a dark background like wind, gather into a mountain peak mark, and the wordmark NORTHWIND resolves under it with the tagline \"Go further.\"",
+      "structure": "abstract shapes and light build tension, converge into the wordmark, then the tagline; hold the final lockup for the last 25%",
+      "effects": [
+        "particle-morph",
+        "mask-rise",
+        "aurora"
+      ],
+      "effectCats": [
+        "3D",
+        "Text",
+        "Background"
+      ]
+    },
+    {
+      "id": "data",
+      "example": "Year in numbers",
+      "name": "Data story",
+      "blurb": "Count-ups and self-drawing charts.",
+      "aspect": "16:9",
+      "duration": 15,
+      "look": "clean",
+      "starter": "A year-in-numbers video for Brewly, a coffee chain: 1.2 million cups served, 38 new stores, 4.8 average rating, and a bar chart of monthly cups that grows from January to December. Each number counts up. End: \"Thank you for a great 2026. Brewly.\"",
+      "structure": "one metric per beat using count-ups and self-drawing charts, then a closing takeaway line",
+      "effects": [
+        "count-up",
+        "line-draw",
+        "ui-cards"
+      ],
+      "effectCats": [
+        "Data",
+        "UI",
+        "Text"
+      ]
+    },
+    {
+      "id": "explainer",
+      "example": "Explain an idea",
+      "name": "Explainer",
+      "blurb": "A concept in clear, animated steps.",
+      "aspect": "16:9",
+      "duration": 15,
+      "look": "playful",
+      "starter": "An explainer of compound interest in three steps: $1,000 saved, it earns 7% a year, and the interest itself starts earning. Show a small coin stack that grows faster and faster on a curve over 30 years to about $7,600. End: \"Start early. Let time do the work.\"",
+      "structure": "one numbered step per scene with a simple diagram that builds up, then a one-line summary",
+      "effects": [
+        "typewriter",
+        "line-draw",
+        "count-up"
+      ],
+      "effectCats": [
+        "Data",
+        "Text",
+        "Shapes"
+      ]
+    },
+    {
+      "id": "update",
+      "example": "What's new",
+      "name": "Feature update",
+      "blurb": "Your release notes as a short, clear video.",
+      "aspect": "16:9",
+      "duration": 10,
+      "look": "clean",
+      "starter": "A \"What's new\" video for Lumen 2.0, a notes app: three updates, each with a simple UI illustration: dark mode (the screen flips to dark), offline sync (a cloud with a check mark), keyboard shortcuts (keys pressing ⌘K). End: \"Lumen 2.0 is out. Update today.\"",
+      "structure": "one update per beat, its name in big type beside a simple app window that shows the change happening, then an end card with the version and a call to action",
+      "effects": [
+        "mask-rise",
+        "ui-cards",
+        "cursor-click"
+      ],
+      "effectCats": [
+        "UI",
+        "Text",
+        "Transition"
+      ]
+    },
+    {
+      "id": "testimonial",
+      "example": "Customer quote",
+      "name": "Customer quote",
+      "blurb": "A review, word by word, with stars and a name.",
+      "aspect": "1:1",
+      "duration": 10,
+      "look": "editorial",
+      "starter": "A customer quote card: \"Kanbo cut our launch prep from six weeks to two.\" by Maya Chen, Head of Product at Fable. The quote appears word by word, five stars fill in one by one, then the name and company fade in with the Kanbo name at the bottom.",
+      "structure": "a large quote mark, the quote revealed word by word, a star rating filling in, then the person's name and role and the product name",
+      "effects": [
+        "typewriter",
+        "mask-rise"
+      ],
+      "effectCats": [
+        "Text",
+        "Background"
+      ]
+    },
+    {
+      "id": "showreel",
+      "example": "Designer showreel",
+      "name": "Motion showreel",
+      "blurb": "Show off: several techniques and a title card.",
+      "aspect": "16:9",
+      "duration": 15,
+      "look": "neon",
+      "starter": "A motion design showreel for designer Alex Rivera: fast cuts between techniques (liquid shapes morphing, kinetic type, a 3D rotating grid, particles forming a logo), a glitch on every cut, then a title card \"Alex Rivera. Motion designer.\" with alexrivera.design.",
+      "structure": "a fast sequence of 4–6 visually distinct ideas, each using a different technique, tied together with transitions and ending on a title card",
+      "effects": [
+        "liquid-blob",
+        "particle-morph",
+        "grid-wave",
+        "skew-wipe"
+      ],
+      "effectCats": [
+        "Text",
+        "Shapes",
+        "3D",
+        "Transition"
+      ]
+    }
+  ],
+  "palettes": [
+    {
+      "id": "auto",
+      "name": "From my prompt",
+      "hint": "No preset look. Opus follows the colours and style you described, or picks what fits.",
+      "phrase": "",
+      "swatch": []
+    },
+    {
+      "id": "cinematic",
+      "name": "Dark & cinematic",
+      "hint": "Black backgrounds, dramatic light, slow confident reveals.",
+      "phrase": "Dark and cinematic: near-black backgrounds, dramatic lighting and glow, elegant type, slow confident reveals",
+      "swatch": [
+        "#000000",
+        "#1C1C1E",
+        "#C9A15B",
+        "#F5F5F7"
+      ]
+    },
+    {
+      "id": "clean",
+      "name": "Clean & minimal",
+      "hint": "Lots of white space and thin type, like a product keynote.",
+      "phrase": "Clean and minimal: white or very light backgrounds, generous white space, thin modern type, soft shadows, calm precise motion",
+      "swatch": [
+        "#FFFFFF",
+        "#F2F2F7",
+        "#1D1D1F",
+        "#0A84FF"
+      ]
+    },
+    {
+      "id": "bold",
+      "name": "Bold & colourful",
+      "hint": "Big type, flat colour blocks, energetic cuts.",
+      "phrase": "Bold and colourful: big heavy type, flat saturated colour blocks, a strict grid, energetic fast cuts",
+      "swatch": [
+        "#E30613",
+        "#111111",
+        "#FFFFFF",
+        "#FFD000"
+      ]
+    },
+    {
+      "id": "neon",
+      "name": "Neon & futuristic",
+      "hint": "Glowing lines on deep navy, sci-fi energy.",
+      "phrase": "Neon and futuristic: deep navy background, glowing magenta and cyan lines, perspective grids, soft glow",
+      "swatch": [
+        "#0B0326",
+        "#FF3D8B",
+        "#19E3FF",
+        "#FFD23F"
+      ]
+    },
+    {
+      "id": "playful",
+      "name": "Soft & playful",
+      "hint": "Pastel colours, rounded shapes, bouncy motion.",
+      "phrase": "Soft and playful: pastel palette, rounded shapes, bouncy spring motion, friendly type",
+      "swatch": [
+        "#FFD6E0",
+        "#C1F0E5",
+        "#FFF1B8",
+        "#C9D7FF"
+      ]
+    },
+    {
+      "id": "editorial",
+      "name": "Elegant editorial",
+      "hint": "Serif headlines on paper tones, like a magazine.",
+      "phrase": "Elegant editorial: large serif headlines on a cream paper background, ink-black accents, refined pacing",
+      "swatch": [
+        "#F3ECDD",
+        "#1A1A1A",
+        "#9E2A2B",
+        "#C8B79A"
+      ]
+    }
+  ],
+  "effects": [
+    {
+      "id": "letter-drop",
+      "name": "Letter drop",
+      "category": "Text",
+      "desc": "Letters fall in one by one and land with a small bounce. The classic showreel opener.",
+      "say": "letters drop in one by one from above with a slight overshoot bounce",
+      "recipe": "per-letter y animates from about -60% of the canvas height to the baseline with easeOutBack (overshoot 1.7), 60ms stagger, letters clipped just above a thin accent rule that wipes in first"
+    },
+    {
+      "id": "mask-rise",
+      "name": "Masked rise",
+      "category": "Text",
+      "desc": "Each letter slides up from behind an invisible line, as if pushed out of the floor.",
+      "say": "each letter rises from behind a hidden baseline mask, staggered",
+      "recipe": "clip a rectangle that ends at the baseline; each letter translates up from one full line-height below with easeOutExpo over 0.6s, 35–50ms stagger; follow with a row of tick marks that pop in left to right"
+    },
+    {
+      "id": "typewriter",
+      "name": "Typewriter cursor",
+      "category": "Text",
+      "desc": "Text types itself out with a blinking block cursor. Good for taglines and tech intros.",
+      "say": "the line types out character by character in a monospace font with a blinking block cursor",
+      "recipe": "monospace font, characters revealed at a steady 20–25 chars/second, solid accent-coloured block cursor after the last character that blinks at 2.5Hz only after typing finishes"
+    },
+    {
+      "id": "stretch-slide",
+      "name": "Stretch slide-in",
+      "category": "Text",
+      "desc": "A word shoots in from the side, stretched wide, and snaps back to its normal width.",
+      "say": "the word slides in from the right stretched wide and snaps to its normal width",
+      "recipe": "x moves from 125% of the canvas width to centre while scaleX goes 1.7 → 1, both with easeOutExpo over 0.45s; an underline grows from the centre right after"
+    },
+    {
+      "id": "squash-bounce",
+      "name": "Squash and stretch",
+      "category": "Text",
+      "desc": "Text falls with weight, squashes on impact, then settles. Makes type feel physical.",
+      "say": "the word falls from above, squashes on impact and springs back like a heavy object landing",
+      "recipe": "fall with quadratic ease-in for 0.3s; on impact scaleX up to 1.18 and scaleY down to 0.72 anchored at the baseline, then a damped sine back to 1 over 0.4s; a ground line widens on impact"
+    },
+    {
+      "id": "outline-echo",
+      "name": "Outline echo",
+      "category": "Text",
+      "desc": "Outlined copies of a word ripple outward behind the solid word. Instant depth.",
+      "say": "outlined copies of the word expand outward like ripples behind the solid word",
+      "recipe": "draw 8 stroked copies behind a filled word, copy n scaled 1 + n×0.22×progress, alpha 1 − n/9, every third copy in the accent colour, progress eases out over ~1.2s"
+    },
+    {
+      "id": "decode",
+      "name": "Decode scramble",
+      "category": "Text",
+      "desc": "Random characters flicker and lock into the real word from left to right.",
+      "say": "the word resolves from random flickering glyphs into the final text, left to right",
+      "recipe": "monospace; each character shows a random glyph (seeded by character index and floor(t×18)) in the accent colour until its lock time, locks left to right 150ms apart"
+    },
+    {
+      "id": "skew-wipe",
+      "name": "Skewed wipe",
+      "category": "Transition",
+      "desc": "A slanted colour bar sweeps across the screen to cut between two scenes.",
+      "say": "cut between scenes with a fast skewed full-screen colour wipe",
+      "recipe": "a parallelogram with ~15% horizontal skew covers the screen left to right in 0.18s (easeInOutCubic), the scene switches while fully covered, then it uncovers to the right in 0.18s"
+    },
+    {
+      "id": "iris",
+      "name": "Iris open",
+      "category": "Transition",
+      "desc": "A circle grows from the centre and reveals the next scene, like a camera shutter.",
+      "say": "the next scene is revealed by a circle that grows from the centre of the screen",
+      "recipe": "clip the incoming scene to a circle whose radius grows from 0 to the half-diagonal with easeInOutCubic over 0.5s, the outgoing scene stays visible outside the circle"
+    },
+    {
+      "id": "grid-wave",
+      "name": "Grid wave",
+      "category": "Shapes",
+      "desc": "A grid of tiles rotates and pulses in a wave travelling out from the centre.",
+      "say": "a full-screen grid of square tiles rotates and pulses in a wave radiating from the centre",
+      "recipe": "tiles on a regular grid; phase = t×2.4 − distanceFromCentre×4; size scales with |sin(phase·π)|, rotation = phase×90°, colour flips between two palette colours by the sign of sin; tiles pop in with easeOutBack ordered by distance"
+    },
+    {
+      "id": "particle-morph",
+      "name": "Particle morph",
+      "category": "3D",
+      "desc": "Hundreds of points form a rotating sphere, then reshape into a ring.",
+      "say": "particles form a slowly rotating 3D sphere, then morph into a torus, coloured by depth",
+      "recipe": "~1000 points on a Fibonacci sphere, each with a matching torus position; lerp between them with easeInOutCubic; rotate in Y and X, simple perspective projection, size and colour by depth (back = cool, front = warm/bright); points fly in from random far positions at the start"
+    },
+    {
+      "id": "liquid-blob",
+      "name": "Liquid blob",
+      "category": "Shapes",
+      "desc": "An organic shape wobbles like liquid, with dots orbiting around it.",
+      "say": "a liquid blob wobbles organically in the centre with a smaller blob inside and dots orbiting it",
+      "recipe": "polar shape r(θ) = R·(1 + 0.12·sin(3θ + 2.2t) + 0.07·sin(5θ − 3.1t) + 0.04·sin(8θ + t)) drawn with 180 points; inner blob of 0.42R drifting on a Lissajous path; 14–18 dots orbit at 1.6R popping in with easeOutBack"
+    },
+    {
+      "id": "count-up",
+      "name": "Count-up number",
+      "category": "Data",
+      "desc": "A big number counts up and slows as it lands, with a bar filling underneath.",
+      "say": "a large number counts up and slows as it lands, with a progress bar filling beneath it",
+      "recipe": "value = target × easeOutExpo(progress) over ~1.6s, formatted with thousands separators in tabular numerals; a small monospace label above; a thin bar below fills with the same easing"
+    },
+    {
+      "id": "line-draw",
+      "name": "Self-drawing chart",
+      "category": "Data",
+      "desc": "A line chart draws itself left to right with a bright dot leading the way.",
+      "say": "a line chart draws itself from left to right with a bright dot at the tip and the value labelled",
+      "recipe": "faint horizontal gridlines first; the polyline is drawn up to progress (easeInOutCubic over ~1.8s) including a partial last segment; a filled dot sits at the tip with a live percentage label next to it"
+    },
+    {
+      "id": "cursor-click",
+      "name": "Cursor walkthrough",
+      "category": "UI",
+      "desc": "A cursor glides across an app screen, clicks a button, and a confirmation slides in.",
+      "say": "a cursor glides to a button in a clean app UI, clicks with a ripple, and a confirmation toast slides in",
+      "recipe": "draw a simple app window (sidebar, header, cards) with rounded rects; the arrow cursor moves on an eased curve (easeInOutCubic, slight arc), the button scales to 0.95 on click, a ring ripple expands and fades, then a toast slides in from the top right with easeOutBack"
+    },
+    {
+      "id": "ui-cards",
+      "name": "Dashboard build",
+      "category": "UI",
+      "desc": "Dashboard cards stagger in, numbers count up and mini charts grow. Instant SaaS demo.",
+      "say": "dashboard cards stagger in one by one, their numbers count up and small bar charts grow inside them",
+      "recipe": "3–4 rounded cards rise 30px and fade in with easeOutBack, 120ms apart; inside each, a label, a number counting up with easeOutExpo, and 5–7 bars growing from the baseline with a 40ms stagger; one accent colour per card"
+    },
+    {
+      "id": "synth-flyover",
+      "name": "Synthwave flyover",
+      "category": "3D",
+      "desc": "The camera glides over a glowing perspective grid toward a striped setting sun.",
+      "say": "the camera glides forward over a glowing perspective grid toward a striped setting sun, with mountain silhouettes",
+      "recipe": "horizon at ~45% height; a sun disc with horizontal cut-out stripes; grid lines converge to a vanishing point, horizontal lines scroll toward the camera with y = horizon + depth^2.2 spacing so they accelerate as they approach; layered mountain silhouettes from a seeded height table drift slowly; magenta and cyan glow on a deep navy sky"
+    },
+    {
+      "id": "card-reveal",
+      "name": "Card reveal",
+      "category": "Game",
+      "desc": "A collectible card flips over in a burst of light rays and sparks. The gacha moment.",
+      "say": "a collectible card flips from its back to reveal a rare character card, with rotating light rays and a burst of sparks",
+      "recipe": "light rays: 12 wedges rotating slowly behind the card, fading in at the reveal; the card flips by scaling X with cos(angle) from π to 0 (easeOutBack), showing a patterned back while scaleX < 0 and a gold-bordered front after; 24 sparks burst radially with easeOutCubic and fade; a rarity label pops in last"
+    },
+    {
+      "id": "confetti",
+      "name": "Confetti burst",
+      "category": "Game",
+      "desc": "A headline pops in and confetti bursts out and falls with gravity. Wins, launches, milestones.",
+      "say": "a headline pops in with a bounce and confetti bursts upward and falls with gravity and spin",
+      "recipe": "~90 confetti pieces from a seeded PRNG, each with launch velocity, spin and colour; position = start + v·τ + ½·g·τ² (τ = time since burst), rotation = spin·τ, drawn as thin rectangles; the headline scales from 0 with easeOutBack just before the burst"
+    },
+    {
+      "id": "film-look",
+      "name": "Film look",
+      "category": "Cinematic",
+      "desc": "Letterbox bars, a slow push-in, layered silhouettes, grain and a vignette. Instantly cinematic.",
+      "say": "a cinematic look: letterbox bars, a slow push-in on layered dusk silhouettes, subtle film grain and a vignette",
+      "recipe": "letterbox bars ease in to ~12% height each; 3 parallax silhouette layers from seeded heights, nearer layers move faster during a slow 1.06× push-in; grain = a few hundred 1px dots re-seeded every 1/24s at 6–8% alpha; radial vignette on top; a widely letter-spaced title fades in"
+    },
+    {
+      "id": "aurora",
+      "name": "Aurora gradient",
+      "category": "Background",
+      "desc": "Soft colour fields drift and blend behind your content. A calm, premium backdrop.",
+      "say": "soft, slowly drifting aurora-like colour gradients as the background",
+      "recipe": "3–4 large radial gradients (radius ~60% of the width) in palette colours, centres moving on slow Lissajous paths (periods 6–11s), blended with 'screen' over a dark base; keep foreground text high-contrast"
+    }
+  ],
+  "assetHelper": "(() => {\n  const cache = {};\n  window.opus6 = {\n    asset(id) {\n      if (!cache[id]) {\n        const url = (window.__ASSETS__ || {})[id];\n        if (!url) return Promise.reject(new Error(\"No asset \\\"\" + id + \"\\\"\"));\n        cache[id] = new Promise((resolve, reject) => {\n          const img = new Image();\n          img.onload = () => resolve(img);\n          img.onerror = () => reject(new Error(\"Asset \\\"\" + id + \"\\\" failed to load\"));\n          img.src = url;\n        });\n      }\n      return cache[id];\n    },\n    fit(img, mode = \"contain\", W = 1080, H = 1920) {\n      const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;\n      const s = mode === \"cover\" ? Math.max(W / iw, H / ih) : Math.min(W / iw, H / ih);\n      return { x: (W - iw * s) / 2, y: (H - ih * s) / 2, s, w: iw * s, h: ih * s };\n    },\n    toCanvas(f, px, py) { const x = f.x + px * f.s, y = f.y + py * f.s; return Object.assign([x, y], { x, y }); },\n  };\n})();"
+}

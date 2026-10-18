@@ -1,45 +1,54 @@
-# Claude Motion Video 交付记录
+# Claude Motion Video — 本轮复刻交付记录
 
-日期：2026-10-18。参考站 Tellcut，采用用户指定的 [web-clone skill](https://github.com/cuilinhao/claude-skill-web-clone)；前后端为独立实现。
+日期：2026-10-18。目标是保留本站品牌，将 Tellcut 可公开取得的页面、演示与 Studio UI 按实际部署源码迁移，同时保留本站真实业务。
 
-## 已上线
+**当前状态：本地类型检查、236 项测试、构建、资源引用与已记录的路由/响应式检查通过；真实 Google 回调、本轮音频浏览器 QA 和生产部署 pending。** 本记录不宣称 100% 完整复刻，也不将旧版线上验证当作本轮版本已部署的证明。
 
-- 应用：https://claudemotionvideo.com
-- www 保留路径和查询参数跳转根域。
-- Cloudflare Workers + D1 + 私有 R2 + Workflows + Email Sending；Namecheap nameservers 已切至 Cloudflare，区域状态 active。
-- 代码：React、TypeScript、Vite、Hono；APIMart 的原生 Claude Messages 接口生成 Canvas 动画，浏览器通过 WebCodecs/Mediabunny 导出静音 H.264 MP4。
+## 当前交付内容
 
-## 实际验收
-
-| 项目 | 结果 |
+| 内容 | 已落地范围 |
 |---|---|
-| 首页 | 1512px 桌面与390×844手机截图；手机无横向溢出；展示本站真实图片→视频示例 |
-| 线上上传/生成 | PNG 经认证API存入私有R2，Workflow调用APIMart，生成4分镜10秒动画并保存项目版本 |
-| 预览/导出 | 真实Chrome播放、选分镜、浏览器编码并上传成片；ffprobe验证1920×1080、30fps、10秒、H.264、3,137,087 bytes |
-| 私有成片 | 登录访问200，匿名访问401；正式浏览器验证退出后清空项目、版本、素材及预览 |
-| 失败退款 | 一次上游请求失败后140积分全额返还；随后新请求成功 |
-| 编辑 | 浏览器选择最后分镜并改标题，自动完成V2，保留V1；余额160→120，预估和实际均40积分 |
-| Stripe测试 | 真实测试API创建Checkout、绑测试卡、三天试用300积分、19.90USD模拟付款后1800积分、重复事件不重复发点、Portal可用；测试订阅已取消，无实际扣款 |
-| 代码检查 | TypeScript、73项单元/集成测试、Vite生产构建通过；生产依赖审计0漏洞 |
-| 密钥 | APIMart存于Worker secret；本地secret文件忽略；仓库候选文件扫描未发现真实凭证 |
+| 公开页面 | 13 个清理后的原结构 HTML 模板，包含两篇实际博客；构建脚本为公开静态页注入本站账号/计费/客服桥。 |
+| 案例与效果 | 470 条公开案例及本地海报，保留作者和 X 来源；21 个原动态 Canvas 效果。 |
+| 视频素材 | 14 个原站 MP4：12 个场景、主页演示和登录视频。 |
+| Studio | 264px 可收起侧栏、聊天、预览、版本、时间轴、设置、效果、图片、原 Lucky spin 及三种免费示例修改。 |
+| 品牌 | Claude Motion Video 名称、本站域名、自有双菱形 favicon；替换原站品牌和业务入口。 |
+| 真实生成 | 本站 APIMart Messages、D1 任务和积分、Workflows、版本保存、私有 R2；上传内容和生成编辑不会发往 Tellcut 后端。 |
+| 真实账号与支付 | 邮件登录、密码/重置、积分/账户、Stripe Checkout/Portal/Webhook、My videos 重命名/删除/下载、客服提交；Google OAuth 生产配置已完成，待真实线上回调。 |
+| 声音与导出 | 真实项目音乐/配音和 H.264 + 可选 AAC 导出；原站默认示例保持无声；导出 Stop 可取消。 |
+| 安全差异 | 代码下载为纯文本 `.txt`，不注入私有图片、不自动播放；模型内容只在受限预览中执行。 |
 
-截图位于 `RECON/screenshots/live-home-desktop.jpg`、`live-home-mobile.jpg` 和 `live-studio-preview.jpg`。私有控制台及验收成片放在被Git忽略的 `RECON/private/`。
+静态路由、素材来源及完整边界见 [TEARDOWN.md](TEARDOWN.md)；当前素材清单为 `public/reference-assets/manifest.json`。案例数量不是本地视频数量，也不是本站已成功生成 470 次的证据。
 
-## 正式收款
+## 本轮验证记录
 
-账户持有人已完成Stripe正式激活与通行密钥身份验证。本站8项权限受限密钥、6个正式Price、固定Portal配置和版本为 `2026-09-30.endive` 的Webhook已安装到Cloudflare encrypted secrets。
+| 检查 | 状态与范围 |
+|---|---|
+| 源码/素材数量 | 已只读核对：13 个静态模板、470 案例、21 效果、12 场景、14 MP4；清单 567 条资产含 Fazier 徽章，文件缺失、大小与 SHA-256 不匹配均为 0。 |
+| 类型检查 | 主代理 2026-10-18 19:37 完整检查通过。 |
+| 完整回归 | 主代理 19:37 全量 236 项测试通过，包含新增安全与业务回归；临时账户竞态脚本另有两个入口共 16 个用例通过，不计入 236。 |
+| 桌面对照 | 主代理已记录 1440px 原站/本站对照，默认 Lucky spin 可运行；截图在 `RECON/screenshots/fidelity/`。 |
+| 响应式布局 | `RECON/fidelity-browser-layout.json`：768px 平板 11 页、390px 手机 9 页，均无横向溢出与破图；不代表完整交互/设备矩阵。 |
+| 本地路由 | `RECON/fidelity-local-routes.json`：18 个有效路由 200、2 个未知路径 404，记录父页 CSP 和私有入口 noindex。 |
+| 已登录与音频交互 | **pending**：本轮完整已登录项目、音频 dialog 焦点/文件名及预览/导出浏览器 QA。 |
+| 构建和引用审计 | 主代理 19:37 构建通过，`scripts/audit-reference.mjs` 的 1,141 处引用审计通过；文档更新阶段未重复构建。 |
+| 远程数据库迁移 | `0008_fidelity_services.sql`、`0009_google_oauth.sql`、`0010_email_verification.sql` 已成功应用。 |
+| 本轮生产发布 | **pending**：部署、13 页线上状态、素材加载、登录、支付跳转、生成、音频/MP4及安全响应头复验。 |
+| Google 登录 | Google Cloud 项目 `claudemotionvideo` 与 OAuth 客户端已正式创建，Audience 为正式版，凭据已存 Cloudflare 加密 secrets；**真实回调与线上登录实测 pending**。 |
 
-正式Checkout已验证Starter三天绑卡试用、之后19.90USD/月；年付166.80USD无试用；六个价格的USD金额、周期及live模式逐个核对。Portal允许更新付款方式和期末取消，关闭套餐切换。签名健康事件返回200、错误签名400，确认公开Webhook路由与线上签名配置一致。验收Checkout均已过期，未提交真实银行卡、未创建正式订阅、未扣款；真实付款后的Stripe事件投递与银行提现未作生产验收。
+## 历史生产证据与本轮分界
 
-结账页面截图：`RECON/screenshots/live-stripe-checkout.jpg`。
+此前 https://claudemotionvideo.com 已上线，旧版完成真实图片生成、私有 MP4、编辑与失败退积分验证；后续音乐/AI 配音导出、Stripe 测试和正式 Checkout 页面，以及 GA4/GSC 也已有记录，详见 `README.md`、`RECON/analytics-verification.json`。这些记录是既有服务证据，不能替代本轮全站结构替换后的回归。
 
-## 已知范围
+此前 Stripe 正式验收没有真实扣款，也没有真实付费订阅的完整付款事件投递/银行提现验收。Google Search Console sitemap 接受成功不等于全部页面已收录；本轮路由变更后的 sitemap/抓取情况需再核对。
 
-- 没有自动主体分割、真实多层蒙版、配音和背景音乐。
-- 退款或拒付后的积分调整由运营人工处理。
-- 导出依赖支持WebCodecs H.264的浏览器；完整设备矩阵和各分辨率/比例性能未覆盖。
-- Cloudflare发信域名及binding已配置，密码重置令牌过期/一次性与会话失效有自动测试；未向真实收件箱发送验收邮件。
-- Chrome扩展未开放本地file URL权限，因此本轮图片选择器未完成自动化验收；图片上传API、保存后图片恢复与预览已实测。
-- 未获得原站完整源码；页面风格和主要使用流程相似，原站客户案例未复制；模板卡为提示预设，不代表每个卡片都有独立生成样片。
+## 仍有差异或不可验证
 
-后续运行、部署和Stripe配置见 `README.md`，实现审计见 `CLONE_AUDIT.md`。
+- 未登录 Tellcut 付费账号，无法核验原站私有生成/账单/项目状态；本站后端是独立实现。
+- 未移植原站流式追问、CONFIG 原地编辑、自动分割/mask、check/repair 与评分私有协议。本站支持的是已实现的生成、聊天编辑、原图渲染与失败退积分。
+- 重命名位于本站 My videos，Studio 标题当前只读；本站默认打开免费示例，原站源码显示部分已登录状态会优先打开最近项目。
+- 音频工具是本站保留的真实能力；不以公开原站视频的无声抽查结果推断其全部付费能力。
+- 完整浏览器/设备矩阵、长期并发和生成质量一致性未覆盖；浏览器必须支持所需 WebCodecs AVC/AAC 编码。
+- 退款/拒付后的积分调整仍以现有运营流程处理；失败生成返还积分不是订阅现金退款承诺。
+
+主代理完成最终 QA 与部署后，应以新证据更新上表 pending 项，而不是沿用本轮之前的“已上线”结论。

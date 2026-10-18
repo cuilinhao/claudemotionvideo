@@ -27,8 +27,8 @@ function validateHtml(html: unknown, duration: number): asserts html is string {
     || (html.match(/<script\b/gi)?.length ?? 0) !== (html.match(/<\/script\s*>/gi)?.length ?? 0)) {
     throw new Error('The provider returned an invalid animation document. Please try again.');
   }
-  // This is an output-quality gate, not the security boundary. The browser also runs
-  // this document in an opaque-origin sandbox with a network-denying CSP.
+  // This contract gate reduces executable output capabilities; it is not a JS
+  // sandbox. Opaque iframe origins and browser CSP remain required at runtime.
   if (/<(?:iframe|object|embed|base|form|link)\b/i.test(html)
     || /<script\b[^>]*\bsrc\s*=/i.test(html)
     || /<meta\b[^>]*http-equiv\s*=/i.test(html)
@@ -42,18 +42,53 @@ function validateHtml(html: unknown, duration: number): asserts html is string {
   let ast: unknown;
   try { ast = parse(scripts, { ecmaVersion: 2022, sourceType: 'script' }); }
   catch { throw new Error('The provider returned animation code with invalid JavaScript syntax.'); }
-  const pending: unknown[] = [ast];
+  const pending: { node: unknown; parent?: Record<string, unknown>; key?: string; lexicalNames: Set<string> }[] = [{ node: ast, lexicalNames: new Set() }];
   let hasDuration = false;
-  const forbidden = new Set(['location', 'cookie', 'domain', 'parent', 'top', 'opener', 'fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource', 'navigator', 'localStorage', 'sessionStorage', 'indexedDB']);
+  const forbiddenGlobals = new Set(['globalThis', 'self', 'parent', 'top', 'opener', 'frames']);
+  const windowMembers = new Set(['DURATION', 'seek', 'READY', 'ASSETS']);
+  const documentMembers = new Set(['getElementById', 'querySelector', 'querySelectorAll', 'createElement', 'fonts']);
+  const forbiddenMembers = new Set(['constructor', '__proto__', 'ownerDocument', 'defaultView', 'contentWindow', 'parentWindow']);
+  const rejectEnvironment = () => { throw new Error('The provider returned animation code outside the supported canvas environment.'); };
   while (pending.length) {
-    const node = pending.pop();
+    const { node, parent, key, lexicalNames: inheritedNames } = pending.pop()!;
     if (!record(node)) continue;
+    let lexicalNames = inheritedNames;
+    if ((node.type === 'BlockStatement' || node.type === 'Program') && Array.isArray(node.body)) {
+      // Generated drawing helpers commonly use a lexical `top` coordinate.
+      // Only direct let/const bindings shadow these legacy window names;
+      // unrelated nested declarations and global var properties do not.
+      lexicalNames = new Set(inheritedNames);
+      for (const statement of node.body) {
+        if (!record(statement) || statement.type !== 'VariableDeclaration'
+          || !['let', 'const'].includes(String(statement.kind)) || !Array.isArray(statement.declarations)) continue;
+        for (const declaration of statement.declarations) if (record(declaration) && record(declaration.id)
+          && declaration.id.type === 'Identifier') lexicalNames.add(String(declaration.id.name));
+      }
+    }
+    if (node.type === 'ThisExpression') rejectEnvironment();
+    if (node.type === 'Identifier') {
+      // A noncomputed object key (e.g. palette.self) is not a global reference.
+      // Shorthand properties, destructuring, arguments, returns and assignments
+      // still count as references and may not capture the browser globals.
+      const propertyName = (parent?.type === 'MemberExpression' && key === 'property' && !parent.computed)
+        || (parent?.type === 'Property' && key === 'key' && !parent.computed && !parent.shorthand);
+      if (!propertyName && forbiddenGlobals.has(String(node.name))
+        && (node.name === 'globalThis' || node.name === 'self' || !lexicalNames.has(String(node.name)))) rejectEnvironment();
+      if (!propertyName && (node.name === 'window' || node.name === 'document')) {
+        if (parent?.type !== 'MemberExpression' || key !== 'object' || !record(parent.property)) rejectEnvironment();
+        const member = parent!.computed ? (parent!.property as Record<string, unknown>).value : (parent!.property as Record<string, unknown>).name;
+        const allowed = node.name === 'window' ? windowMembers : documentMembers;
+        if (typeof member !== 'string' || !allowed.has(member)) rejectEnvironment();
+      }
+    }
     if (node.type === 'MemberExpression' && record(node.object) && record(node.property)) {
       const property = node.computed ? node.property.value : node.property.name;
-      if (property === 'constructor' || property === '__proto__'
-        || (['window', 'self', 'globalThis', 'document'].includes(String(node.object.name))
-          && (typeof property !== 'string' || forbidden.has(property)))) {
-        throw new Error('The provider returned animation code outside the supported canvas environment.');
+      if (typeof property === 'string' && forbiddenMembers.has(property)) rejectEnvironment();
+      if (node.object.name === 'document' && property === 'createElement') {
+        const arguments_ = parent?.arguments;
+        if (parent?.type !== 'CallExpression' || key !== 'callee' || !Array.isArray(arguments_)
+          || !record(arguments_[0]) || arguments_[0].type !== 'Literal'
+          || !['canvas', 'img'].includes(String(arguments_[0].value))) rejectEnvironment();
       }
     }
     if (node.type === 'AssignmentExpression' && record(node.left) && node.left.type === 'MemberExpression'
@@ -64,9 +99,9 @@ function validateHtml(html: unknown, duration: number): asserts html is string {
       }
       hasDuration = true;
     }
-    for (const value of Object.values(node)) {
-      if (Array.isArray(value)) pending.push(...value);
-      else if (record(value) && typeof value.type === 'string') pending.push(value);
+    for (const [childKey, value] of Object.entries(node)) {
+      if (Array.isArray(value)) pending.push(...value.map(child => ({ node: child, parent: node, key: childKey, lexicalNames })));
+      else if (record(value) && typeof value.type === 'string') pending.push({ node: value, parent: node, key: childKey, lexicalNames });
     }
   }
   if (!hasDuration) throw new Error('The provider returned an animation without a declared duration.');
@@ -120,6 +155,7 @@ HTML contract:
 - User asset IDs are supplied below. Their ORIGINAL image pixels are available at window.ASSETS[id] as a data URL. For each supplied asset, create a new Image(), assign its src to window.ASSETS[id], wait for image.decode() using window.READY = Promise.all(...), and use ctx.drawImage(image,...) in seek. Never embed Base64 bytes in your output. Preserve the actual product/photo pixels; animate positions, scaling, rotation, masks and rectangular source crops. Do not replace an uploaded image with an illustration. There is no automatic subject segmentation; never describe a crop as a segmented layer.
 - window.READY can be a Promise for image loading. The host waits for it. Draw all text with built-in system fonts and fit text to the canvas. Keep important content inside a 6% safe margin.
 - No access to window.parent, window.top, opener, postMessage, storage, cookies, navigator or navigation. The host owns playback and frame export. No event listeners needed.
+- Access window only through window.DURATION, window.seek, window.READY or window.ASSETS. Do not use globalThis, self or this, and never alias, destructure, pass or return window/document. Use document only for direct canvas lookup, document.fonts or document.createElement("canvas"/"img"); never create scripts or other DOM elements.
 - Use high-contrast colors, thoughtful hierarchy and legible pacing. Follow the user's requested language for visible text. Use a coherent visual idea, multiple timed scenes and meaningful transitions rather than a generic static title slide.
 For edits, the prior accepted HTML is supplied in the conversation. Its CMV_STORYBOARD comment contains the accepted shot IDs and exact time intervals. Modify that exact composition, retaining images, branding and unaffected scenes. If selectedShot is supplied, look up that ID in CMV_STORYBOARD and limit the visual change to that shot's time interval unless the instruction expressly requires a global change. Always return the complete updated HTML and complete storyboard, never a patch.`;
 

@@ -1,0 +1,142 @@
+[
+  {
+    "path": "/",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/pricing",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/examples",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/effects",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/blogs",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/blogs/opus-5-5-video-prompt-guide",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/blogs/opus-5-5-video-examples",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/opus-5-5-video-generator",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/featured",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/contact",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/terms",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/privacy",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/refunds",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/studio",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": "noindex"
+  },
+  {
+    "path": "/my-videos",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": "noindex"
+  },
+  {
+    "path": "/account",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": "noindex"
+  },
+  {
+    "path": "/sign-in",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": "noindex"
+  },
+  {
+    "path": "/reset-password",
+    "status": 200,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": "noindex"
+  },
+  {
+    "path": "/missing-page-test",
+    "status": 404,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  },
+  {
+    "path": "/blogs/missing-article",
+    "status": 404,
+    "hasBody": true,
+    "csp": "frame-src 'self'; object-src 'none'; base-uri 'self'",
+    "private": null
+  }
+]

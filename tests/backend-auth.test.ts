@@ -31,4 +31,13 @@ describe('account security', () => {
     expect((await getSessionUser(db, token, 101))?.id).toBe('alice');
     expect(await getSessionUser(db, token, 100 + 31 * 86400)).toBeNull();
   });
+  it('cannot create a password session after its previously checked password has been revoked', async () => {
+    const { db } = makeDb(); await seedUser(db);
+    const checkedHash = await hashPassword('attacker known password');
+    await db.prepare("UPDATE users SET password_hash=? WHERE id='alice'").bind(checkedHash).run();
+    expect(await verifyPassword('attacker known password', checkedHash)).toBe(true);
+    await db.prepare("UPDATE users SET password_hash=? WHERE id='alice'").bind(await hashPassword('new verified owner password')).run();
+    await expect(createSession(db, 'alice', 100, checkedHash)).rejects.toMatchObject({ status: 401 });
+    expect(await db.prepare('SELECT COUNT(*) AS n FROM sessions').first('n')).toBe(0);
+  });
 });

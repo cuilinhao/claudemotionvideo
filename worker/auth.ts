@@ -1,4 +1,5 @@
 import type { UserRow } from './types';
+import { ApiError } from './errors';
 
 const ITERATIONS = 100_000; // Workers WebCrypto supported per-operation maximum.
 export const SESSION_COOKIE = 'cmv_session';
@@ -35,10 +36,27 @@ export async function rateLimit(db: D1Database, key: string, maximum: number, se
     .bind(key, now + seconds, now, now, now + seconds).first<{ count: number }>();
   return !!row && row.count <= maximum;
 }
-export async function createSession(db: D1Database, userId: string, now = Math.floor(Date.now() / 1000)) {
+/** Execute the returned statements together, before issuing the verified session.
+ * Legacy/unverified registrations may belong to someone who only guessed this
+ * email. Invalidate their credentials on first proof of mailbox ownership.
+ */
+export async function emailVerificationStatements(db: D1Database, email: string, now: number, validMagicTokenHash?: string): Promise<D1PreparedStatement[]> {
+  const password = await hashPassword(hex(crypto.getRandomValues(new Uint8Array(32))));
+  const guard = validMagicTokenHash ? ` AND EXISTS (SELECT 1 FROM magic_links WHERE magic_links.email=users.email
+    AND magic_links.token_hash=? AND magic_links.expires_at>? AND magic_links.consumed_at IS NULL)` : '';
+  const bindings = validMagicTokenHash ? [email, validMagicTokenHash, now] : [email];
+  return [
+    db.prepare(`DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE email=? AND email_verified_at IS NULL${guard})`).bind(...bindings),
+    db.prepare(`UPDATE users SET password_hash=?,email_verified_at=? WHERE email=? AND email_verified_at IS NULL${guard}`).bind(password, now, ...bindings),
+  ];
+}
+
+export async function createSession(db: D1Database, userId: string, now = Math.floor(Date.now() / 1000), expectedPasswordHash?: string) {
   const token = hex(crypto.getRandomValues(new Uint8Array(32)));
-  await db.prepare('INSERT INTO sessions (token_hash,user_id,expires_at,created_at) VALUES (?,?,?,?)')
-    .bind(await digest(token), userId, now + SESSION_AGE, now).run();
+  const created = await db.prepare(`INSERT INTO sessions (token_hash,user_id,expires_at,created_at)
+    SELECT ?,id,?,? FROM users WHERE id=? AND (? IS NULL OR password_hash=?)`)
+    .bind(await digest(token), now + SESSION_AGE, now, userId, expectedPasswordHash ?? null, expectedPasswordHash ?? null).run();
+  if (!created.meta.changes) throw new ApiError(401, 'Your sign-in credentials changed. Please sign in again.', 'INVALID_CREDENTIALS');
   return token;
 }
 export async function getSessionUser(db: D1Database, token: string | undefined, now = Math.floor(Date.now() / 1000)) {
