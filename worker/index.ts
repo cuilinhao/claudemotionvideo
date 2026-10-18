@@ -1,6 +1,7 @@
 import { app } from './app';
 import { refillAnnualSubscribers } from './billing';
 import { recoverStaleJobs } from './workflow-runner';
+import { recoverStaleSpeech } from './audio';
 import type { Env } from './types';
 export { GenerationWorkflow } from './workflow';
 
@@ -23,7 +24,7 @@ export default {
   },
   async scheduled(_controller: ScheduledController, env: Env, context: ExecutionContext) {
     context.waitUntil(Promise.all([
-      refillAnnualSubscribers(env), recoverStaleJobs(env),
+      refillAnnualSubscribers(env), recoverStaleJobs(env), recoverStaleSpeech(env),
       env.DB.batch([
         env.DB.prepare('DELETE FROM sessions WHERE expires_at<=?').bind(Math.floor(Date.now() / 1000)),
         env.DB.prepare('DELETE FROM rate_limits WHERE expires_at<=?').bind(Math.floor(Date.now() / 1000)),

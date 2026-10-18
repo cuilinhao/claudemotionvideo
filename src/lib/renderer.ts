@@ -55,6 +55,8 @@ export function buildPreviewDocument(html: string, assets: Record<string, string
   const fail=()=>send({type:"cmv:error",error:"This animation could not render. Try regenerating this version."});
   let exporting=null;
   let queue=Promise.resolve();
+  let pendingSeek=null;
+  let previewQueued=false;
   let stage;
   const bounded=(promise,ms)=>new Promise((resolve,reject)=>{
     const timer=setTimeout(()=>reject(new Error("Render timeout")),ms);
@@ -74,11 +76,24 @@ export function buildPreviewDocument(html: string, assets: Record<string, string
   window.addEventListener("message",event=>{
     const data=event.data;
     if(event.source!==host || !data || typeof data!=="object" || data.channel!==channel)return;
-    if(data.type==="cmv:export-start" && typeof data.exportId==="string"){exporting=data.exportId;return}
+    if(data.type==="cmv:export-start" && typeof data.exportId==="string"){exporting=data.exportId;pendingSeek=null;return}
     if(data.type==="cmv:export-end" && data.exportId===exporting){exporting=null;return}
     if(data.type!=="cmv:seek" && data.type!=="cmv:frame")return;
     if(typeof data.time!=="number" || !Number.isFinite(data.time))return;
-    if(data.type==="cmv:seek" && exporting)return;
+    if(data.type==="cmv:seek"){
+      if(exporting)return;
+      pendingSeek=Math.max(0,Math.min(window.DURATION,data.time));
+      if(previewQueued)return;
+      previewQueued=true;
+      queue=queue.then(async()=>{
+        await ready;
+        while(pendingSeek!==null && !exporting){
+          const time=pendingSeek;pendingSeek=null;
+          await bounded(window.seek(time),10000);
+        }
+      }).catch(fail).finally(()=>{previewQueued=false});
+      return;
+    }
     if(data.type==="cmv:frame" && (typeof data.requestId!=="string" || data.requestId.length>128 || data.exportId!==exporting || !exporting))return;
     queue=queue.then(async()=>{
       await ready;
@@ -125,9 +140,9 @@ function requestFrame(iframe: HTMLIFrameElement, channel: string, exportId: stri
   });
 }
 
-/** Render every frame at its exact timestamp, applying encoder backpressure. Silent H.264 MP4. */
+/** Render exact video timestamps and optionally mux the prepared preview mix as AAC. */
 export async function exportMp4(iframe: HTMLIFrameElement, options: {
-  channel: string; duration: number; aspect: string; onProgress?: (progress: number) => void;
+  channel: string; duration: number; aspect: string; audio?: AudioBuffer; onProgress?: (progress: number) => void;
 }): Promise<Blob> {
   if (!Number.isFinite(options.duration) || options.duration <= 0 || options.duration > 30) throw new Error('Invalid video duration.');
   if (!iframe.sandbox.contains('allow-scripts') || iframe.sandbox.contains('allow-same-origin')) {
@@ -137,11 +152,20 @@ export async function exportMp4(iframe: HTMLIFrameElement, options: {
   if (!globalThis.isSecureContext || typeof globalThis.VideoEncoder === 'undefined') {
     throw new Error('MP4 export needs a browser with WebCodecs H.264 support. Open this project in the latest Chrome or Edge over HTTPS.');
   }
+  const audio = options.audio;
+  if (audio && (!Number.isFinite(audio.duration) || Math.abs(audio.duration - options.duration) > 1 / 30
+    || ![1, 2].includes(audio.numberOfChannels) || !Number.isFinite(audio.sampleRate) || audio.sampleRate < 8000 || audio.sampleRate > 96000)) {
+    throw new Error('The audio duration or format does not match this video. Prepare the audio again before exporting.');
+  }
   const { width, height } = videoDimensions(options.aspect);
-  const { Output, Mp4OutputFormat, BufferTarget, CanvasSource, Quality, canEncodeVideo } = await import('mediabunny');
+  const { Output, Mp4OutputFormat, BufferTarget, CanvasSource, AudioBufferSource, Quality, canEncodeVideo, canEncodeAudio } = await import('mediabunny');
   const quality = new Quality({ bitrate: 8_000_000 });
   if (!await canEncodeVideo('avc', { width, height, frameRate: 30, quality })) {
     throw new Error('This browser cannot encode 1080p H.264 MP4. Try the latest Chrome or Edge on a supported device.');
+  }
+  const audioQuality = new Quality({ bitrate: 192_000 });
+  if (audio && !await canEncodeAudio('aac', { numberOfChannels: audio.numberOfChannels, sampleRate: audio.sampleRate, quality: audioQuality })) {
+    throw new Error('This browser cannot encode AAC audio for MP4. Try the latest Chrome or Edge on a device with AAC encoding support.');
   }
   const canvas = document.createElement('canvas');
   canvas.width = width; canvas.height = height;
@@ -151,6 +175,8 @@ export async function exportMp4(iframe: HTMLIFrameElement, options: {
   const output = new Output({ format: new Mp4OutputFormat({ fastStart: 'in-memory' }), target });
   const video = new CanvasSource(canvas, { codec: 'avc', quality, keyFrameInterval: 2 });
   output.addVideoTrack(video, { frameRate: 30 });
+  const audioSource = audio ? new AudioBufferSource({ codec: 'aac', quality: audioQuality }) : undefined;
+  if (audioSource) output.addAudioTrack(audioSource);
   const exportId = crypto.randomUUID();
   // The codec capability check above is asynchronous: another export may have
   // started since the initial check, so acquire the lock again before mutation.
@@ -160,6 +186,12 @@ export async function exportMp4(iframe: HTMLIFrameElement, options: {
   try {
     options.onProgress?.(0);
     await output.start();
+    if (audioSource && audio) {
+      // AudioBufferSource starts at timestamp zero. Closing the whole short track
+      // lets the muxer flush it as frames arrive, without recording in real time.
+      await audioSource.add(audio);
+      audioSource.close();
+    }
     const count = Math.round(options.duration * 30);
     for (let index = 0; index < count; index++) {
       if (!iframe.isConnected) throw new Error('The preview was closed during export.');

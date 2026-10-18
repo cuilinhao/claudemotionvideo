@@ -1,3 +1,5 @@
+import type { AudioAsset, ProjectAudio } from "../../shared/audio";
+
 export type User = {
   id: string;
   email: string;
@@ -32,17 +34,30 @@ export type Job = {
 };
 type ApiError = { error?: string; code?: string };
 
+export class ApiRequestError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly code?: string,
+  ) {
+    super(message);
+    this.name = "ApiRequestError";
+  }
+}
+
 async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
   const response = await fetch(url, { credentials: "same-origin", ...init });
   if (!response.ok) {
     let message = `Request failed (${response.status})`;
+    let code: string | undefined;
     try {
       const body = (await response.json()) as ApiError;
       if (body.error) message = body.error;
+      code = body.code;
     } catch {
       /* response wasn't JSON */
     }
-    throw new Error(message);
+    throw new ApiRequestError(message, response.status, code);
   }
   if (response.status === 204) return undefined as T;
   const contentType = response.headers.get("content-type") ?? "";
@@ -119,14 +134,58 @@ export const api = {
     }),
   portal: () =>
     request<{ url: string }>("/api/billing/portal", { method: "POST" }),
-  saveMp4: (projectId: string, versionId: string, blob: Blob) =>
+  saveMp4: (projectId: string, versionId: string, blob: Blob, audioRevision: number) =>
     request<{ url: string }>(
       `/api/projects/${encodeURIComponent(projectId)}/versions/${encodeURIComponent(versionId)}/mp4`,
-      { method: "PUT", headers: { "content-type": "video/mp4" }, body: blob },
+      {
+        method: "PUT",
+        headers: {
+          "content-type": "video/mp4",
+          "X-Audio-Revision": String(audioRevision),
+        },
+        body: blob,
+      },
     ),
   mp4: (projectId: string, versionId: string) =>
     request<Blob>(
       `/api/projects/${encodeURIComponent(projectId)}/versions/${encodeURIComponent(versionId)}/mp4`,
+    ),
+  projectAudio: (projectId: string) =>
+    request<ProjectAudio>(`/api/projects/${encodeURIComponent(projectId)}/audio`),
+  saveProjectAudio: (projectId: string, settings: ProjectAudio["settings"]) =>
+    request<ProjectAudio>(`/api/projects/${encodeURIComponent(projectId)}/audio`, {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(settings),
+    }),
+  uploadAudio: (projectId: string, file: File) => {
+    const data = new FormData();
+    data.append("projectId", projectId);
+    data.append("file", file);
+    return request<{ asset: AudioAsset }>("/api/audio/assets", {
+      method: "POST",
+      body: data,
+    });
+  },
+  audioAsset: (id: string) =>
+    request<Blob>(`/api/audio/assets/${encodeURIComponent(id)}`),
+  generateVoice: (input: {
+    projectId: string;
+    text: string;
+    voice: string;
+    idempotencyKey: string;
+  }) =>
+    request<{ asset: AudioAsset; cost: number }>(
+      `/api/projects/${encodeURIComponent(input.projectId)}/voice`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          text: input.text,
+          voice: input.voice,
+          idempotencyKey: input.idempotencyKey,
+        }),
+      },
     ),
 };
 

@@ -29,14 +29,14 @@ The recognizable user journey is: select an idea and reference image, describe m
 | Prompt-to-animation request | `worker/ai.ts` sends text plus image base64 to `https://api.apimart.ai/v1/messages`, validates a single canvas document, and requires `window.seek`, `window.DURATION`, and image rendering for uploaded assets. | `SOURCE` |
 | Durable job and credit accounting | `worker/jobs.ts` writes a job and ledger debit transactionally, honors per-user idempotency, launches the Cloudflare Workflow; `worker/workflow-runner.ts` reads images, calls the provider once, stores a version, and returns job credits on failure/timeout. | `SOURCE` |
 | Preview isolation | `src/lib/renderer.ts` builds a restrictive CSP document, mounted in a sandbox iframe with `allow-scripts` but no `allow-same-origin`; messages require matching iframe source and random channel. | `SOURCE` |
-| MP4 export | `src/lib/renderer.ts` requests deterministic frames and encodes silent H.264 through Mediabunny/WebCodecs at 30 fps; `worker/app.ts` accepts an authenticated MP4 upload up to 64 MiB and stores it in R2. | `SOURCE` |
+| MP4 export | `src/lib/renderer.ts` requests deterministic frames and encodes H.264 at 30 fps plus an optional AAC soundtrack through Mediabunny/WebCodecs; `worker/app.ts` accepts an authenticated MP4 upload up to 64 MiB and stores it in R2. | `SOURCE` |
 | One actual generation artifact | `RECON/live-generation.json` contains a 1920×1080, 10-second Canvas document and 4-entry storyboard. Parent's recorded run: 72 seconds for one APIMart generation, exported H.264 MP4, 5,380,655 bytes. | `SOURCE` for the saved document; observed result is one sample, not a performance guarantee. |
 
 ## What the public reference does not establish
 
 The original site's public UI does not reveal its model/provider, prompt construction, segmentation method, generation backend, render service, storage provider, or actual cost (`GUESS` if speculated). This clone uses the implementation described above; that is evidence about this repository only and must not be projected onto Tellcut.
 
-The clone's prompt and code explicitly preserve reference image pixels and allow movement, scale, rotation, masks and rectangular crops. There is no automated subject segmentation or separate extracted subject layer; no audio synthesis or soundtrack is implemented (`SOURCE`: `worker/ai.ts`, `src/lib/renderer.ts`). One uploaded image-to-video success proves neither repeatable output quality nor broad input compatibility.
+The clone's prompt and code explicitly preserve reference image pixels and allow movement, scale, rotation, masks and rectangular crops. There is no automated subject segmentation or separate extracted subject layer (`SOURCE`: `worker/ai.ts`). Music presets, audio uploads and APIMart AI narration are implemented separately in the parent page (`src/lib/audio-engine.ts`, `worker/audio.ts`). One uploaded image-to-video success proves neither repeatable output quality nor broad input compatibility.
 
 ## Claims cross-check
 
@@ -51,3 +51,7 @@ The clone's prompt and code explicitly preserve reference image pixels and allow
 ## Transferable product method
 
 The useful product pattern is a constrained, inspectable loop: collect structured format options and a brief; attach optional references; create an idempotent job with visible status and usage cost; preserve every output as a version; let the user refine either the whole version or a selected shot; then preview and export with explicit browser capability checks. It keeps creative iteration legible and avoids presenting a generic image generation as a finished editable video.
+
+## Tellcut audio spot check — 2026-10-18
+
+Downloaded and inspected four publicly served official MP4 files with ffprobe: `/demo/studio-demo.mp4` (23.8 s), `/scenarios/launch.mp4` (15 s), `/scenarios/game.mp4` (10 s), and `/scenarios/showreel.mp4` (15 s). Each contained one H.264 video stream and no audio stream. The public Studio example exposed no audio controls at inspection time. This does not establish every paid export is silent. The homepage Examples collection explicitly credits external Claude users; its music-related examples are not evidence of Tellcut built-in audio generation.

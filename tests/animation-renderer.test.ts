@@ -69,6 +69,29 @@ describe('isolated animation renderer', () => {
     await dispatch({ type: 'cmv:seek', time: 3, channel });
     expect(context.lastTime).toBe(3);
   });
+  it('coalesces preview seeks to the newest time while a slow frame is rendering', async () => {
+    const listeners: Record<string, Function[]> = {};
+    const parent = { postMessage() {} };
+    let release: (() => void) | undefined;
+    const times: number[] = [];
+    const context: any = {
+      parent, document: { getElementById: () => ({ width: 1920, height: 1080 }), images: [], readyState: 'complete' },
+      addEventListener: (type: string, fn: Function) => (listeners[type] ??= []).push(fn),
+      setTimeout, clearTimeout, Promise, Object, Number, Math,
+      DURATION: 10,
+      seek: (time: number) => { times.push(time); if (time === 1) return new Promise<void>(resolve => { release = resolve; }); },
+    };
+    context.window = context;
+    const doc = buildPreviewDocument('<canvas id="stage"></canvas>', {}, channel);
+    for (const match of doc.matchAll(/<script>([\s\S]*?)<\/script>/g)) runInNewContext(match[1], context);
+    const tick = () => new Promise(resolve => setTimeout(resolve, 0));
+    await tick();
+    const seek = (time: number) => listeners.message.forEach(fn => fn({ source: parent, data: { type: 'cmv:seek', time, channel } }));
+    seek(1); await tick();
+    seek(2); seek(3); seek(4);
+    release?.(); await tick();
+    expect(times).toEqual([0, 1, 4]);
+  });
   it('uses fixed, even 1080p output sizes and rejects unknown aspect ratios', () => {
     expect(videoDimensions('16:9')).toEqual({ width: 1920, height: 1080 });
     expect(videoDimensions('9:16')).toEqual({ width: 1080, height: 1920 });

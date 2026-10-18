@@ -275,6 +275,7 @@ function SectionHead({
 function DemoCard({ compact = false }: { compact?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(true);
+  const [muted, setMuted] = useState(true);
 
   async function togglePlayback() {
     const video = videoRef.current;
@@ -306,16 +307,17 @@ function DemoCard({ compact = false }: { compact?: boolean }) {
           <span className="demo-source-label">MP4 PREVIEW</span>
           <video
             ref={videoRef}
-            src="/demos/orbit-demo.mp4"
+            src="/demos/orbit-demo.mp4?v=audio-1"
             poster="/demos/orbit-poster.jpg"
             autoPlay
-            muted
+            muted={muted}
             loop
             playsInline
             controls
             aria-label="Generated Orbit dashboard motion graphics video"
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
+            onVolumeChange={() => setMuted(videoRef.current?.muted ?? true)}
           />
           <button
             className="demo-play-control"
@@ -326,11 +328,26 @@ function DemoCard({ compact = false }: { compact?: boolean }) {
           >
             {playing ? "PAUSE" : "PLAY"}
           </button>
+          <button
+            className="demo-sound-control"
+            type="button"
+            onClick={() => {
+              const video = videoRef.current;
+              if (!video) return;
+              video.muted = !video.muted;
+              setMuted(video.muted);
+              if (!video.muted && video.paused) void video.play().catch(() => setPlaying(false));
+            }}
+            aria-label={muted ? "Enable demo sound" : "Mute demo sound"}
+            aria-pressed={!muted}
+          >
+            {muted ? "SOUND ON" : "MUTE"}
+          </button>
         </div>
       </div>
       <div className="demo-card-foot">
         <span>ORBIT / PRODUCT MOTION</span>
-        <span>H.264 MP4 · 1080P · 30 FPS</span>
+        <span>1080P MP4 · MUSIC + VOICE</span>
       </div>
     </div>
   );
@@ -661,6 +678,14 @@ export function HomePage({
               page lists the current credit schedule.
             </p>
           </details>
+          <details>
+            <summary>Can I add music and a voiceover?</summary>
+            <p>
+              Choose a built-in soundtrack or upload your own music and narration.
+              AI voiceover costs 20 credits per generation. Adjust each volume,
+              preview the mix, then export a video with sound.
+            </p>
+          </details>
         </div>
       </section>
       <section className="home-cta">
@@ -822,7 +847,8 @@ export function PricingPage({
             <h3>How much does a video cost?</h3>
             <p>
               10 seconds costs 80 credits, 15 seconds 100, and 30 seconds 160.
-              Chat edits are 20 credits.
+              Chat edits are 20 credits. Optional AI voiceover is another 20
+              credits per generation; built-in music and audio uploads use no credits.
             </p>
           </article>
           <article>
@@ -1139,7 +1165,7 @@ export function LegalPage({
         ],
         [
           "Your content",
-          "You keep rights to the content you provide and videos you create. You are responsible for having permission to use uploaded images, names, marks and recognizable people.",
+          "You keep rights to the content you provide and videos you create. You are responsible for having permission to use uploaded images, music, recordings, names, marks and recognizable people.",
         ],
         [
           "Credits and subscriptions",
@@ -1157,7 +1183,7 @@ export function LegalPage({
       body: [
         [
           "Information we use",
-          "We process account details, prompts, uploaded images, generated videos and usage records to operate the service, protect accounts and provide support.",
+          "We process account details, prompts, narration scripts, uploaded images and audio, generated videos and usage records to operate the service, protect accounts and provide support.",
         ],
         [
           "How content is handled",

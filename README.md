@@ -1,16 +1,17 @@
 # Claude Motion Video
 
-基于文本和最多四张参考图生成 Canvas 动画，浏览器预览并导出静音 H.264 MP4。生成代码经服务端校验后保存在版本中；成片由用户浏览器逐帧渲染、编码，再上传到 Cloudflare R2。
+基于文本和最多四张参考图生成 Canvas 动画，浏览器预览并导出含音乐/配音的 H.264 + AAC MP4。生成代码经服务端校验后保存在版本中；成片由用户浏览器逐帧渲染、编码，再上传到 Cloudflare R2。
 
 ## 技术栈与数据流
 
 - React 19、TypeScript、Vite 7；Cloudflare Worker/Hono 提供同源 API。
-- D1 保存用户、会话、积分流水、项目、任务、版本和 Stripe 事件；R2 保存原图和 MP4；Cloudflare Workflows 执行生成任务。
+- D1 保存用户、会话、积分流水、项目、任务、版本和 Stripe 事件；R2 保存原图、私有音频和 MP4；Cloudflare Workflows 执行生成任务。
 - Worker 将图片内容和提示发送至 APIMart Messages 接口，由模型返回 HTML Canvas 动画和 storyboard。默认模型配置在 `wrangler.jsonc` 的 `APIMART_MODEL`（当前值 `claude-opus-5-5`）；真实单次演示信息和边界见下文。
 - 上传：`POST /api/assets` 校验文件后存入私有 R2；`GET /api/assets/:id` 按登录用户校验并返回原图。
 - 生成：`POST /api/jobs` 校验用户、项目、素材和幂等键，在 D1 同批记账/建 job，然后创建 Workflow。Workflow 读取图片后调用 APIMart，校验生成代码并保存 `versions`；Studio 轮询 `GET /api/jobs/:id`。
 - 预览：Studio 取回版本 HTML 和授权图片数据，将内容放入仅 `allow-scripts` 的 sandbox iframe。CSP 禁止网络请求，消息桥用窗口来源及随机 channel 校验。
-- MP4：`src/lib/renderer.ts` 通过 Mediabunny/WebCodecs 请求 iframe 每一帧，按 30 fps 编码 H.264 MP4；随后 `PUT /api/projects/:id/versions/:vid/mp4` 将二进制存 R2。后端不代用户渲染视频。
+- MP4：`src/lib/renderer.ts` 通过 Mediabunny/WebCodecs 请求 iframe 每一帧，按 30 fps 编码 H.264，并把与预览相同的混音编码为 AAC 音轨；随后 `PUT /api/projects/:id/versions/:vid/mp4` 将二进制存 R2。后端不代用户渲染视频。
+- 音频：`GET/PUT /api/projects/:id/audio` 保存混音设置与 revision；`POST /api/audio/assets` 上传带 `file`、`projectId` 的私有音频；`POST /api/projects/:id/voice` 通过 APIMart `/v1/audio/speech` 生成配音。相同幂等键不会重复调用上游；失败/中断任务按原扣点流水退款。
 - 计费：Stripe Checkout/Customer Portal；Webhook 签名校验后更新订阅与积分。购买页当前套餐由 `src/lib/content.ts` 定义；生成成本由 `worker/credits.ts` 执行。
 
 ## 本地运行
@@ -52,6 +53,7 @@ npm run build
 | `users`, `sessions`, `password_resets`, `rate_limits` | 账户、会话、重置令牌和频率限制 |
 | `credit_ledger` | 不可修改的积分流水；触发器更新余额并阻止负余额 |
 | `projects`, `assets`, `versions` | 项目、私有图片元数据、动画 HTML/storyboard/版本及 MP4 key |
+| `audio_assets`, `project_audio`, `speech_requests` | 私有音频、项目混音设置/版本、幂等配音请求与计费状态 |
 | `jobs` | 队列状态、幂等键、计费数额、版本关联 |
 | `stripe_events` | 防止重复处理 Stripe webhook |
 
@@ -122,10 +124,13 @@ npm run deploy
 
 - 上传 PNG/JPEG/WebP，单张小于 5 MiB，每个用户最多存 200 张/累计 500 MiB；每个视频最多引用 4 张。
 - 支持 10/15/30 秒、16:9/9:16/1:1。生成结果是单个 canvas 的动画代码；用户原图以完整图像像素传递，模型可缩放/裁切/移动图像，但没有自动主体分割或独立蒙版层。
-- 当前实现没有音频生成或音轨混音；演示 MP4 为静音 H.264。
-- MP4 是客户端导出，需安全上下文与支持的 WebCodecs AVC 浏览器/设备；不支持时显示导出错误。上传大小上限 64 MiB。
-- 已验证的一次真实生成：10 秒 1920×1080、30 fps、H.264、5,380,655 bytes、4 shots；APIMart 单次请求约 72 秒。该记录是一次性演示，不代表服务 SLA、延迟或每次结果质量。
-- 线上另一次验收已完成图片上传 → Workflow → APIMart → 版本预览 → 浏览器编码 → 私有 R2：10 秒、1920×1080、30 fps、H.264、3,137,087 bytes。匿名请求成片返回 401。一次上游请求失败后已核对积分全退，随后新请求生成成功。
+- 音频：Pulse/Ambient/Uplift 三种原创合成配乐，默认 Pulse，支持关闭；可上传音乐和配音（MP3/WAV/M4A/OGG，单个最多 10 MiB、120 秒）。独立音量、配音时音乐自动降低、起止淡入淡出，长音频按视频长度裁切。
+- APIMart AI 配音使用 `gpt-4o-mini-tts`，最多 600 字符，可选 Alloy/Nova/Onyx；每次成功生成扣 20 积分，失败退还。后台不自动重试上游；相同幂等键不会重复扣点。
+- MP4 是客户端导出，需安全上下文与支持的 WebCodecs AVC/AAC 浏览器/设备；不支持时显示导出错误。上传大小上限 64 MiB。
+- 最初静音版本的一次真实生成：10 秒 1920×1080、30 fps、H.264、5,380,655 bytes、4 shots；APIMart 单次请求约 72 秒。该记录是一次性演示，不代表服务 SLA、延迟或每次结果质量。
+- 最初线上静音版本的另一次验收已完成图片上传 → Workflow → APIMart → 版本预览 → 浏览器编码 → 私有 R2：10 秒、1920×1080、30 fps、H.264、3,137,087 bytes。匿名请求成片返回 401。一次上游请求失败后已核对积分全退，随后新请求生成成功。
+- 2026-10-18 音频验收：真实 APIMart 配音 7 秒、24kHz 单声道 WAV，扣点 20；浏览器混音后导出 1920×1080 / 30fps H.264 + 48kHz 双声道 AAC，5,568,623 bytes。音频平均 -20.2 dB、峰值 -2.7 dB，确认为非静音。PCM/画面严格 10 秒，AAC 编码包填充使容器显示 10.069 秒；导出不支持 AAC 的浏览器会提示错误。首页演示已使用这段音乐+AI配音样片。
+- 线上音频复验：已有 V2 测试项目加载私有配音后，Chrome 导出并存回 R2 成功，MP4 3,486,434 bytes，H.264 + AAC；匿名访问音频和成片均返回 401。首页公有样片下载 SHA-256 与本地交付文件一致。
 - 生成失败的任务代码会返还本次任务积分。它不构成购买订阅的通用退款承诺；购买取消/退款以当前 Stripe/应用条款与适用流程为准。
 - 付款退款、拒付的积分调整目前由运营人工处理；Webhook 不会自动撤销已发积分。
 

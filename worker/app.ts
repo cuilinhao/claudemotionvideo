@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { audioRoutes } from './audio';
 import { getCookie, setCookie, deleteCookie } from 'hono/cookie';
 import { bodyLimit } from 'hono/body-limit';
 import { z } from 'zod';
@@ -93,10 +94,13 @@ app.delete('/api/projects/:id', async c => {
   const project = await c.env.DB.prepare('SELECT * FROM projects WHERE id=? AND user_id=?').bind(c.req.param('id'), userId).first<ProjectRow>();
   if (!project) throw new ApiError(404, 'Project not found.');
   if (await c.env.DB.prepare("SELECT id FROM jobs WHERE project_id=? AND status IN ('queued','running')").bind(project.id).first()) throw new ApiError(409, 'Wait for this project’s generation to finish before deleting it.');
+  if (await c.env.DB.prepare("SELECT id FROM speech_requests WHERE project_id=? AND user_id=? AND status='running'").bind(project.id, userId).first()) throw new ApiError(409, 'Wait for this project’s voiceover to finish before deleting it.');
   const versions = await c.env.DB.prepare('SELECT mp4_key FROM versions WHERE project_id=? AND mp4_key IS NOT NULL').bind(project.id).all<{ mp4_key: string }>();
-  const removed = await c.env.DB.prepare("DELETE FROM projects WHERE id=? AND user_id=? AND NOT EXISTS(SELECT 1 FROM jobs WHERE project_id=? AND status IN ('queued','running'))").bind(project.id, userId, project.id).run();
+  const audio = await c.env.DB.prepare('SELECT r2_key FROM audio_assets WHERE project_id=? AND user_id=?').bind(project.id, userId).all<{ r2_key: string }>();
+  const removed = await c.env.DB.prepare("DELETE FROM projects WHERE id=? AND user_id=? AND NOT EXISTS(SELECT 1 FROM jobs WHERE project_id=? AND status IN ('queued','running')) AND NOT EXISTS(SELECT 1 FROM speech_requests WHERE project_id=? AND user_id=? AND status='running')").bind(project.id, userId, project.id, project.id, userId).run();
   if (!removed.meta.changes) throw new ApiError(409, 'A generation is active. Please try again later.');
   for (const v of versions.results) await c.env.BUCKET.delete(v.mp4_key);
+  for (const asset of audio.results) await c.env.BUCKET.delete(asset.r2_key);
   return c.json({ ok: true });
 });
 app.post('/api/jobs', async c => {
@@ -163,14 +167,31 @@ app.put('/api/projects/:id/versions/:vid/mp4', async c => {
   const version = await c.env.DB.prepare('SELECT * FROM versions WHERE id=? AND project_id=? AND user_id=?').bind(c.req.param('vid'), c.req.param('id'), userId).first<VersionRow>();
   if (!version) throw new ApiError(404, 'Version not found.');
   if (!await rateLimit(c.env.DB, `exports:${userId}`, 10, 60)) throw new ApiError(429, 'Please wait before uploading more exports.');
+  const requestedRevision = c.req.header('X-Audio-Revision') ?? '0';
+  if (!/^\d+$/.test(requestedRevision) || !Number.isSafeInteger(Number(requestedRevision))) throw new ApiError(400, 'Invalid audio revision.');
+  const revision = Number(requestedRevision);
+  const currentRevision = await c.env.DB.prepare('SELECT revision FROM project_audio WHERE project_id=? AND user_id=?').bind(version.project_id, userId).first<number>('revision') ?? 0;
+  if (revision !== currentRevision) throw new ApiError(409, 'Audio settings changed. Export the video again.', 'AUDIO_REVISION_CHANGED');
   const size = Number(c.req.header('Content-Length'));
   if (c.req.header('Content-Type')?.split(';')[0] !== 'video/mp4') throw new ApiError(415, 'Upload an MP4 video.');
   if (!Number.isSafeInteger(size) || size < 12 || size > 64 * 1024 * 1024) throw new ApiError(413, 'MP4 exports must be under 64 MB.');
   const bytes = await c.req.arrayBuffer();
   if (bytes.byteLength !== size || new TextDecoder().decode(new Uint8Array(bytes, 4, 4)) !== 'ftyp') throw new ApiError(400, 'The export is not a valid MP4 file.');
-  const key = `users/${userId}/videos/${version.id}.mp4`;
-  await c.env.BUCKET.put(key, bytes, { httpMetadata: { contentType: 'video/mp4' } });
-  await c.env.DB.prepare('UPDATE versions SET mp4_key=? WHERE id=? AND user_id=?').bind(key, version.id, userId).run();
+  const key = `users/${userId}/videos/${version.id}/${crypto.randomUUID()}.mp4`;
+  try {
+    await c.env.BUCKET.put(key, bytes, { httpMetadata: { contentType: 'video/mp4' } });
+    const saved = await c.env.DB.prepare('UPDATE versions SET mp4_key=? WHERE id=? AND user_id=? AND mp4_key IS ? AND COALESCE((SELECT revision FROM project_audio WHERE project_id=versions.project_id),0)=?').bind(key, version.id, userId, version.mp4_key, revision).run();
+    if (!saved.meta.changes) throw new ApiError(409, 'This project changed while exporting. Export the video again.', 'EXPORT_CHANGED');
+  } catch (error) {
+    // Reconcile a possibly committed UPDATE before removing its media object.
+    const storedKey = await c.env.DB.prepare('SELECT mp4_key FROM versions WHERE id=? AND user_id=?').bind(version.id, userId).first<string>('mp4_key');
+    if (storedKey !== key) {
+      await c.env.BUCKET.delete(key);
+      if (error instanceof ApiError) throw error;
+      throw new ApiError(503, 'The export could not be saved. Please try exporting again.');
+    }
+  }
+  if (version.mp4_key) await c.env.BUCKET.delete(version.mp4_key);
   return c.json({ url: `/api/projects/${version.project_id}/versions/${version.id}/mp4` });
 });
 app.get('/api/projects/:id/versions/:vid/mp4', async c => {
@@ -187,6 +208,7 @@ export function sniffImage(bytes: Uint8Array): string | null {
   if (new TextDecoder().decode(bytes.subarray(0, 4)) === 'RIFF' && new TextDecoder().decode(bytes.subarray(8, 12)) === 'WEBP') return 'image/webp';
   return null;
 }
+app.route('/', audioRoutes);
 app.notFound(c => c.json({ error: 'Not found.', code: 'NOT_FOUND' }, 404));
 app.onError((error, c) => {
   if (error instanceof ApiError) return c.json({ error: error.message, code: error.code }, error.status);

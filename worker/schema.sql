@@ -68,3 +68,29 @@ CREATE TABLE IF NOT EXISTS jobs (
 );
 CREATE INDEX IF NOT EXISTS jobs_status ON jobs(status,updated_at);
 CREATE TABLE IF NOT EXISTS stripe_events (id TEXT PRIMARY KEY, type TEXT NOT NULL, processed_at TEXT NOT NULL);
+
+CREATE TABLE IF NOT EXISTS audio_assets (
+  id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id),
+  project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  name TEXT NOT NULL, media_type TEXT NOT NULL, size INTEGER NOT NULL CHECK(size>0 AND size<=10485760),
+  r2_key TEXT NOT NULL UNIQUE, created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS audio_assets_user ON audio_assets(user_id,project_id);
+CREATE TRIGGER IF NOT EXISTS audio_storage_guard BEFORE INSERT ON audio_assets
+WHEN (SELECT COUNT(*) FROM audio_assets WHERE user_id=NEW.user_id)>=50
+  OR (SELECT COALESCE(SUM(size),0) FROM audio_assets WHERE user_id=NEW.user_id)+NEW.size>209715200
+BEGIN SELECT RAISE(ABORT, 'AUDIO_STORAGE_FULL'); END;
+CREATE TABLE IF NOT EXISTS project_audio (
+  project_id TEXT PRIMARY KEY REFERENCES projects(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id), settings TEXT NOT NULL, revision INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL
+);
+-- Keep paid request tombstones even after project/audio deletion.
+CREATE TABLE IF NOT EXISTS speech_requests (
+  id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), project_id TEXT NOT NULL,
+  request_hash TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('running','completed','failed')),
+  asset_id TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS speech_requests_status ON speech_requests(status,updated_at);
+CREATE TRIGGER IF NOT EXISTS speech_project_guard BEFORE INSERT ON speech_requests
+WHEN NOT EXISTS(SELECT 1 FROM projects WHERE id=NEW.project_id AND user_id=NEW.user_id)
+BEGIN SELECT RAISE(ABORT, 'PROJECT_NOT_FOUND'); END;

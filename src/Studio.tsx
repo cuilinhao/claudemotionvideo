@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -44,6 +44,7 @@ import {
   isPreviewMessage,
 } from "./lib/renderer";
 import { Brand } from "./Marketing";
+import { AudioPanel, type PreparedAudio } from "./AudioPanel";
 
 function StudioHeader({
   user,
@@ -114,12 +115,24 @@ export function StudioPage({
   const [timeline, setTimeline] = useState(0);
   const [exporting, setExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
+  const [audioBusy, setAudioBusy] = useState(true);
+  const [audioRevision, setAudioRevision] = useState(0);
+  const [preparedAudio, setPreparedAudio] = useState<PreparedAudio>({
+    buffer: null,
+    wav: null,
+    musicDuration: null,
+    voiceDuration: null,
+  });
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState("");
   const [readyChannel, setReadyChannel] = useState("");
   const [toast, setToast] = useState("");
   const [mobilePanel, setMobilePanel] = useState<
     "projects" | "chat" | "preview"
   >("preview");
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioUrlRef = useRef("");
+  const playbackStartRef = useRef(0);
   const [previewChannel, setPreviewChannel] = useState(() =>
     crypto.randomUUID(),
   );
@@ -146,11 +159,49 @@ export function StudioPage({
       return [];
     }
   }, [activeVersion]);
+  const handleAudioPrepared = useCallback((audio: PreparedAudio) => {
+    setPreparedAudio(audio);
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+    const nextUrl = audio.wav ? URL.createObjectURL(audio.wav) : "";
+    audioUrlRef.current = nextUrl;
+    setAudioPreviewUrl(nextUrl);
+    audioRef.current?.pause();
+    setPlaying(false);
+    setTimeline(0);
+  }, []);
+  const handleAudioBusy = useCallback((value: boolean) => {
+    if (value) {
+      audioRef.current?.pause();
+      setPlaying(false);
+    }
+    setAudioBusy(value);
+  }, []);
+  const handleAudioRevision = useCallback((revision: number) => setAudioRevision(revision), []);
+  useEffect(() => () => {
+    audioRef.current?.pause();
+    audioRef.current?.removeAttribute("src");
+    audioRef.current?.load();
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+    audioUrlRef.current = "";
+  }, []);
   useEffect(() => {
     setPlaying(false);
+    audioRef.current?.pause();
+    if (audioRef.current) audioRef.current.currentTime = 0;
     setTimeline(0);
     setSelectedShot("");
   }, [activeVersion?.id]);
+  useEffect(() => {
+    audioRef.current?.pause();
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+    audioUrlRef.current = "";
+    setAudioPreviewUrl("");
+    setPreparedAudio({ buffer: null, wav: null, musicDuration: null, voiceDuration: null });
+    setAudioRevision(0);
+    setAudioBusy(true);
+    setPlaying(false);
+    setTimeline(0);
+  }, [projectId, user?.id]);
   const hasProject = Boolean(projectId);
   const estimatedCost = estimateGenerationCost({
     duration,
@@ -195,6 +246,13 @@ export function StudioPage({
     setBusy(false);
     setExporting(false);
     setExportProgress(0);
+    audioRef.current?.pause();
+    setAudioBusy(true);
+    setAudioRevision(0);
+    setPreparedAudio({ buffer: null, wav: null, musicDuration: null, voiceDuration: null });
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+    audioUrlRef.current = "";
+    setAudioPreviewUrl("");
     setError("");
     setPlaying(false);
     setTimeline(0);
@@ -378,19 +436,33 @@ export function StudioPage({
   }, [previewChannel]);
   useEffect(() => {
     if (!playing || exporting) return;
-    const id = setInterval(
-      () => setTimeline((t) => (t >= duration ? 0 : t + 0.2)),
-      200,
-    );
-    return () => clearInterval(id);
-  }, [playing, duration, exporting]);
-  useEffect(() => {
-    if (!playing || exporting) return;
-    iframeRef.current?.contentWindow?.postMessage(
-      { type: "cmv:seek", time: timeline, channel: previewChannel },
-      "*",
-    );
-  }, [timeline, playing, exporting, previewChannel]);
+    let frame = 0;
+    let lastUiUpdate = 0;
+    playbackStartRef.current = performance.now() - timeline * 1000;
+    const tick = (now: number) => {
+      let time = audioPreviewUrl && audioRef.current
+        ? audioRef.current.currentTime
+        : (now - playbackStartRef.current) / 1000;
+      if (!Number.isFinite(time)) time = 0;
+      time = Math.min(duration, time);
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "cmv:seek", time, channel: previewChannel },
+        "*",
+      );
+      if (now - lastUiUpdate > 90 || time >= duration) {
+        lastUiUpdate = now;
+        setTimeline(time);
+      }
+      if (time >= duration || (audioPreviewUrl && audioRef.current?.ended)) {
+        audioRef.current?.pause();
+        setPlaying(false);
+        return;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [playing, exporting, duration, previewChannel, audioPreviewUrl]);
   async function uploadFiles(files: FileList | null) {
     if (!files) return;
     if (!user) {
@@ -519,6 +591,10 @@ export function StudioPage({
   );
   async function exportVideo() {
     if (!activeVersion || !projectId || !user) return;
+    if (audioBusy) {
+      setError("Wait for the audio mix to finish saving and preparing before export.");
+      return;
+    }
     if (!previewReady) {
       setError("Wait for the preview to finish loading before exporting.");
       return;
@@ -527,7 +603,10 @@ export function StudioPage({
       setError("The preview is still loading. Try again in a moment.");
       return;
     }
+    const revision = audioRevision;
+    const exportAudio = preparedAudio.buffer ?? undefined;
     setExporting(true);
+    audioRef.current?.pause();
     setPlaying(false);
     setError("");
     setExportProgress(0);
@@ -537,12 +616,13 @@ export function StudioPage({
         channel: previewChannel,
         duration,
         aspect,
+        audio: exportAudio,
         onProgress: (progress) => {
           if (selection === selectionRef.current) setExportProgress(progress);
         },
       });
       if (selection !== selectionRef.current) return;
-      const saved = await api.saveMp4(projectId, activeVersion.id, blob);
+      const saved = await api.saveMp4(projectId, activeVersion.id, blob, revision);
       if (selection !== selectionRef.current) return;
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
@@ -625,15 +705,35 @@ export function StudioPage({
     setMobilePanel("chat");
   }
   function seek(t: number) {
-    setTimeline(Math.min(duration, Math.max(0, t)));
+    const next = Math.min(duration, Math.max(0, t));
+    setTimeline(next);
+    playbackStartRef.current = performance.now() - next * 1000;
+    if (audioRef.current && audioPreviewUrl) audioRef.current.currentTime = next;
     iframeRef.current?.contentWindow?.postMessage(
-      { type: "cmv:seek", time: t, channel: previewChannel },
+      { type: "cmv:seek", time: next, channel: previewChannel },
       "*",
     );
+  }
+  function togglePlayback() {
+    if (playing) {
+      audioRef.current?.pause();
+      setPlaying(false);
+      return;
+    }
+    if (audioPreviewUrl && audioRef.current) {
+      audioRef.current.currentTime = timeline;
+      void audioRef.current.play().then(() => setPlaying(true)).catch((cause) => {
+        setError(cause instanceof Error ? cause.message : "Could not play audio preview.");
+      });
+    } else {
+      playbackStartRef.current = performance.now() - timeline * 1000;
+      setPlaying(true);
+    }
   }
   const needsAuth = !user;
   return (
     <main className="studio-shell">
+      <audio ref={audioRef} src={audioPreviewUrl || undefined} preload="auto" hidden />
       <StudioHeader user={user} onAuth={onAuth} onLogout={onLogout} />
       {needsAuth && (
         <div className="studio-signin-hint">
@@ -683,7 +783,7 @@ export function StudioPage({
           <button
             className="button button-primary button-xs"
             onClick={() => void exportVideo()}
-            disabled={!activeVersion || !previewReady || exporting || busy}
+            disabled={!activeVersion || !previewReady || exporting || busy || audioBusy}
           >
             {exporting ? (
               <>
@@ -1044,6 +1144,19 @@ export function StudioPage({
               ))}
             </div>
           )}
+          {activeVersion && projectId && user && (
+            <AudioPanel
+              key={`${user.id}:${projectId}`}
+              projectId={projectId}
+              userId={user.id}
+              duration={duration}
+              disabled={busy || exporting}
+              onAudioPrepared={handleAudioPrepared}
+              onPreparing={handleAudioBusy}
+              onRevision={handleAudioRevision}
+              onCredits={onCredits}
+            />
+          )}
         </section>
         <section
           className={`preview-panel ${mobilePanel === "preview" ? "mobile-active" : ""}`}
@@ -1066,8 +1179,8 @@ export function StudioPage({
               </button>
               <button
                 className="icon-button tiny"
-                onClick={() => setPlaying((p) => !p)}
-                disabled={!activeVersion || busy || exporting}
+                onClick={togglePlayback}
+                disabled={!activeVersion || busy || exporting || audioBusy}
                 title={playing ? "Pause" : "Play"}
               >
                 {playing ? (

@@ -22,4 +22,4 @@ This project keeps marketing copy, pricing data, brand, sample media and editor 
 2. Run `npm run check`, `npm test` and `npm run build`; preview home, pricing, example, contact, reset-password and Studio routes at desktop and narrow viewport sizes.
 3. Verify the demo video and poster are a matching pair; verify poster accessible text and provide working playback controls.
 4. Confirm production domain routes, Stripe environment, webhook signature, customer portal, support inbox and email sender independently. Do not use live Stripe mode until merchant activation is complete.
-5. Review copy against product reality: no subject segmentation, layer extraction or audio is currently provided; MP4 export runs in the user's browser and requires compatible WebCodecs support.
+5. Review copy against product reality: no subject segmentation or layer extraction is provided. Music and optional AI/uploaded narration are mixed in the browser; MP4 export requires compatible WebCodecs AVC/AAC support.
