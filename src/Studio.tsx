@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -125,6 +125,9 @@ export function StudioPage({
   );
   const selectionRef = useRef(0);
   const assetLoadRef = useRef(0);
+  const currentUserIdRef = useRef(user?.id ?? null);
+  const previousUserIdRef = useRef(user?.id ?? null);
+  currentUserIdRef.current = user?.id ?? null;
   const inputRef = useRef<HTMLInputElement>(null);
   const sentRef = useRef(false);
   const storyboard = useMemo(() => {
@@ -170,15 +173,46 @@ export function StudioPage({
         `Create a motion graphic using this effect: ${query.get("prompt")}`,
       );
   }, [location.search]);
+  useLayoutEffect(() => {
+    const nextUserId = user?.id ?? null;
+    const previousUserId = previousUserIdRef.current;
+    if (previousUserId === nextUserId) return;
+    previousUserIdRef.current = nextUserId;
+    selectionRef.current++;
+    assetLoadRef.current++;
+    setProjects([]);
+    setProjectId("");
+    setProject(null);
+    setVersions([]);
+    setActiveVersion(null);
+    setAssets([]);
+    setAssetsLoading(false);
+    if (previousUserId !== null || nextUserId === null) setPrompt("");
+    setSelectedShot("");
+    setJob(null);
+    setJobProgress("");
+    setUploading(false);
+    setBusy(false);
+    setExporting(false);
+    setExportProgress(0);
+    setError("");
+    setPlaying(false);
+    setTimeline(0);
+    setReadyChannel("");
+    setPreviewChannel(crypto.randomUUID());
+  }, [user?.id]);
   useEffect(() => {
     let alive = true;
     if (!user) return;
+    const requestUserId = user.id;
     api
       .projects()
       .then((r) => {
-        if (alive) setProjects(r.projects);
+        if (alive && currentUserIdRef.current === requestUserId)
+          setProjects(r.projects);
       })
       .catch((e) => {
+        if (!alive || currentUserIdRef.current !== requestUserId) return;
         setError(
           e instanceof Error ? e.message : "Could not load this project.",
         );
@@ -186,14 +220,21 @@ export function StudioPage({
     return () => {
       alive = false;
     };
-  }, [user]);
+  }, [user?.id]);
   useEffect(() => {
     if (!projectId) return;
     let alive = true;
+    const requestUserId = currentUserIdRef.current;
+    const selection = selectionRef.current;
     api
       .project(projectId)
       .then((r) => {
-        if (!alive) return;
+        if (
+          !alive ||
+          selection !== selectionRef.current ||
+          currentUserIdRef.current !== requestUserId
+        )
+          return;
         setProject(r.project);
         setAspect(r.project.aspect);
         setDuration(r.project.duration as 10 | 15 | 30);
@@ -213,7 +254,12 @@ export function StudioPage({
         setJobProgress(activeJob?.progress ?? "");
       })
       .catch((e) => {
-        if (!alive) return;
+        if (
+          !alive ||
+          selection !== selectionRef.current ||
+          currentUserIdRef.current !== requestUserId
+        )
+          return;
         setAssetsLoading(false);
         setError(e instanceof Error ? e.message : "Could not load this project.");
       });
@@ -262,14 +308,21 @@ export function StudioPage({
   });
   useEffect(() => {
     if (!job || job.status === "completed" || job.status === "failed") return;
+    const requestUserId = currentUserIdRef.current;
+    const selection = selectionRef.current;
+    const isCurrent = () =>
+      selection === selectionRef.current &&
+      currentUserIdRef.current === requestUserId;
     return watchJob(job.id, {
       getJob: api.job,
       loadProject: api.project,
       onJob: (next) => {
+        if (!isCurrent()) return;
         setJob(next);
         setJobProgress(next.progress);
       },
       onComplete: (next, r) => {
+        if (!isCurrent()) return;
         setProjectId(next.projectId);
         setProject(r.project);
         setProjects((p) => [r.project, ...p.filter((x) => x.id !== r.project.id)]);
@@ -284,6 +337,7 @@ export function StudioPage({
         setTimeout(() => setToast(""), 3000);
       },
       onFailed: (next) => {
+        if (!isCurrent()) return;
         setBusy(false);
         setError(
           next.error ||
@@ -291,10 +345,12 @@ export function StudioPage({
         );
         onCredits();
       },
-      onError: (e) =>
+      onError: (e) => {
+        if (!isCurrent()) return;
         setError(
           e instanceof Error ? e.message : "Could not check generation status.",
-        ),
+        );
+      },
     });
   }, [job?.id]);
   useEffect(() => {
@@ -374,7 +430,7 @@ export function StudioPage({
       if (selection === selectionRef.current)
         setError(e instanceof Error ? e.message : "Could not upload image.");
     } finally {
-      setUploading(false);
+      if (selection === selectionRef.current) setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
     }
   }
@@ -475,14 +531,19 @@ export function StudioPage({
     setPlaying(false);
     setError("");
     setExportProgress(0);
+    const selection = selectionRef.current;
     try {
       let blob = await exportMp4(iframeRef.current, {
         channel: previewChannel,
         duration,
         aspect,
-        onProgress: setExportProgress,
+        onProgress: (progress) => {
+          if (selection === selectionRef.current) setExportProgress(progress);
+        },
       });
+      if (selection !== selectionRef.current) return;
       const saved = await api.saveMp4(projectId, activeVersion.id, blob);
+      if (selection !== selectionRef.current) return;
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = `${(project?.title || "motion-study").toLowerCase().replace(/[^a-z0-9]+/g, "-")}.mp4`;
@@ -492,10 +553,13 @@ export function StudioPage({
       setTimeout(() => setToast(""), 3000);
       void saved;
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not export this video.");
+      if (selection === selectionRef.current)
+        setError(e instanceof Error ? e.message : "Could not export this video.");
     } finally {
-      setExporting(false);
-      setExportProgress(0);
+      if (selection === selectionRef.current) {
+        setExporting(false);
+        setExportProgress(0);
+      }
     }
   }
   async function openProject(p: Project) {
