@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /studio
+Disallow: /reset-password
+Sitemap: https://claudemotionvideo.com/sitemap.xml

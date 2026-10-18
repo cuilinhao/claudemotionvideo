@@ -1,0 +1,55 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "claudemotionvideo",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-18",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "account_id": "8021c9867ba6881cf688f0a25af0d32f",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "claudemotionvideo-db",
+      "database_id": "5a0792fe-81c8-4b3a-957c-2cb217fbc8a1"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "claudemotionvideo-assets"
+    }
+  ],
+  "workflows": [
+    {
+      "binding": "GENERATION",
+      "name": "claudemotionvideo-generation",
+      "class_name": "GenerationWorkflow"
+    }
+  ],
+  "vars": {
+    "APP_URL": "https://claudemotionvideo.com",
+    "APIMART_MODEL": "claude-opus-5-5",
+    "EMAIL_FROM": "noreply@claudemotionvideo.com"
+  },
+  "send_email": [{ "name": "EMAIL", "allowed_sender_addresses": ["noreply@claudemotionvideo.com"] }],
+  "routes": [
+    { "pattern": "claudemotionvideo.com/*", "zone_name": "claudemotionvideo.com" },
+    { "pattern": "www.claudemotionvideo.com/*", "zone_name": "claudemotionvideo.com" }
+  ],
+  "triggers": {
+    "crons": [
+      "15 * * * *"
+    ]
+  },
+  "observability": {
+    "enabled": true
+  },
+  "workers_dev": true
+}
