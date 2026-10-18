@@ -118,3 +118,40 @@ CREATE TABLE IF NOT EXISTS oauth_identities (
   created_at INTEGER NOT NULL, PRIMARY KEY(provider,provider_subject), UNIQUE(provider,user_id)
 );
 CREATE INDEX IF NOT EXISTS oauth_identities_user ON oauth_identities(user_id);
+
+-- Additive migration: video purchases are independent from subscription credits.
+CREATE TABLE IF NOT EXISTS single_video_balances (
+  user_id TEXT PRIMARY KEY REFERENCES users(id), balance INTEGER NOT NULL DEFAULT 0 CHECK(balance>=0)
+);
+CREATE TABLE IF NOT EXISTS single_video_ledger (
+  id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), amount INTEGER NOT NULL CHECK(amount IN (-1,1)),
+  reason TEXT NOT NULL, external_key TEXT NOT NULL UNIQUE, created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS single_video_ledger_user ON single_video_ledger(user_id,created_at);
+CREATE TRIGGER IF NOT EXISTS single_video_balance_guard BEFORE INSERT ON single_video_ledger
+WHEN NEW.amount<0 AND NOT EXISTS(SELECT 1 FROM single_video_ledger WHERE external_key=NEW.external_key)
+  AND COALESCE((SELECT balance FROM single_video_balances WHERE user_id=NEW.user_id),0)+NEW.amount<0
+BEGIN SELECT RAISE(ABORT, 'INSUFFICIENT_SINGLE_VIDEOS'); END;
+CREATE TRIGGER IF NOT EXISTS single_video_balance_apply AFTER INSERT ON single_video_ledger
+BEGIN
+  INSERT INTO single_video_balances(user_id,balance) VALUES(NEW.user_id,0) ON CONFLICT(user_id) DO NOTHING;
+  UPDATE single_video_balances SET balance=balance+NEW.amount WHERE user_id=NEW.user_id;
+END;
+CREATE TRIGGER IF NOT EXISTS single_video_ledger_no_update BEFORE UPDATE ON single_video_ledger
+BEGIN SELECT RAISE(ABORT, 'IMMUTABLE_LEDGER'); END;
+CREATE TRIGGER IF NOT EXISTS single_video_ledger_no_delete BEFORE DELETE ON single_video_ledger
+BEGIN SELECT RAISE(ABORT, 'IMMUTABLE_LEDGER'); END;
+-- No project/job FK: request tombstones must survive project deletion.
+CREATE TABLE IF NOT EXISTS generation_payments (
+  job_id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), idempotency_key TEXT NOT NULL,
+  request_hash TEXT NOT NULL, payment_type TEXT NOT NULL CHECK(payment_type IN ('single_video','credits')),
+  charged_cost INTEGER NOT NULL CHECK(charged_cost>=0), created_at TEXT NOT NULL,
+  UNIQUE(user_id,idempotency_key)
+);
+CREATE TRIGGER IF NOT EXISTS generation_payment_legacy_guard BEFORE INSERT ON generation_payments
+WHEN EXISTS(SELECT 1 FROM credit_ledger WHERE external_key='job:'||NEW.job_id)
+BEGIN SELECT RAISE(ABORT, 'IDEMPOTENCY_CONFLICT'); END;
+CREATE TRIGGER IF NOT EXISTS generation_payments_no_update BEFORE UPDATE ON generation_payments
+BEGIN SELECT RAISE(ABORT, 'IMMUTABLE_PAYMENT'); END;
+CREATE TRIGGER IF NOT EXISTS generation_payments_no_delete BEFORE DELETE ON generation_payments
+BEGIN SELECT RAISE(ABORT, 'IMMUTABLE_PAYMENT'); END;

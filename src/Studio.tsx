@@ -14,7 +14,7 @@ import {
 import { templateData } from "./lib/content";
 import type { AuthMode } from "./lib/ui-types";
 import { watchJob } from "./lib/job-polling";
-import { estimateGenerationCost } from "./lib/generation-cost";
+import { estimateGenerationPayment } from "./lib/generation-cost";
 import {
   buildPreviewDocument,
   createAnimationSourceDownload,
@@ -214,7 +214,8 @@ export function StudioPage({
     setTimeline(0);
   }, [projectId, user?.id]);
   const hasProject = Boolean(projectId);
-  const estimatedCost = estimateGenerationCost({
+  const generationPayment = estimateGenerationPayment({
+    singleVideoGenerations: user?.singleVideoGenerations,
     duration,
     assetIds: assets.map((asset) => asset.id),
     ...(activeVersion ? { previousAssetIds: activeVersion.assetIds } : {}),
@@ -562,6 +563,7 @@ export function StudioPage({
         ...(projectId ? { projectId } : {}),
         ...(activeVersion ? { versionId: activeVersion.id } : {}),
         ...(selectedShot ? { selectedShot } : {}),
+        paymentType: generationPayment.paymentType,
         idempotencyKey: crypto.randomUUID(),
       });
       if (selection !== selectionRef.current) return;
@@ -809,6 +811,8 @@ export function StudioPage({
   const currentScene = studioScenarios.find(s => s.id === sceneId);
   const controlsDisabled = busy || exporting || uploading || assetsLoading;
   const composer = <div className="ed-ask"><div className="composer">
+    {!hasProject && <p className="muted small cmv-generation-balance">{user ? `${user.singleVideoGenerations ?? 0} purchased video generation${user.singleVideoGenerations === 1 ? '' : 's'} remaining · ${generationPayment.label} for this video` : 'Registration includes 0 free videos. Buy one video for $5 or choose a subscription.'} <a href="/pricing#single-video">Buy one video · $5</a></p>}
+    {hasProject && <p className="muted small cmv-generation-balance">Extra edits and AI voiceover use subscription credits.</p>}
     {brandColors.length > 0 && <div className="cmp-added"><span className="pchip">{brandColors.map(color => <i key={color} className="dot" style={{ background: color }} />)}Brand colours<button aria-label="Remove brand colours" onClick={() => setBrandColors([])}>×</button></span></div>}
     {(error || previewDocument.error) && <p className="error" role="alert">{error || previewDocument.error}</p>}
     <div className="ed-ask-box" onDragOver={event => { if (event.dataTransfer.types.includes('Files')) event.preventDefault(); }} onDrop={event => { event.preventDefault(); if (!controlsDisabled) void uploadFiles(event.dataTransfer.files); }}>
@@ -822,8 +826,8 @@ export function StudioPage({
       <div className="ws-tools">
         <button className="tool-round" aria-label="Add an image" title="Add an image" disabled={controlsDisabled || assets.length >= 4} onClick={() => inputRef.current?.click()}>{uploading ? <LoaderCircle size={16} className="spin" /> : <Plus size={16} />}</button>
         <EffectPicker value={effectIds} onChange={setEffectIds} disabled={controlsDisabled} suggested={currentScene?.effects} />
-        {!hasProject && <VideoSettings aspect={aspect} duration={duration} styleId={styleId} brandColors={brandColors} cost={estimatedCost} onAspect={setAspect} onDuration={setDuration} onStyle={setStyleId} onColors={setBrandColors} disabled={controlsDisabled} />}
-        {hasProject && <span className="mono muted cmv-edit-cost">{estimatedCost} credits</span>}
+        {!hasProject && <VideoSettings aspect={aspect} duration={duration} styleId={styleId} brandColors={brandColors} cost={generationPayment.label} onAspect={setAspect} onDuration={setDuration} onStyle={setStyleId} onColors={setBrandColors} disabled={controlsDisabled} />}
+        {hasProject && <span className="mono muted cmv-edit-cost">{generationPayment.label}</span>}
         <button className="ed-send" aria-label="Send" disabled={controlsDisabled || prompt.trim().length < 2} onClick={() => void startGeneration()}>{busy ? <span className="pulse" /> : <ArrowUp size={16} />}</button>
       </div>
     </div>
@@ -834,7 +838,7 @@ export function StudioPage({
       <div className="ed-opus"><div className="ed-done"><Check size={15} /><b>{index ? 'Done. Your change is ready.' : 'Done. Your video is ready.'}</b></div><div className="ed-ver-row"><span className="mono">v{index + 1}</span><button disabled={controlsDisabled} aria-pressed={activeVersion?.id === version.id} onClick={() => void chooseVersion(version)}>{activeVersion?.id === version.id ? 'Showing' : 'Show'}</button>{index > 0 && <button disabled={controlsDisabled} onClick={() => void chooseVersion(orderedVersions[index - 1])}>Undo</button>}</div></div>
     </div>)}
     {pendingPrompt && <div className="ed-user"><p>{pendingPrompt}</p><span className="ed-chips mono">{aspect} · {duration}s</span></div>}
-    {busy && <div className="ed-opus"><div className="ed-run"><div className="ed-run-head"><span className="pulse" /><b>{activeVersion ? 'Working on your change' : 'Making your video'}</b></div><p className="muted">{jobProgress}</p><ol className="run-steps"><li className={job?.status === 'running' ? 'done' : 'now'}>Read your brief</li><li className={job?.status === 'running' ? 'now' : ''}>Plan the storyboard</li><li>Write the animation code</li></ol><span className="muted small">You can leave and return to this video. Failed generation credits are returned automatically.</span></div></div>}
+    {busy && <div className="ed-opus"><div className="ed-run"><div className="ed-run-head"><span className="pulse" /><b>{activeVersion ? 'Working on your change' : 'Making your video'}</b></div><p className="muted">{jobProgress}</p><ol className="run-steps"><li className={job?.status === 'running' ? 'done' : 'now'}>Read your brief</li><li className={job?.status === 'running' ? 'now' : ''}>Plan the storyboard</li><li>Write the animation code</li></ol><span className="muted small">You can leave and return to this video. Failed generation payments are returned automatically.</span></div></div>}
     <div ref={messagesEndRef} />
   </div>{composer}</section>;
   return <section className="studio-shell">
@@ -1013,10 +1017,10 @@ function EffectPicker({ value, onChange, disabled, suggested }: { value: string[
 }
 
 function VideoSettings({ aspect, duration, styleId, brandColors, cost, disabled, onAspect, onDuration, onStyle, onColors }: {
-  aspect: '16:9' | '9:16' | '1:1'; duration: 10 | 15 | 30; styleId: string; brandColors: string[]; cost: number; disabled: boolean;
+  aspect: '16:9' | '9:16' | '1:1'; duration: 10 | 15 | 30; styleId: string; brandColors: string[]; cost: string; disabled: boolean;
   onAspect: (aspect: '16:9' | '9:16' | '1:1') => void; onDuration: (duration: 10 | 15 | 30) => void; onStyle: (style: string) => void; onColors: (colors: string[]) => void;
 }) {
   const [open, setOpen] = useState(false); const button = useRef<HTMLButtonElement>(null);
   const style = studioPalettes.find(palette => palette.id === styleId) || studioPalettes[0];
-  return <div className="picker-wrap settings-picker"><button ref={button} className="tool-pill settings-pill" disabled={disabled} aria-haspopup="dialog" aria-expanded={open} aria-label={`Video settings: ${aspect}, ${duration} seconds`} onClick={() => setOpen(value => !value)}><span className="mono">{aspect} · {duration}s</span>{style.swatch.length > 0 && <span className="brand-dots">{style.swatch.map(color => <i key={color} style={{ background: color }} />)}</span>}{brandColors.length > 0 && <span className="brand-dots">{brandColors.map((color, index) => <i key={index} style={{ background: color }} />)}</span>}</button>{open && <FloatingPanel anchor={button} label="Video settings" width={440} onClose={() => setOpen(false)}><div className="pop-head"><b>Video settings</b></div><div className="set-group"><span className="set-label">Format</span><div className="seg" role="radiogroup" aria-label="Format">{(['16:9', '9:16', '1:1'] as const).map(format => <button key={format} role="radio" aria-checked={aspect === format} onClick={() => onAspect(format)}><span className="cmv-aspect-icon" style={{ aspectRatio: format.replace(':', '/') }} /><span className="mono">{format}</span></button>)}</div></div><div className="set-group"><span className="set-label">Length<span className="set-cost"><Zap size={12} />{cost} credits</span></span><div className="seg" role="radiogroup" aria-label="Length">{([10, 15, 30] as const).map(length => <button key={length} role="radio" aria-checked={duration === length} onClick={() => onDuration(length)}><span className="mono">{length}s</span></button>)}</div></div><div className="set-group"><span className="set-label">Colors</span><div className="palettes" role="radiogroup" aria-label="Colors">{studioPalettes.map(palette => <button key={palette.id} role="radio" aria-checked={styleId === palette.id} className="palette" title={palette.hint} onClick={() => onStyle(palette.id)}><span className="palette-colors">{palette.swatch.length ? palette.swatch.map((color, index) => <i key={index} style={{ background: color }} />) : <Sparkles size={16} />}</span><span className="palette-name">{palette.name}</span></button>)}</div></div><div className="brand-colors"><div><b>Your brand colours</b><span className="muted small"> optional, up to 3</span></div><div className="brand-row">{brandColors.map((color, index) => <span className="brand-chip" key={index}><input type="color" value={color} aria-label={`Brand colour ${index + 1}`} onChange={event => onColors(brandColors.map((value, i) => i === index ? event.target.value.toUpperCase() : value))} /><span className="mono">{color}</span><button aria-label={`Remove ${color}`} onClick={() => onColors(brandColors.filter((_, i) => i !== index))}>×</button></span>)}{brandColors.length < 3 && <button className="btn small" onClick={() => onColors([...brandColors, ['#FF5A36', '#111111', '#F4EFE6'][brandColors.length]])}>+ Add colour</button>}</div></div><div className="pop-foot"><button className="btn small primary" onClick={() => setOpen(false)}>Done</button></div></FloatingPanel>}</div>;
+  return <div className="picker-wrap settings-picker"><button ref={button} className="tool-pill settings-pill" disabled={disabled} aria-haspopup="dialog" aria-expanded={open} aria-label={`Video settings: ${aspect}, ${duration} seconds`} onClick={() => setOpen(value => !value)}><span className="mono">{aspect} · {duration}s</span>{style.swatch.length > 0 && <span className="brand-dots">{style.swatch.map(color => <i key={color} style={{ background: color }} />)}</span>}{brandColors.length > 0 && <span className="brand-dots">{brandColors.map((color, index) => <i key={index} style={{ background: color }} />)}</span>}</button>{open && <FloatingPanel anchor={button} label="Video settings" width={440} onClose={() => setOpen(false)}><div className="pop-head"><b>Video settings</b></div><div className="set-group"><span className="set-label">Format</span><div className="seg" role="radiogroup" aria-label="Format">{(['16:9', '9:16', '1:1'] as const).map(format => <button key={format} role="radio" aria-checked={aspect === format} onClick={() => onAspect(format)}><span className="cmv-aspect-icon" style={{ aspectRatio: format.replace(':', '/') }} /><span className="mono">{format}</span></button>)}</div></div><div className="set-group"><span className="set-label">Length<span className="set-cost"><Zap size={12} />{cost}</span></span><div className="seg" role="radiogroup" aria-label="Length">{([10, 15, 30] as const).map(length => <button key={length} role="radio" aria-checked={duration === length} onClick={() => onDuration(length)}><span className="mono">{length}s</span></button>)}</div></div><div className="set-group"><span className="set-label">Colors</span><div className="palettes" role="radiogroup" aria-label="Colors">{studioPalettes.map(palette => <button key={palette.id} role="radio" aria-checked={styleId === palette.id} className="palette" title={palette.hint} onClick={() => onStyle(palette.id)}><span className="palette-colors">{palette.swatch.length ? palette.swatch.map((color, index) => <i key={index} style={{ background: color }} />) : <Sparkles size={16} />}</span><span className="palette-name">{palette.name}</span></button>)}</div></div><div className="brand-colors"><div><b>Your brand colours</b><span className="muted small"> optional, up to 3</span></div><div className="brand-row">{brandColors.map((color, index) => <span className="brand-chip" key={index}><input type="color" value={color} aria-label={`Brand colour ${index + 1}`} onChange={event => onColors(brandColors.map((value, i) => i === index ? event.target.value.toUpperCase() : value))} /><span className="mono">{color}</span><button aria-label={`Remove ${color}`} onClick={() => onColors(brandColors.filter((_, i) => i !== index))}>×</button></span>)}{brandColors.length < 3 && <button className="btn small" onClick={() => onColors([...brandColors, ['#FF5A36', '#111111', '#F4EFE6'][brandColors.length]])}>+ Add colour</button>}</div></div><div className="pop-foot"><button className="btn small primary" onClick={() => setOpen(false)}>Done</button></div></FloatingPanel>}</div>;
 }

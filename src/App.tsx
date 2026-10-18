@@ -12,6 +12,8 @@ export default function App() {
   const [user,setUser] = useState<User|null>(null);
   const [authMode,setAuthMode] = useState<AuthMode|null>(null);
   const [notice,setNotice] = useState('');
+  const [singleVideoEnabled,setSingleVideoEnabled] = useState(false);
+  const [paymentRefreshing,setPaymentRefreshing] = useState(false);
   const mounted = useRef(false);
   const authEpoch = useRef(0);
   const refreshRequest = useRef(0);
@@ -23,7 +25,7 @@ export default function App() {
     const epoch = authEpoch.current, request = ++refreshRequest.current;
     try {
       const result = await api.me();
-      if (mounted.current && epoch === authEpoch.current && request === refreshRequest.current) setUser(result.user);
+      if (mounted.current && epoch === authEpoch.current && request === refreshRequest.current) { setUser(result.user); setSingleVideoEnabled(result.singleVideoEnabled); }
     } catch { /* Keep the last known account when the session cannot be checked. */ }
   },[]);
   const openAuth = useCallback(() => setAuthMode('login'),[]);
@@ -35,6 +37,16 @@ export default function App() {
     setUser(next);
     void refreshMe();
   },[refreshMe]);
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get('billing') !== 'success') return;
+    setPaymentRefreshing(true);
+    let attempts = 0;
+    const timer = setInterval(() => {
+      void refreshMe();
+      if (++attempts >= 15) { clearInterval(timer); setPaymentRefreshing(false); }
+    }, 2000);
+    return () => { clearInterval(timer); setPaymentRefreshing(false); };
+  },[location.search,refreshMe]);
   useEffect(() => {
     mounted.current = true;
     void refreshMe();
@@ -83,7 +95,7 @@ export default function App() {
       <Route path="/studio" element={studio}/>
       <Route path="/studio/v/:id" element={studio}/>
       <Route path="/my-videos" element={layout(<MyVideosPage user={user} onAuth={openAuth}/>)}/>
-      <Route path="/account" element={layout(<AccountPage user={user} onAuth={openAuth}/>)}/>
+      <Route path="/account" element={layout(<AccountPage user={user} onAuth={openAuth} singleVideoEnabled={singleVideoEnabled}/>)}/>
       <Route path="/sign-in" element={layout(<MagicLinkPage onDone={signedIn} onAuth={openAuth}/>)}/>
       <Route path="/reset-password" element={layout(<main className="wrap"><div className="page-head"><h1>Reset your password</h1><button className="btn primary" onClick={()=>setAuthMode('reset')}>Update password</button></div></main>)}/>
       <Route path="*" element={layout(<main className="wrap"><div className="page-head"><p className="mono muted">404</p><h1>Page not found</h1><p>This page doesn't exist. Head back to the Studio to make something new.</p><a className="btn primary" href="/">Back home</a></div></main>)}/>
@@ -91,5 +103,6 @@ export default function App() {
     {authMode&&<AuthModal mode={authMode} onMode={setAuthMode} onClose={()=>setAuthMode(null)} onDone={signedIn}/>}
     <SupportChat user={user}/>
     {notice&&<div className="cmv-notice" role="status">{notice}</div>}
+    {paymentRefreshing&&!notice&&<div className="cmv-notice" role="status">Confirming your payment. Your balance refreshes automatically for up to 30 seconds.</div>}
   </>;
 }

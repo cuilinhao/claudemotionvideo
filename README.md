@@ -12,7 +12,7 @@
 - 预览：Studio 取回版本 HTML 和授权图片数据，将内容放入仅 `allow-scripts` 的 sandbox iframe。CSP 禁止网络请求，消息桥用窗口来源及随机 channel 校验。
 - MP4：`src/lib/renderer.ts` 通过 Mediabunny/WebCodecs 请求 iframe 每一帧，按 30 fps 编码 H.264，并把与预览相同的混音编码为 AAC 音轨；随后 `PUT /api/projects/:id/versions/:vid/mp4` 将二进制存 R2。后端不代用户渲染视频。
 - 音频：`GET/PUT /api/projects/:id/audio` 保存混音设置与 revision；`POST /api/audio/assets` 上传带 `file`、`projectId` 的私有音频；`POST /api/projects/:id/voice` 通过 APIMart `/v1/audio/speech` 生成配音。相同幂等键不会重复调用上游；失败/中断任务按原扣点流水退款。
-- 计费：Stripe Checkout/Customer Portal；Webhook 签名校验后更新订阅与积分。购买页当前套餐由 `src/lib/content.ts` 定义；生成成本由 `worker/credits.ts` 执行。
+- 计费：Stripe Checkout/Customer Portal；注册默认 0 积分、0 次免费生成，无需绑卡。保留月付/年付订阅，另提供 $5 USD 一次性购买 1 次视频生成；没有新用户绑卡试用。Webhook 签名校验后发放订阅积分或单次生成次数。
 
 ## 本地运行
 
@@ -75,6 +75,7 @@ APIMART_API_KEY=本机私有值
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_PORTAL_CONFIGURATION=bpc_...
+STRIPE_SINGLE_VIDEO_PRICE=price_...
 STRIPE_PRICES={"starter":{"month":"price_...","year":"price_..."},"pro":{"month":"price_...","year":"price_..."},"max":{"month":"price_...","year":"price_..."}}
 ```
 
@@ -88,11 +89,14 @@ npx wrangler secret put STRIPE_SECRET_KEY
 npx wrangler secret put STRIPE_WEBHOOK_SECRET
 npx wrangler secret put STRIPE_PRICES
 npx wrangler secret put STRIPE_PORTAL_CONFIGURATION
+npx wrangler secret put STRIPE_SINGLE_VIDEO_PRICE
 ```
 
 `STRIPE_PRICES` 是非密钥配置，但应当作为 Worker 环境变量注入且必须是完整 JSON 映射，不能暴露 Stripe secret key。也要为生产 EMAIL binding 配置发件地址/权限，否则忘记密码 API 明确返回 503，不会假称邮件已发送。
 
 ## Stripe 配置
+
+2026-10-18 晚间更新：取消新增绑卡试用，并上线 $5 USD 单次视频。正式产品为 `prod_VSqGsLmZ11cWIx`，一次性 Price 为 `price_1URuZz7UYmtkCYxVvj1nv7rN`；Price ID 是公开配置，已写入 `wrangler.jsonc`。yihao Chrome 中的 `claudemotionvideo` 商户已配置该产品及 8 项 Webhook 事件。数据库通过追加 `single_video_balances`、`single_video_ledger`、`generation_payments` 和触发器迁移，无需重建旧表。首次上线版本：`409460c4-19b0-4f05-973c-693c08a66351`。提交前独立发布目录复验：全量 328 项测试、类型检查、生产构建和静态资源审计通过；正式单次 Checkout 已验证为 US$5.00，不含订阅或自动续费，未进行真实扣款。此前的试用验收记录仅说明历史版本。
 
 `node scripts/configure-stripe.mjs test` 或 `node scripts/configure-stripe.mjs live` 会创建/复用 Starter、Pro、Max 的月付和年付 Price，并设置 Customer Portal；脚本要求预先将相应模式的 key 存在 `.secrets/stripe-test-key` / `.secrets/stripe-live-key`。运行后将 Price ID 映射设置为 `STRIPE_PRICES`，将 `stripe-{mode}-portal.json` 的 `id` 设置为 `STRIPE_PORTAL_CONFIGURATION`，确保客户打开的是本站的订阅管理配置。脚本定义的 USD 价格为：
 
@@ -102,13 +106,17 @@ npx wrangler secret put STRIPE_PORTAL_CONFIGURATION
 | Pro | $39.90 | $286.80 | 3,600 |
 | Max | $79.90 | $478.80 | 7,500 |
 
-账单/信用卡由 Stripe 管理；首个符合条件的月付订阅可能创建 3 天试用，代码要求收集付款方式。Webhook 地址为 `https://<应用域名>/api/billing/webhook`，配置 Stripe 端点时需将签名 secret 注入 `STRIPE_WEBHOOK_SECRET`。计划订阅后需再按 Stripe 控制台完成的配置和事件列表核对 webhook 行为。
+账单/支付由 Stripe 管理；月付和年付订阅均直接付费，不再提供 3 天 / 300 积分绑卡试用。注册无需添加支付方式。一次性购买使用 `mode=payment`，不订阅、不自动续费，也不要求为未来扣款保存支付卡；付款时仍需完成正常支付。
+
+`STRIPE_SINGLE_VIDEO_PRICE` 必须对应同一 Stripe 环境下的 USD 500 美分一次性 Price。一次购买发放 1 次独立生成次数，支持 10/15/30 秒、最多 4 张参考图和 1080p MP4 导出；新生成优先使用已购买次数。聊天修改和 AI 配音仍使用积分。失败任务退回实际扣除的次数或积分；重复回调、重复请求不会重复发放或扣除。该购买不改变用户订阅套餐。
+
+Webhook 地址为 `https://<应用域名>/api/billing/webhook`，配置 Stripe 端点时需将签名 secret 注入 `STRIPE_WEBHOOK_SECRET`。除订阅事件外，必须监听 `checkout.session.completed` 和 `checkout.session.async_payment_succeeded`；仅在服务端重新获取 Checkout 并确认已支付、商品/金额/币种/用户匹配后发放单次次数。
 
 `node scripts/configure-stripe-webhook.mjs live` 会为本站创建或核对正式 Webhook；已有端点但本地缺少签名密钥时会停止，防止悄悄替换端点。受限服务端密钥需允许写入 Customers、Products、Prices、Customer Portal、Checkout Sessions、Webhook Endpoints，以及读取 Subscriptions、Invoices。生产密钥放入 Cloudflare Worker encrypted secrets；本地开发继续使用独立测试环境。
 
 截至 2026-10-18，https://claudemotionvideo.com 已通过 Cloudflare Workers 路由上线；www 返回保留路径/查询的 301 到根域。Stripe 测试 API 已验证 Checkout、三天绑卡试用、付款发点、重复 webhook 防重和 Portal；测试订阅均已取消，无实际扣款。正式账户激活及身份验证已由持有人完成，8项权限受限密钥、6个正式Price、固定Portal配置和Webhook已接入Cloudflare encrypted secrets，生产结账已开启。正式Checkout页面验证三天绑卡试用后19.90USD/月，年付166.80USD无试用；Portal按期末取消，签名Webhook健康检查200、错误签名400。验收Checkout均已过期，未创建真实付费订阅或实际扣款；真实扣款后的Webhook交付未作生产验收。
 
-Webhook 使用 Stripe API 版本 `2026-09-30.endive`，订阅事件：`checkout.session.completed`、`customer.subscription.created`、`customer.subscription.updated`、`customer.subscription.deleted`、`invoice.paid`、`invoice.payment_failed`、`invoice.payment_action_required`。必须使用该版本对应的 invoice parent/line price 字段；价格映射、密钥与 webhook 必须来自同一模式。正式环境不要放入测试密钥。
+Webhook 使用 Stripe API 版本 `2026-09-30.endive`，事件：`checkout.session.completed`、`checkout.session.async_payment_succeeded`、`customer.subscription.created`、`customer.subscription.updated`、`customer.subscription.deleted`、`invoice.paid`、`invoice.payment_failed`、`invoice.payment_action_required`。必须使用该版本对应的 invoice parent/line price 字段；价格映射、密钥与 webhook 必须来自同一模式。正式环境不要放入测试密钥。
 
 ## 部署
 

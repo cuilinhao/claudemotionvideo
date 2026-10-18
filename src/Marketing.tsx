@@ -711,27 +711,29 @@ export function PricingPage({
   user,
   onAuth,
   billingEnabled,
+  singleVideoEnabled = false,
 }: {
   user: User | null;
   onAuth: (m: AuthMode) => void;
   billingEnabled: boolean;
+  singleVideoEnabled?: boolean;
 }) {
   const [yearly, setYearly] = useState(false);
-  const [loading, setLoading] = useState<Plan | null>(null);
+  const [loading, setLoading] = useState<Plan | "single-video" | null>(null);
   const [error, setError] = useState("");
-  async function buy(plan: Plan) {
+  async function buy(plan: Plan | "single-video") {
     setError("");
     if (!user) {
       onAuth("register");
       return;
     }
-    if (!billingEnabled) {
+    if (plan === "single-video" ? !singleVideoEnabled : !billingEnabled) {
       setError("Checkout is not available yet. Please try again later.");
       return;
     }
     setLoading(plan);
     try {
-      const r = await api.checkout(plan, yearly ? "year" : "month");
+      const r = plan === "single-video" ? await api.checkoutSingleVideo() : await api.checkout(plan, yearly ? "year" : "month");
       window.location.assign(r.url);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not start checkout.");
@@ -768,6 +770,7 @@ export function PricingPage({
         </div>
       </div>
       {error && <div className="inline-error">{error}</div>}
+      <article className="plan-card plan-popular single-video-card" id="single-video"><div className="popular-flag">ONE-TIME PAYMENT</div><h2>One video</h2><div className="plan-price">$5 <small>USD / video</small></div><p>No subscription. No automatic renewal.</p><ul><li>One new video generation · 10, 15 or 30 seconds</li><li>Up to 4 reference images · 1080p MP4 export</li><li>Built-in music and audio uploads included</li></ul><p>Extra edits and AI voiceover use subscription credits. Registration includes 0 free videos; no card binding is required to create an account.</p><button className="button button-primary" disabled={loading !== null} onClick={() => void buy("single-video")}>{loading === "single-video" ? "Opening…" : "Buy one video · $5"}</button></article>
       <div className="plans-grid">
         {plans.map((p) => (
           <article
@@ -824,9 +827,7 @@ export function PricingPage({
               {user?.plan === p.id ? "Current plan" : "Choose " + p.name}
               <ArrowRight size={15} />
             </button>
-            <p className="plan-note">
-              {!yearly ? "3-day free trial · 300 credits" : ""}
-            </p>
+
           </article>
         ))}
       </div>
@@ -846,7 +847,7 @@ export function PricingPage({
           <article>
             <h3>How much does a video cost?</h3>
             <p>
-              10 seconds costs 80 credits, 15 seconds 100, and 30 seconds 160.
+              With a subscription, 10 seconds costs 80 credits, 15 seconds 100, and 30 seconds 160.
               Chat edits are 20 credits. Optional AI voiceover is another 20
               credits per generation; built-in music and audio uploads use no credits.
             </p>
@@ -854,7 +855,7 @@ export function PricingPage({
           <article>
             <h3>How do image uploads count?</h3>
             <p>
-              Use up to four images. The first adds 60 credits and each
+              The $5 one-time generation includes up to four images. With subscription credits, the first adds 60 credits and each
               additional image adds 20.
             </p>
           </article>
@@ -873,10 +874,9 @@ export function PricingPage({
             </p>
           </article>
           <article>
-            <h3>How does the trial work?</h3>
+            <h3>Can I buy just one video?</h3>
             <p>
-              Monthly plans begin with 3 days and 300 credits. Add a card; your
-              plan renews on day four unless cancelled.
+              Yes. Pay $5 USD once for one new video generation, with no subscription or automatic renewal. Registration includes 0 free videos. Extra edits and AI voiceover use subscription credits.
             </p>
           </article>
           <article>

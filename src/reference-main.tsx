@@ -9,7 +9,8 @@ import { trackPageView } from './lib/analytics';
 import './fidelity-shared.css';
 import './motion-theme.css';
 
-type Checkout = {plan: Plan; interval: 'month' | 'year'};
+type Checkout = {plan: Plan; interval: 'month' | 'year'} | { singleVideo: true };
+const checkoutCallback = (choice: Checkout) => 'singleVideo' in choice ? '/pricing?checkout=single-video' : `/pricing?checkout=${choice.plan}&interval=${choice.interval}`;
 function ReferenceApp() {
   const [user,setUser] = useState<User|null>(null);
   const [auth,setAuth] = useState<AuthMode|null>(null);
@@ -21,6 +22,7 @@ function ReferenceApp() {
   const refreshRequest = useRef(0);
   const logoutPending = useRef(false);
   const checkoutBusy = useRef(false);
+  const configuration = useRef({billingEnabled:false,singleVideoEnabled:false});
   const noticeTimer = useRef<ReturnType<typeof setTimeout>|null>(null);
   const notify = useCallback((message: string) => {setNotice(message);if (noticeTimer.current) clearTimeout(noticeTimer.current);noticeTimer.current=setTimeout(()=>setNotice(''),5000);},[]);
   const refresh = useCallback(async () => {
@@ -29,6 +31,7 @@ function ReferenceApp() {
     try {
       const result = await api.me();
       if (!mounted.current || epoch !== authEpoch.current || request !== refreshRequest.current) return null;
+      configuration.current = {billingEnabled: result.billingEnabled, singleVideoEnabled: result.singleVideoEnabled};
       currentUser.current = result.user;
       setUser(result.user);
       return result.user;
@@ -37,8 +40,10 @@ function ReferenceApp() {
   const checkout = useCallback(async (choice: Checkout) => {
     if (!mounted.current || logoutPending.current || checkoutBusy.current) return;
     if (!currentUser.current) {setPending(choice);setAuth('login');return;}
+    const enabled = 'singleVideo' in choice ? configuration.current.singleVideoEnabled : configuration.current.billingEnabled;
+    if (!enabled) {notify('This checkout is being configured. Please try again later.');return;}
     checkoutBusy.current=true;notify('Opening secure checkout…');
-    try {const result = await api.checkout(choice.plan,choice.interval);location.assign(result.url);}
+    try {const result = 'singleVideo' in choice ? await api.checkoutSingleVideo() : await api.checkout(choice.plan,choice.interval);location.assign(result.url);}
     catch (err) {notify(err instanceof Error ? err.message : 'Checkout could not open. Please try again.');checkoutBusy.current=false;}
   },[notify]);
   useEffect(() => {
@@ -49,16 +54,18 @@ function ReferenceApp() {
       const button=(event.target as Element)?.closest<HTMLElement>('[data-checkout]');
       if (!button) return;
       const plan=button.dataset.checkout,interval=button.dataset.interval;
+      if (plan==='single-video') {event.preventDefault();void checkout({singleVideo:true});return;}
       if ((plan==='starter'||plan==='pro'||plan==='max')&&(interval==='month'||interval==='year')) {event.preventDefault();void checkout({plan,interval});}
     };
     document.addEventListener('click',click);
     const signin=()=>setAuth('login');addEventListener('cmv:signin',signin);
     const parameters=new URLSearchParams(location.search),plan=parameters.get('checkout'),interval=parameters.get('interval');
-    if ((plan==='starter'||plan==='pro'||plan==='max')&&(interval==='month'||interval==='year')) {
+    const choice: Checkout|null = plan==='single-video' ? {singleVideo:true} : (plan==='starter'||plan==='pro'||plan==='max')&&(interval==='month'||interval==='year') ? {plan,interval} : null;
+    if (choice) {
       history.replaceState(null,'',location.pathname);
       const epoch = authEpoch.current;
       void refresh().then(()=>{
-        if (mounted.current && epoch === authEpoch.current) void checkout({plan,interval});
+        if (mounted.current && epoch === authEpoch.current) void checkout(choice);
       });
     }
     return ()=>{
@@ -101,7 +108,7 @@ function ReferenceApp() {
         currentUser.current = next;
         setUser(next);
         if (pending) { const choice = pending; setPending(null); void checkout(choice); }
-      }} callbackURL={pending ? `/pricing?checkout=${pending.plan}&interval=${pending.interval}` : undefined} />}
+      }} callbackURL={pending ? checkoutCallback(pending) : undefined} />}
     {notice && <div className="cmv-notice" role="status">{notice}</div>}
   </>;
 }

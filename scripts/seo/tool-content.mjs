@@ -31,8 +31,8 @@ export const toolPages = [
     ],
     faqs: [
       {
-        question: 'Is there a free way to try a text animation generator?',
-        answer: 'Eligible accounts can start a three-day trial with 300 credits on their first monthly subscription. A card is required. The subscription becomes paid on day 4 and renews unless cancelled; cancel before the trial ends to avoid the first charge. Yearly plans are paid up front and do not include this trial.',
+        question: 'Can I buy one text animation video without a subscription?',
+        answer: 'Registration includes 0 free videos. Pay $5 USD once for one new video generation, with no subscription or automatic renewal. Choose 10, 15 or 30 seconds and up to 4 reference images; 1080p MP4 export, built-in music and audio uploads are included. Extra edits and AI voiceover use subscription credits. No card binding is required to create an account; payment is collected at checkout.',
       },
       {
         question: 'Can I animate text without After Effects?',

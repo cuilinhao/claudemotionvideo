@@ -4,6 +4,7 @@ export type User = {
   id: string;
   email: string;
   credits: number;
+  singleVideoGenerations: number;
   plan: string | null;
   subscriptionStatus: string | null;
 };
@@ -70,7 +71,7 @@ async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
-  me: () => request<{ user: User | null; billingEnabled: boolean; providers: AuthProviders }>("/api/me"),
+  me: () => request<{ user: User | null; billingEnabled: boolean; singleVideoEnabled: boolean; providers: AuthProviders }>("/api/me"),
   socialSignIn: (provider: "google", callbackURL: string) =>
     request<{ url: string }>("/api/auth/sign-in/social", {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider, callbackURL }),
@@ -136,6 +137,7 @@ export const api = {
     projectId?: string;
     versionId?: string;
     selectedShot?: string;
+    paymentType?: 'single_video' | 'credits';
     idempotencyKey: string;
   }) =>
     request<{ jobId: string; projectId: string; cost: number }>("/api/jobs", {
@@ -155,6 +157,8 @@ export const api = {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ plan, interval }),
     }),
+  checkoutSingleVideo: () =>
+    request<{ url: string }>("/api/billing/checkout-single-video", { method: "POST" }),
   portal: () =>
     request<{ url: string }>("/api/billing/portal", { method: "POST" }),
   saveMp4: (projectId: string, versionId: string, blob: Blob, audioRevision: number) =>

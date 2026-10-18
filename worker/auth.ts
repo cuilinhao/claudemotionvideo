@@ -61,6 +61,6 @@ export async function createSession(db: D1Database, userId: string, now = Math.f
 }
 export async function getSessionUser(db: D1Database, token: string | undefined, now = Math.floor(Date.now() / 1000)) {
   if (!token || !/^[a-f0-9]{64}$/.test(token)) return null;
-  return db.prepare('SELECT users.* FROM users JOIN sessions ON users.id=sessions.user_id WHERE sessions.token_hash=? AND sessions.expires_at>?')
+  return db.prepare('SELECT users.*,COALESCE((SELECT balance FROM single_video_balances WHERE user_id=users.id),0) AS single_video_generations FROM users JOIN sessions ON users.id=sessions.user_id WHERE sessions.token_hash=? AND sessions.expires_at>?')
     .bind(await digest(token), now).first<UserRow>();
 }

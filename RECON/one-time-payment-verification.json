@@ -1,0 +1,56 @@
+{
+  "verifiedAt": "2026-10-18T14:03:58.824Z",
+  "config": {
+    "status": 200,
+    "billingEnabled": true,
+    "singleVideoEnabled": true,
+    "providers": {
+      "email": true,
+      "google": true
+    }
+  },
+  "pricing": {
+    "status": 200,
+    "oneTime": true,
+    "buyOneVideo": true,
+    "removedTrial": true
+  },
+  "stripe": {
+    "product": "prod_VSqGsLmZ11cWIx",
+    "price": "price_1URuZz7UYmtkCYxVvj1nv7rN",
+    "unitAmount": 500,
+    "currency": "usd",
+    "webhookEventCount": 8
+  },
+  "tests": {
+    "files": 37,
+    "passed": 328,
+    "typecheck": true,
+    "build": true,
+    "referenceAudit": true,
+    "freshDependencies": true
+  },
+  "realPaymentPerformed": false,
+  "productionCheckout": {
+    "singleVideo": {
+      "amount": "US$5.00",
+      "mode": "payment",
+      "automaticRenewal": false
+    },
+    "starterMonthly": {
+      "amount": "US$19.90",
+      "mode": "subscription",
+      "trial": false
+    },
+    "submittedPayment": false
+  },
+  "migration": {
+    "usersBefore": 2,
+    "usersAfter": 2,
+    "creditsBefore": 120,
+    "creditsAfter": 120,
+    "purchaseGrants": 0
+  },
+  "initialDeploymentVersion": "409460c4-19b0-4f05-973c-693c08a66351",
+  "releaseBase": "9a29da7"
+}

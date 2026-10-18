@@ -1,6 +1,8 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { effectRoutes } from './seo/effect-routes.mjs';
+import { toolPages } from './seo/tool-content.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
@@ -182,7 +184,7 @@ async function checkRouteSet() {
   }
   await walk(dist);
   const htmlRoutes = files.map((file) => `/${path.relative(dist, file).replace(/\/index\.html$/, '').replace(/\.html$/, '')}`).map((x) => x === '/index' ? '/' : x);
-  const expected = [...expectedStaticRoutes, ...expectedReactRoutes, '/refund', '/404'];
+  const expected = [...expectedStaticRoutes, ...expectedReactRoutes, ...toolPages.map(page => page.path), ...effectRoutes.map(effect => `/effects/${effect.slug}`), '/refund', '/404'];
   const unexpected = htmlRoutes.filter((route) => !expected.includes(route));
   const duplicated = htmlRoutes.filter((route, i) => htmlRoutes.indexOf(route) !== i);
   if (unexpected.length) fail(`Unexpected HTML routes: ${unexpected.join(', ')}`);

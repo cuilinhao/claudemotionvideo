@@ -140,9 +140,23 @@ Motion graphics pricing
 
 Credits refill every month. Unused credits roll over, up to 2× your monthly amount. Cancel any time.
 
-Compare plans Monthly Yearly Up to -50% Starter
+Compare plans One-time payment One video
 
-$19.9 /month Billed monthly, cancel any time Eligible accounts · 3-day trial (about 3 videos) 1,500 credits a month About 15 videos a month (15s each)
+$5 USD / video No subscription. No automatic renewal.
+
+One new video generation: 10, 15 or 30 seconds
+
+Up to 4 reference images and 1080p MP4 export
+
+Built-in music and audio uploads included
+
+Extra edits and AI voiceover use subscription credits.
+
+Buy one video · $5 Registration includes 0 free videos. No card binding is required to create an account. Payment is collected at checkout.
+
+Monthly Yearly Up to -50% Starter
+
+$19.9 /month Billed monthly, cancel any time 1,500 credits a month About 15 videos a month (15s each)
 
 1080p MP4, no watermark
 
@@ -152,7 +166,7 @@ Commercial use
 
 Get Starter Most popular Pro
 
-$39.9 /month Billed monthly, cancel any time Eligible accounts · 3-day trial (about 3 videos) 3,600 credits a month About 36 videos a month (15s each)
+$39.9 /month Billed monthly, cancel any time 3,600 credits a month About 36 videos a month (15s each)
 
 Everything in Starter
 
@@ -160,7 +174,7 @@ Lower cost per video
 
 Get Pro Max
 
-$79.9 /month Billed monthly, cancel any time Eligible accounts · 3-day trial (about 3 videos) 7,500 credits a month About 75 videos a month (15s each)
+$79.9 /month Billed monthly, cancel any time 7,500 credits a month About 75 videos a month (15s each)
 
 Everything in Pro
 
@@ -192,9 +206,7 @@ Everything in Pro
 
 Lowest cost per video, for agencies and teams
 
-Get Max Want to try first? Eligible accounts can start with a 3-day trial on a monthly plan.
-
-Pay safely and securely with Stripe
+Get Max Pay safely and securely with Stripe
 
 Common options shown below may be offered when eligible; Stripe confirms the available methods at checkout.
 

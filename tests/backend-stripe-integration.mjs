@@ -50,7 +50,7 @@ try {
     qa = { ...credentials, userId: registered.user.id, cookie: registration.headers.get('set-cookie').split(';')[0] };
   }
   const initial = await api('/api/me');
-  assert.equal(initial.user.id, qa.userId); assert.equal(initial.user.credits, 0); assert.equal(initial.billingEnabled, true);
+  assert.equal(initial.user.id, qa.userId); assert.equal(initial.user.credits, 0); assert.equal(initial.user.singleVideoGenerations, 0); assert.equal(initial.billingEnabled, true);
   report('local-account', { userId: initial.user.id, credits: initial.user.credits, billingEnabled: true });
   const checkoutResponse = await api('/api/billing/checkout', 'POST', { plan: 'starter', interval: 'month' });
   assert.equal(new URL(checkoutResponse.url).hostname, 'checkout.stripe.com');
@@ -62,7 +62,8 @@ try {
   checkout = sessions.data.find(session => session.url === checkoutResponse.url);
   assert(checkout); assert.equal(checkout.livemode, false); assert.equal(checkout.mode, 'subscription');
   assert.equal(checkout.payment_method_collection, 'always');
-  assert.equal(checkout.amount_total, 0, 'First monthly Checkout must start with a free trial');
+  assert.equal(checkout.amount_total, 1990, 'Monthly Checkout charges immediately without a trial');
+  assert.equal(checkout.metadata.billingPolicy, 'no_trial_v1');
   const items = await stripe.checkout.sessions.listLineItems(checkout.id);
   assert.equal(items.data[0].price.id, prices.starter.month); assert.equal(items.data[0].quantity, 1);
   assert.deepEqual(checkout.allowed_payment_method_types ?? checkout.payment_method_types, ['card']);
@@ -71,15 +72,9 @@ try {
   const paymentMethod = await stripe.paymentMethods.attach('pm_card_visa', { customer: customerId });
   assert.equal(paymentMethod.livemode, false);
   await stripe.customers.update(customerId, { invoice_settings: { default_payment_method: paymentMethod.id } });
-  subscription = await stripe.subscriptions.create({ customer: customerId, items: [{ price: prices.starter.month }], default_payment_method: paymentMethod.id, trial_period_days: 3, trial_settings: { end_behavior: { missing_payment_method: 'cancel' } }, metadata: { userId: qa.userId, plan: 'starter', interval: 'month' } }, { idempotencyKey: `cmv-qa-trial:${qa.userId}` });
-  assert.equal(subscription.livemode, false); assert.equal(subscription.status, 'trialing');
-  assert.equal(subscription.trial_end - subscription.trial_start, 3 * 86400);
-  const trialEvent = eventFor('customer.subscription.created', subscription);
-  await deliver(trialEvent); await deliver(trialEvent); await deliver(eventFor('customer.subscription.updated', subscription));
-  let account = await api('/api/me'); assert.equal(account.user.credits, 300); assert.equal(account.user.subscriptionStatus, 'trialing');
-  report('trial', { subscriptionId: subscription.id, eventId: trialEvent.id, credits: account.user.credits, duplicateSafe: true, days: 3, livemode: false });
-
-  subscription = await stripe.subscriptions.update(subscription.id, { trial_end: 'now', proration_behavior: 'none', expand: ['latest_invoice'] });
+  subscription = await stripe.subscriptions.create({ customer: customerId, items: [{ price: prices.starter.month }], default_payment_method: paymentMethod.id, metadata: { userId: qa.userId, plan: 'starter', interval: 'month' }, expand: ['latest_invoice'] }, { idempotencyKey: `cmv-qa-paid:${qa.userId}` });
+  assert.equal(subscription.livemode, false); assert.equal(subscription.trial_end, null);
+  await deliver(eventFor('customer.subscription.created', subscription));
   let invoice = typeof subscription.latest_invoice === 'string' ? await stripe.invoices.retrieve(subscription.latest_invoice) : subscription.latest_invoice;
   assert(invoice); assert.equal(invoice.livemode, false);
   for (let attempt = 0; invoice.status !== 'paid' && attempt < 15; attempt++) {
@@ -91,11 +86,29 @@ try {
   assert.equal(invoice.status, 'paid'); assert.equal(invoice.amount_paid, 1990);
   const invoiceEvent = eventFor('invoice.paid', invoice);
   await deliver(invoiceEvent); await deliver(invoiceEvent); await deliver(eventFor('invoice.paid', invoice));
-  account = await api('/api/me'); assert.equal(account.user.credits, 1800); assert.equal(account.user.subscriptionStatus, 'active');
+  const account = await api('/api/me'); assert.equal(account.user.credits, 1500); assert.equal(account.user.subscriptionStatus, 'active');
   const credits = await api('/api/credits');
   assert.equal(credits.ledger.filter(entry => entry.reason === 'Monthly subscription credits').length, 1);
-  assert.equal(credits.ledger.filter(entry => entry.reason === 'Three-day trial credits').length, 1);
+  assert.equal(credits.ledger.filter(entry => entry.reason === 'Three-day trial credits').length, 0);
   report('invoice', { invoiceId: invoice.id, eventId: invoiceEvent.id, amountPaid: invoice.amount_paid, currency: invoice.currency, credits: account.user.credits, duplicateSafe: true, paidLedgerRows: 1, livemode: false });
+
+  // Active subscribers may also purchase a single video. An open unpaid
+  // Checkout must never grant an entitlement, even with a signed completion event.
+  if (initial.singleVideoEnabled) {
+    const singleResponse = await api('/api/billing/checkout-single-video', 'POST');
+    const singleSessions = await stripe.checkout.sessions.list({ customer: customerId, limit: 10 });
+    const single = singleSessions.data.find(session => session.url === singleResponse.url);
+    assert(single); assert.equal(single.livemode, false); assert.equal(single.mode, 'payment');
+    assert.equal(single.amount_total, 500); assert.equal(single.currency, 'usd');
+    assert.equal(single.metadata.purchaseType, 'single_video');
+    const singleItems = await stripe.checkout.sessions.listLineItems(single.id);
+    assert.equal(singleItems.data.length, 1); assert.equal(singleItems.data[0].quantity, 1);
+    assert.equal(singleItems.data[0].price.unit_amount, 500); assert.equal(singleItems.data[0].price.currency, 'usd');
+    await deliver(eventFor('checkout.session.completed', single));
+    assert.equal((await api('/api/me')).user.singleVideoGenerations, 0);
+    await stripe.checkout.sessions.expire(single.id);
+    report('single-video-checkout', { mode: 'payment', amount: 500, currency: 'usd', quantity: 1, unpaidGrantRejected: true, livemode: false });
+  }
 
   const portal = await api('/api/billing/portal', 'POST');
   assert.equal(new URL(portal.url).hostname, 'billing.stripe.com');
@@ -115,7 +128,7 @@ try {
     } catch (error) { report('cleanup-failure', { object: 'subscription', id: subscription.id, code: error.code ?? error.name }); process.exitCode = 1; }
   }
   if (checkout?.status === 'open') {
-    try { await stripe.checkout.sessions.expire(checkout.id); report('cleanup-checkout', { sessionId: checkout.id, expired: true }); }
+    try { const current = await stripe.checkout.sessions.retrieve(checkout.id); if (current.status === 'open') await stripe.checkout.sessions.expire(checkout.id); report('cleanup-checkout', { sessionId: checkout.id, expired: true }); }
     catch (error) { report('cleanup-failure', { object: 'checkout', id: checkout.id, code: error.code ?? error.name }); process.exitCode = 1; }
   }
 }

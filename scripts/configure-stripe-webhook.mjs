@@ -10,6 +10,7 @@ const url = 'https://claudemotionvideo.com/api/billing/webhook';
 const apiVersion = '2026-09-30.endive';
 const enabledEvents = [
   'checkout.session.completed',
+  'checkout.session.async_payment_succeeded',
   'customer.subscription.created',
   'customer.subscription.updated',
   'customer.subscription.deleted',
@@ -32,7 +33,7 @@ if (endpoint) {
 } else {
   endpoint = await stripe.webhookEndpoints.create({
     url, api_version: apiVersion, enabled_events: enabledEvents,
-    description: 'Claude Motion Video subscription and credit ledger events',
+    description: 'Claude Motion Video subscriptions and one-time video purchases',
     metadata: { cmv_app: 'claudemotionvideo' },
   }, { idempotencyKey: 'cmv-webhook-v1' });
   if (!endpoint.secret) throw new Error('Stripe did not return the new signing secret');

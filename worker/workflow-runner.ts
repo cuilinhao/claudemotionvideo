@@ -46,7 +46,7 @@ export async function executeGeneration(env: Env, step: Pick<WorkflowStep, 'do'>
   } catch (error) {
     console.error('Generation failed', { jobId, type: error instanceof Error ? error.name : 'Unknown' });
     await step.do('Refund failed generation', async () => {
-      await refundJob(env.DB, jobId, 'We could not complete this animation. Your credits were refunded. Please try again.');
+      await refundJob(env.DB, jobId, 'We could not complete this animation. Your credits or purchased generation were returned. Please try again.');
       return { refunded: true };
     });
     return { failed: true };
@@ -58,6 +58,6 @@ export async function recoverStaleJobs(env: Env) {
   const stale = await env.DB.prepare("SELECT id FROM jobs WHERE status IN ('queued','running') AND updated_at<? LIMIT 100").bind(cutoff).all<{ id: string }>();
   for (const job of stale.results) {
     try { const instance = await env.GENERATION.get(job.id); await instance.terminate(); } catch { /* Missing/failed workflows still need refunds. */ }
-    await refundJob(env.DB, job.id, 'Generation timed out. Your credits were refunded. Please try again.');
+    await refundJob(env.DB, job.id, 'Generation timed out. Your credits or purchased generation were returned. Please try again.');
   }
 }

@@ -8,6 +8,7 @@ export interface Env {
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   STRIPE_PRICES?: string;
+  STRIPE_SINGLE_VIDEO_PRICE?: string;
   STRIPE_PORTAL_CONFIGURATION?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
@@ -17,6 +18,7 @@ export interface Env {
 }
 
 export interface UserRow {
+  single_video_generations?: number;
   id: string; email: string; password_hash: string; email_verified_at: number | null; credits: number; plan: string;
   monthly_credits: number; subscription_status: string; stripe_customer_id: string | null;
   subscription_id: string | null; subscription_interval: 'month' | 'year' | null;
@@ -45,5 +47,5 @@ export interface JobRow {
 }
 export type ApiEnv = { Bindings: Env; Variables: { user: UserRow | null } };
 export const publicUser = (user: UserRow) => ({
-  id: user.id, email: user.email, credits: user.credits, plan: user.plan, subscriptionStatus: user.subscription_status,
+  id: user.id, email: user.email, credits: user.credits, singleVideoGenerations: user.single_video_generations ?? 0, plan: user.plan, subscriptionStatus: user.subscription_status,
 });

@@ -23,9 +23,10 @@ function pricePlan(env: Env, priceId: string | undefined) {
   }
   return null;
 }
+export const singleVideoEnabled = (env: Env) => !!(env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET && /^price_[A-Za-z0-9_]+$/.test(env.STRIPE_SINGLE_VIDEO_PRICE ?? ''));
 export const billingEnabled = (env: Env) => !!(env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET && configuredPrices(env));
 function stripeClient(env: Env) {
-  if (!billingEnabled(env)) throw new ApiError(503, 'Billing is being configured. Please try again later.', 'BILLING_UNAVAILABLE');
+  if (!(env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET)) throw new ApiError(503, 'Billing is being configured. Please try again later.', 'BILLING_UNAVAILABLE');
   return new Stripe(env.STRIPE_SECRET_KEY!, { httpClient: Stripe.createFetchHttpClient(), maxNetworkRetries: 2, timeout: 20_000 });
 }
 const objectId = (value: string | { id: string } | null | undefined) => typeof value === 'string' ? value : value?.id;
@@ -54,12 +55,6 @@ export async function applySubscriptionEvent(db: D1Database, eventId: string, ev
       WHERE id=? AND billing_event_created<=?`)
       .bind(subscription.customerId, subscription.id, subscription.status, subscription.interval, subscription.plan, subscription.periodStart, subscription.periodEnd, eventCreated, user.id, eventCreated),
   ];
-  if (subscription.status === 'trialing' && subscription.hasPaymentMethod && subscription.interval === 'month') {
-    statements.push(db.prepare(`INSERT INTO credit_ledger (id,user_id,amount,reason,external_key,created_at)
-      SELECT ?,id,300,'Three-day trial credits',?,? FROM users WHERE id=? AND trial_used=0
-      ON CONFLICT(external_key) DO NOTHING`).bind(crypto.randomUUID(), `trial:${user.id}`, now, user.id));
-    statements.push(db.prepare('UPDATE users SET trial_used=1 WHERE id=?').bind(user.id));
-  }
   const eligibleInvoice = eventType === 'invoice.paid' && invoice && invoice.amountPaid > 0 && subscription.status === 'active'
     && ['subscription_create', 'subscription_cycle', 'subscription_update'].includes(invoice.billingReason)
     && invoice.periodStart === subscription.periodStart && invoice.periodEnd > invoice.periodStart;
@@ -107,17 +102,21 @@ async function subscriptionSnapshot(env: Env, stripe: Stripe, subscription: Stri
   const known = await env.DB.prepare('SELECT id FROM users WHERE stripe_customer_id=?').bind(customerId).first<{ id: string }>();
   const userId = subscription.metadata.userId ?? known?.id;
   if (!userId) return null;
-  let hasPaymentMethod = !!subscription.default_payment_method;
-  if (subscription.status === 'trialing' && !hasPaymentMethod) {
-    const customer = await stripe.customers.retrieve(customerId);
-    hasPaymentMethod = !customer.deleted && !!customer.invoice_settings.default_payment_method;
-  }
+  const hasPaymentMethod = !!subscription.default_payment_method;
   return { id: subscription.id, userId, customerId, ...matched, status: subscription.status, periodStart: item.current_period_start, periodEnd: item.current_period_end, hasPaymentMethod };
 }
 
 export async function processStripeEvent(env: Env, event: Stripe.Event) {
   if (await env.DB.prepare('SELECT id FROM stripe_events WHERE id=?').bind(event.id).first()) return;
   const stripe = stripeClient(env);
+  if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
+    // Treat the signed payload only as an identifier; fulfillment uses Stripe's canonical state.
+    const session = await stripe.checkout.sessions.retrieve((event.data.object as Stripe.Checkout.Session).id);
+    if (session.mode === 'payment') {
+      await fulfillSingleVideo(env, stripe, event, session);
+      return;
+    }
+  }
   let subscriptionId: string | undefined; let invoice: Stripe.Invoice | undefined;
   if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
     const session = event.data.object as Stripe.Checkout.Session;
@@ -149,6 +148,7 @@ export async function processStripeEvent(env: Env, event: Stripe.Event) {
 }
 
 export async function createCheckout(env: Env, user: UserRow, plan: Plan, interval: 'month' | 'year') {
+  if (!billingEnabled(env)) throw new ApiError(503, 'Billing is being configured. Please try again later.', 'BILLING_UNAVAILABLE');
   const stripe = stripeClient(env); const prices = configuredPrices(env)!; const now = Math.floor(Date.now() / 1000);
   if (['active', 'trialing', 'past_due', 'unpaid'].includes(user.subscription_status)) throw new ApiError(409, 'Manage your existing subscription in the billing portal.', 'SUBSCRIPTION_EXISTS');
   // Serialize Checkout creation per user; an existing open session is reused.
@@ -160,7 +160,7 @@ export async function createCheckout(env: Env, user: UserRow, plan: Plan, interv
     if (user.checkout_session_id && (user.checkout_expires_at ?? 0) > now) {
       const existing = await stripe.checkout.sessions.retrieve(user.checkout_session_id);
       if (existing.status === 'open' && existing.url) {
-        if (user.checkout_plan === plan && user.checkout_interval === interval) return { url: existing.url };
+        if (user.checkout_plan === plan && user.checkout_interval === interval && existing.metadata?.billingPolicy === 'no_trial_v1') return { url: existing.url };
         await stripe.checkout.sessions.expire(existing.id);
       } else if (existing.status === 'complete') throw new ApiError(409, 'Your payment is processing. Refresh your account in a moment.');
     }
@@ -172,12 +172,11 @@ export async function createCheckout(env: Env, user: UserRow, plan: Plan, interv
     }
     const active = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 100 });
     if (active.has_more || active.data.some(item => ['active', 'trialing', 'past_due', 'unpaid', 'incomplete', 'paused'].includes(item.status))) throw new ApiError(409, 'Manage your existing billing history in the billing portal.', 'SUBSCRIPTION_EXISTS');
-    const firstMonthlyTrial = !user.trial_used && active.data.length === 0 && interval === 'month';
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription', customer: customerId, client_reference_id: user.id,
       line_items: [{ price: prices[plan][interval], quantity: 1 }], payment_method_collection: 'always', allowed_payment_method_types: ['card'],
-      subscription_data: { metadata: { userId: user.id, plan, interval }, ...(firstMonthlyTrial ? { trial_period_days: 3, trial_settings: { end_behavior: { missing_payment_method: 'cancel' as const } } } : {}) },
-      metadata: { userId: user.id }, success_url: `${env.APP_URL}/studio?billing=success`, cancel_url: `${env.APP_URL}/pricing?billing=canceled`,
+      subscription_data: { metadata: { userId: user.id, plan, interval } },
+      metadata: { userId: user.id, billingPolicy: 'no_trial_v1' }, success_url: `${env.APP_URL}/studio?billing=success`, cancel_url: `${env.APP_URL}/pricing?billing=canceled`,
       expires_at: now + 1800,
     }, { idempotencyKey: `cmv-checkout:${user.id}:${plan}:${interval}:${user.checkout_session_id ?? 'first'}:${Math.floor(now / 1800)}` });
     if (!session.url) throw new Error('Stripe did not return a checkout URL');
@@ -185,6 +184,67 @@ export async function createCheckout(env: Env, user: UserRow, plan: Plan, interv
     return { url: session.url };
   } finally { await env.DB.prepare('UPDATE users SET checkout_lease=0 WHERE id=? AND checkout_lease=?').bind(user.id, leaseUntil).run(); }
 }
+async function fulfillSingleVideo(env: Env, stripe: Stripe, event: Stripe.Event, session: Stripe.Checkout.Session) {
+  const recordEvent = () => env.DB.prepare('INSERT INTO stripe_events (id,type,processed_at) VALUES (?,?,?) ON CONFLICT(id) DO NOTHING').bind(event.id, event.type, new Date().toISOString());
+  if (!singleVideoEnabled(env) || session.mode !== 'payment' || session.status !== 'complete' || session.payment_status !== 'paid'
+    || session.currency !== 'usd' || session.amount_total !== 500 || session.metadata?.purchaseType !== 'single_video'
+    || !session.client_reference_id || session.client_reference_id !== session.metadata.userId) {
+    await recordEvent().run(); return;
+  }
+  const customerId = objectId(session.customer);
+  const user = await env.DB.prepare('SELECT * FROM users WHERE id=? AND stripe_customer_id=?').bind(session.client_reference_id, customerId ?? '').first<UserRow>();
+  if (!user || !customerId) { await recordEvent().run(); return; }
+  const lines = await stripe.checkout.sessions.listLineItems(session.id, { limit: 2 });
+  const item = lines.data[0];
+  if (lines.has_more || lines.data.length !== 1 || item.quantity !== 1 || !item.price || item.price.id !== env.STRIPE_SINGLE_VIDEO_PRICE
+    || item.price.currency !== 'usd' || item.price.unit_amount !== 500 || item.price.type !== 'one_time') {
+    await recordEvent().run(); return;
+  }
+  await env.DB.batch([
+    recordEvent(),
+    env.DB.prepare(`INSERT INTO single_video_ledger(id,user_id,amount,reason,external_key,created_at)
+      SELECT ?,id,1,'Single video purchase',?,? FROM users WHERE id=? AND stripe_customer_id=?
+      ON CONFLICT(external_key) DO NOTHING`)
+      .bind(crypto.randomUUID(), `checkout:${session.id}`, new Date().toISOString(), user.id, customerId),
+    env.DB.prepare('UPDATE users SET checkout_expires_at=0 WHERE id=? AND checkout_session_id=?').bind(user.id, session.id),
+  ]);
+}
+
+export async function createSingleVideoCheckout(env: Env, user: UserRow) {
+  if (!singleVideoEnabled(env)) throw new ApiError(503, 'Single video purchases are being configured. Please try again later.', 'BILLING_UNAVAILABLE');
+  const stripe = stripeClient(env); const now = Math.floor(Date.now() / 1000); const leaseUntil = now + 300;
+  const lease = await env.DB.prepare('UPDATE users SET checkout_lease=? WHERE id=? AND checkout_lease<? RETURNING id').bind(leaseUntil, user.id, now).first();
+  if (!lease) throw new ApiError(409, 'A checkout is already being prepared. Please try again shortly.');
+  try {
+    user = (await env.DB.prepare('SELECT * FROM users WHERE id=?').bind(user.id).first<UserRow>())!;
+    if (user.checkout_session_id && (user.checkout_expires_at ?? 0) > now) {
+      const existing = await stripe.checkout.sessions.retrieve(user.checkout_session_id);
+      if (existing.status === 'open' && existing.url) {
+        if (user.checkout_plan === 'single_video') return { url: existing.url };
+        await stripe.checkout.sessions.expire(existing.id);
+      } else if (existing.status === 'complete' && existing.mode === 'payment' && !await env.DB.prepare('SELECT id FROM single_video_ledger WHERE external_key=?').bind(`checkout:${existing.id}`).first()) {
+        throw new ApiError(409, 'Your payment is processing. Refresh your account in a moment.');
+      }
+    }
+    let customerId = user.stripe_customer_id;
+    if (!customerId) {
+      const customer = await stripe.customers.create({ email: user.email, metadata: { userId: user.id } }, { idempotencyKey: `cmv-customer:${user.id}` });
+      customerId = customer.id;
+      await env.DB.prepare('UPDATE users SET stripe_customer_id=? WHERE id=? AND stripe_customer_id IS NULL').bind(customerId, user.id).run();
+    }
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment', customer: customerId, client_reference_id: user.id,
+      line_items: [{ price: env.STRIPE_SINGLE_VIDEO_PRICE!, quantity: 1 }], adaptive_pricing: { enabled: false },
+      metadata: { userId: user.id, purchaseType: 'single_video' },
+      success_url: `${env.APP_URL}/studio?billing=success`, cancel_url: `${env.APP_URL}/pricing?billing=canceled`, expires_at: now + 1800,
+    }, { idempotencyKey: `cmv-video:${user.id}:${user.checkout_session_id ?? 'first'}:${Math.floor(now / 1800)}` });
+    if (!session.url) throw new Error('Stripe did not return a checkout URL');
+    await env.DB.prepare("UPDATE users SET checkout_session_id=?,checkout_expires_at=?,checkout_plan='single_video',checkout_interval=NULL WHERE id=?")
+      .bind(session.id, session.expires_at, user.id).run();
+    return { url: session.url };
+  } finally { await env.DB.prepare('UPDATE users SET checkout_lease=0 WHERE id=? AND checkout_lease=?').bind(user.id, leaseUntil).run(); }
+}
+
 export async function createBillingPortal(env: Env, user: UserRow) {
   const stripe = stripeClient(env);
   if (!user.stripe_customer_id) throw new ApiError(400, 'Choose a plan before opening the billing portal.');

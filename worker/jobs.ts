@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { digest } from './auth';
-import { creditStatement, generationCost, refundJob } from './credits';
+import { generationCost, refundJob } from './credits';
 import { ApiError } from './errors';
 import type { Env, JobRow, ProjectRow, UserRow, VersionRow } from './types';
 
@@ -14,13 +14,20 @@ export const jobInputSchema = z.object({
 export type JobInput = z.infer<typeof jobInputSchema>;
 export const publicJob = (job: JobRow) => ({ id: job.id, projectId: job.project_id, status: job.status, progress: job.progress, ...(job.error ? { error: job.error } : {}), ...(job.version_id ? { versionId: job.version_id } : {}) });
 
+async function chargeResult(db: D1Database, job: JobRow) {
+  const payment = await db.prepare('SELECT payment_type,charged_cost FROM generation_payments WHERE job_id=?').bind(job.id).first<{ payment_type: 'single_video' | 'credits'; charged_cost: number }>();
+  return { jobId: job.id, projectId: job.project_id, cost: payment?.charged_cost ?? job.cost, paymentType: payment?.payment_type ?? 'credits' as const };
+}
+
 export async function createJob(env: Env, user: UserRow, input: JobInput) {
   const requestHash = await digest(JSON.stringify(input));
   const existing = await env.DB.prepare('SELECT * FROM jobs WHERE user_id=? AND idempotency_key=?').bind(user.id, input.idempotencyKey).first<JobRow>();
   if (existing) {
     if (existing.request_hash !== requestHash) throw new ApiError(409, 'This request key has already been used for different work.', 'IDEMPOTENCY_CONFLICT');
-    return { jobId: existing.id, projectId: existing.project_id, cost: existing.cost };
+    return chargeResult(env.DB, existing);
   }
+  const tombstone = await env.DB.prepare('SELECT job_id FROM generation_payments WHERE user_id=? AND idempotency_key=?').bind(user.id, input.idempotencyKey).first();
+  if (tombstone) throw new ApiError(409, 'This request key has already been used. Start a new request.', 'IDEMPOTENCY_CONFLICT');
   if (new Set(input.assetIds).size !== input.assetIds.length) throw new ApiError(400, 'Each image may appear only once.');
   let project: ProjectRow | null = null;
   if (input.projectId) {
@@ -48,18 +55,30 @@ export async function createJob(env: Env, user: UserRow, input: JobInput) {
     await env.DB.batch([
       env.DB.prepare('INSERT INTO projects (id,user_id,title,aspect,duration,created_at,updated_at) VALUES (?,?,?,?,?,?,?) ON CONFLICT(id) DO NOTHING')
         .bind(projectId, user.id, input.prompt.slice(0, 80), input.aspect, input.duration, now, now),
-      // The immutable debit is also the request tombstone after project deletion.
-      // A duplicate must abort the whole batch instead of creating unpaid work.
-      creditStatement(env.DB, user.id, -cost, previous ? 'Animation edit' : 'Animation generation', `job:${id}`, false),
+      // Select the payment inside the same transaction as both debit and job.
+      // The request tombstone survives project deletion and prevents switching
+      // payment sources from making a duplicate request payable again.
+      env.DB.prepare(`INSERT INTO generation_payments(job_id,user_id,idempotency_key,request_hash,payment_type,charged_cost,created_at)
+        SELECT ?,?,?,?,CASE WHEN ?=0 AND COALESCE((SELECT balance FROM single_video_balances WHERE user_id=?),0)>0 THEN 'single_video' ELSE 'credits' END,
+        CASE WHEN ?=0 AND COALESCE((SELECT balance FROM single_video_balances WHERE user_id=?),0)>0 THEN 0 ELSE ? END,?`)
+        .bind(id, user.id, input.idempotencyKey, requestHash, previous ? 1 : 0, user.id, previous ? 1 : 0, user.id, cost, now),
+      env.DB.prepare(`INSERT INTO single_video_ledger(id,user_id,amount,reason,external_key,created_at)
+        SELECT ?,user_id,-1,'Animation generation',?,? FROM generation_payments WHERE job_id=? AND payment_type='single_video'`)
+        .bind(crypto.randomUUID(), `job:${id}`, now, id),
+      env.DB.prepare(`INSERT INTO credit_ledger(id,user_id,amount,reason,external_key,created_at)
+        SELECT ?,user_id,-charged_cost,?,?,? FROM generation_payments WHERE job_id=? AND payment_type='credits'`)
+        .bind(crypto.randomUUID(), previous ? 'Animation edit' : 'Animation generation', `job:${id}`, now, id),
+      // Keep the nominal legacy credit cost for compatibility with deployed
+      // jobs CHECK(cost>0). generation_payments is the charged-cost authority.
       env.DB.prepare(`INSERT INTO jobs (id,user_id,project_id,prompt,aspect,duration,asset_ids,previous_version_id,selected_shot,cost,status,idempotency_key,request_hash,created_at,updated_at)
         VALUES (?,?,?,?,?,?,?,?,?,?,'queued',?,?,?,?) ON CONFLICT(user_id,idempotency_key) DO NOTHING`)
         .bind(id, user.id, projectId, input.prompt, input.aspect, input.duration, JSON.stringify(input.assetIds), previous?.id ?? null, input.selectedShot ?? null, cost, input.idempotencyKey, requestHash, now, now),
     ]);
   } catch (error) {
-    if (String(error).includes('INSUFFICIENT_CREDITS')) throw new ApiError(402, `This request needs ${cost} credits. Choose a plan to continue.`, 'INSUFFICIENT_CREDITS');
-    if (await env.DB.prepare('SELECT id FROM credit_ledger WHERE external_key=?').bind(`job:${id}`).first()) {
+    if (String(error).includes('INSUFFICIENT_CREDITS')) throw new ApiError(402, previous ? `This edit needs ${cost} credits. Choose a subscription to continue.` : `Buy one video for $5 or choose a subscription to cover ${cost} credits.`, 'INSUFFICIENT_CREDITS');
+    if (await env.DB.prepare('SELECT job_id FROM generation_payments WHERE job_id=?').bind(id).first() || await env.DB.prepare('SELECT id FROM credit_ledger WHERE external_key=?').bind(`job:${id}`).first()) {
       const concurrent = await env.DB.prepare('SELECT * FROM jobs WHERE id=? AND user_id=?').bind(id, user.id).first<JobRow>();
-      if (concurrent && concurrent.request_hash === requestHash) return { jobId: concurrent.id, projectId: concurrent.project_id, cost: concurrent.cost };
+      if (concurrent && concurrent.request_hash === requestHash) return chargeResult(env.DB, concurrent);
       throw new ApiError(409, 'This request key has already been used. Start a new request.', 'IDEMPOTENCY_CONFLICT');
     }
     throw error;
@@ -71,12 +90,12 @@ export async function createJob(env: Env, user: UserRow, input: JobInput) {
     catch {
       try { const instance = await env.GENERATION.get(id); await instance.status(); }
       catch {
-        await refundJob(env.DB, id, 'The generation service could not start. Your credits were refunded.');
-        throw new ApiError(503, 'The generation service could not start. Your credits were refunded.', 'GENERATION_UNAVAILABLE');
+        await refundJob(env.DB, id, 'The generation service could not start. Your credits or purchased generation were returned.');
+        throw new ApiError(503, 'The generation service could not start. Your credits or purchased generation were returned.', 'GENERATION_UNAVAILABLE');
       }
     }
   }
-  return { jobId: id, projectId, cost: stored.cost };
+  return chargeResult(env.DB, stored);
 }
 
 export async function completeJob(db: D1Database, job: JobRow, result: { html: string; storyboard: string }) {

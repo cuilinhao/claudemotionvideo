@@ -36,6 +36,7 @@
   ],
   "vars": {
     "APP_URL": "https://claudemotionvideo.com",
+    "STRIPE_SINGLE_VIDEO_PRICE": "price_1URuZz7UYmtkCYxVvj1nv7rN",
     "APIMART_MODEL": "claude-opus-5-5",
     "EMAIL_FROM": "noreply@claudemotionvideo.com"
   },

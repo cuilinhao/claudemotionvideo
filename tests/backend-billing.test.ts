@@ -26,13 +26,13 @@ describe('Stripe signatures and credit events', () => {
     await applySubscriptionEvent(db, 'evt_b', 'invoice.paid', snapshot, invoice);
     expect(await db.prepare("SELECT credits FROM users WHERE id='alice'").first('credits')).toBe(1500);
   });
-  it('requires card collection for a trial and grants it only once per account', async () => {
+  it('never grants new trial credits even when a legacy trial has a payment method', async () => {
     const { db } = makeDb(); await seedUser(db);
     await applySubscriptionEvent(db, 'evt_no_card', 'checkout.session.completed', { ...snapshot, status: 'trialing', hasPaymentMethod: false });
     expect(await db.prepare("SELECT credits FROM users WHERE id='alice'").first('credits')).toBe(0);
     await applySubscriptionEvent(db, 'evt_card', 'checkout.session.completed', { ...snapshot, status: 'trialing' });
     await applySubscriptionEvent(db, 'evt_card_again', 'customer.subscription.updated', { ...snapshot, status: 'trialing' });
-    expect(await db.prepare("SELECT credits FROM users WHERE id='alice'").first('credits')).toBe(300);
+    expect(await db.prepare("SELECT credits FROM users WHERE id='alice'").first('credits')).toBe(0);
   });
   it('does not grant free invoice or unpaid-subscription credits', async () => {
     const { db } = makeDb(); await seedUser(db);

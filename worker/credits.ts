@@ -40,8 +40,13 @@ export async function grantMonthlyCredits(db: D1Database, userId: string, allowa
 export async function refundJob(db: D1Database, jobId: string, message: string) {
   const now = new Date().toISOString();
   await db.batch([
-    db.prepare("UPDATE jobs SET status='failed',progress='Failed — credits refunded',error=?,updated_at=? WHERE id=? AND status IN ('queued','running')")
+    db.prepare("UPDATE jobs SET status='failed',progress='Failed — payment restored',error=?,updated_at=? WHERE id=? AND status IN ('queued','running')")
       .bind(message, now, jobId),
+    db.prepare(`INSERT INTO single_video_ledger (id,user_id,amount,reason,external_key,created_at)
+      SELECT ?,jobs.user_id,1,'Failed generation refund',?,? FROM jobs
+      JOIN single_video_ledger AS debit ON debit.user_id=jobs.user_id AND debit.external_key=? AND debit.amount=-1
+      WHERE jobs.id=? AND jobs.status='failed' ON CONFLICT(external_key) DO NOTHING`)
+      .bind(crypto.randomUUID(), `refund:${jobId}`, now, `job:${jobId}`, jobId),
     db.prepare(`INSERT INTO credit_ledger (id,user_id,amount,reason,external_key,created_at)
       SELECT ?,jobs.user_id,-debit.amount,'Failed generation refund',?,? FROM jobs
       JOIN credit_ledger AS debit ON debit.user_id=jobs.user_id AND debit.external_key=? AND debit.amount<0

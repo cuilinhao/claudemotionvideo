@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { allowedOrigin, createSession, digest, getSessionUser, hashPassword, rateLimit, SESSION_AGE, SESSION_COOKIE, verifyPassword } from './auth';
 import { ApiError } from './errors';
 import { createJob, jobInputSchema, publicJob } from './jobs';
-import { billingEnabled, createBillingPortal, createCheckout, processStripeEvent, verifyStripeEvent } from './billing';
+import { billingEnabled, singleVideoEnabled, createBillingPortal, createCheckout, createSingleVideoCheckout, processStripeEvent, verifyStripeEvent } from './billing';
 import { requestPasswordReset, resetPassword } from './password-reset';
 import { consumeMagicLink, magicLinkInput, requestMagicLink } from './magic-link';
 import { beginGoogleOAuth, completeGoogleOAuth, googleOAuthEnabled, googleSignInInput, GOOGLE_STATE_AGE, GOOGLE_STATE_COOKIE } from './google-auth';
@@ -21,12 +21,13 @@ app.use('/api/*', async (c, next) => {
   }
   const user = c.req.path === '/api/billing/webhook' ? null : await getSessionUser(c.env.DB, getCookie(c, SESSION_COOKIE));
   c.set('user', user);
-  if (!user && c.req.path !== '/api/me' && c.req.path !== '/api/support' && !c.req.path.startsWith('/api/auth/') && c.req.path !== '/api/billing/webhook') throw new ApiError(401, 'Please sign in to continue.', 'AUTH_REQUIRED');
+  if (!user && c.req.path !== '/api/me' && c.req.path !== '/api/config' && c.req.path !== '/api/support' && !c.req.path.startsWith('/api/auth/') && c.req.path !== '/api/billing/webhook') throw new ApiError(401, 'Please sign in to continue.', 'AUTH_REQUIRED');
   await next();
 });
 app.use('/api/auth/*', bodyLimit({ maxSize: 4096, onError: c => c.json({ error: 'Request too large.' }, 413) }));
 app.use('/api/jobs', bodyLimit({ maxSize: 32_768, onError: c => c.json({ error: 'Request too large.' }, 413) }));
-app.get('/api/me', c => c.json({ user: c.get('user') ? publicUser(c.get('user')!) : null, billingEnabled: billingEnabled(c.env), providers: { email: !!(c.env.EMAIL && c.env.EMAIL_FROM), google: googleOAuthEnabled(c.env) } }));
+app.get('/api/config', c => c.json({ billingEnabled: billingEnabled(c.env), singleVideoEnabled: singleVideoEnabled(c.env), providers: { email: !!(c.env.EMAIL && c.env.EMAIL_FROM), google: googleOAuthEnabled(c.env) } }));
+app.get('/api/me', c => c.json({ user: c.get('user') ? publicUser(c.get('user')!) : null, billingEnabled: billingEnabled(c.env), singleVideoEnabled: singleVideoEnabled(c.env), providers: { email: !!(c.env.EMAIL && c.env.EMAIL_FROM), google: googleOAuthEnabled(c.env) } }));
 
 app.post('/api/auth/sign-in/magic-link', async c => {
   const ip = c.req.header('CF-Connecting-IP') ?? 'local';
@@ -43,6 +44,7 @@ app.post('/api/auth/magic-link/consume', async c => {
   if (!parsed.success) throw new ApiError(400, 'This sign-in link is invalid. Request a new link.', 'INVALID_INPUT');
   const result = await consumeMagicLink(c.env, parsed.data.token);
   setCookie(c, SESSION_COOKIE, result.session, { httpOnly: true, secure: new URL(c.env.APP_URL).protocol === 'https:', sameSite: 'Lax', path: '/', maxAge: SESSION_AGE });
+  result.user.single_video_generations = await c.env.DB.prepare('SELECT balance FROM single_video_balances WHERE user_id=?').bind(result.user.id).first<number>('balance') ?? 0;
   return c.json({ user: publicUser(result.user), redirect: result.redirect });
 });
 app.post('/api/auth/sign-in/social', async c => {
@@ -107,6 +109,7 @@ for (const action of ['register', 'login'] as const) {
     if (!user) throw new Error('Account creation failed');
     const token = await createSession(c.env.DB, user.id, undefined, user.password_hash);
     setCookie(c, SESSION_COOKIE, token, { httpOnly: true, secure: new URL(c.env.APP_URL).protocol === 'https:', sameSite: 'Lax', path: '/', maxAge: SESSION_AGE });
+    user.single_video_generations = await c.env.DB.prepare('SELECT balance FROM single_video_balances WHERE user_id=?').bind(user.id).first<number>('balance') ?? 0;
     return c.json({ user: publicUser(user) }, action === 'register' ? 201 : 200);
   });
 }
@@ -188,7 +191,7 @@ app.get('/api/jobs/:id', async c => {
 });
 app.get('/api/credits', async c => {
   const ledger = await c.env.DB.prepare('SELECT amount,reason,created_at FROM credit_ledger WHERE user_id=? ORDER BY created_at DESC LIMIT 100').bind(c.get('user')!.id).all<{ amount: number; reason: string; created_at: string }>();
-  return c.json({ credits: c.get('user')!.credits, ledger: ledger.results.map(row => ({ amount: row.amount, reason: row.reason, createdAt: row.created_at })) });
+  return c.json({ credits: c.get('user')!.credits, singleVideoGenerations: c.get('user')!.single_video_generations ?? 0, ledger: ledger.results.map(row => ({ amount: row.amount, reason: row.reason, createdAt: row.created_at })) });
 });
 
 app.use('/api/billing/*', bodyLimit({ maxSize: 1024 * 1024, onError: c => c.json({ error: 'Request too large.' }, 413) }));
@@ -197,6 +200,10 @@ app.post('/api/billing/checkout', async c => {
   const parsed = z.object({ plan: z.enum(['starter', 'pro', 'max']), interval: z.enum(['month', 'year']) }).safeParse(await c.req.json().catch(() => null));
   if (!parsed.success) throw new ApiError(400, 'Choose a valid plan and billing interval.');
   return c.json(await createCheckout(c.env, c.get('user')!, parsed.data.plan, parsed.data.interval));
+});
+app.post('/api/billing/checkout-single-video', async c => {
+  if (!await rateLimit(c.env.DB, `billing:${c.get('user')!.id}`, 10, 60)) throw new ApiError(429, 'Please wait before trying again.');
+  return c.json(await createSingleVideoCheckout(c.env, c.get('user')!));
 });
 app.post('/api/billing/portal', async c => {
   if (!await rateLimit(c.env.DB, `billing:${c.get('user')!.id}`, 10, 60)) throw new ApiError(429, 'Please wait before trying again.');
