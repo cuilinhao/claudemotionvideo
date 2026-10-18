@@ -1,0 +1,365 @@
+{
+  "base": "http://127.0.0.1:8790",
+  "date": "2026-10-18T13:22:30.322Z",
+  "pages": [
+    {
+      "path": "/effects/letter-drop-animation",
+      "status": 200,
+      "title": "Letter Drop Animation — Text Animation Effect",
+      "schemas": [
+        "VideoObject",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/effects/masked-rise-animation",
+      "status": 200,
+      "title": "Masked Rise Animation — Text Animation Effect",
+      "schemas": [
+        "VideoObject",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/effects/typewriter-cursor-animation",
+      "status": 200,
+      "title": "Typewriter Cursor Animation — Text Animation Effect",
+      "schemas": [
+        "VideoObject",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/effects/stretch-slide-in-animation",
+      "status": 200,
+      "title": "Stretch Slide-In Animation — Text Animation Effect",
+      "schemas": [
+        "VideoObject",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/effects/squash-and-stretch-animation",
+      "status": 200,
+      "title": "Squash And Stretch Animation — Text Animation Effect",
+      "schemas": [
+        "VideoObject",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/effects/outline-echo-effect",
+      "status": 200,
+      "title": "Outline Echo Effect — Text Animation Effect",
+      "schemas": [
+        "VideoObject",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/effects/decode-scramble-text-effect",
+      "status": 200,
+      "title": "Decode Scramble Text Effect — Text Animation Effect",
+      "schemas": [
+        "VideoObject",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/effects/skewed-wipe-transition",
+      "status": 200,
+      "title": "Skewed Wipe Transition — Text Animation Effect",
+      "schemas": [
+        "VideoObject",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/text-animation-generator",
+      "status": 200,
+      "title": "Text Animation Generator — Animate Text in Seconds",
+      "schemas": [
+        "FAQPage",
+        "HowTo",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/animated-title-generator",
+      "status": 200,
+      "title": "Animated Title Generator — Animated Titles & Intros",
+      "schemas": [
+        "FAQPage",
+        "HowTo",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "title": "Text Animation Generator — Animate Text & Titles With AI",
+      "schemas": [
+        "SoftwareApplication",
+        "FAQPage",
+        "HowTo"
+      ]
+    },
+    {
+      "path": "/pricing",
+      "status": 200,
+      "title": "Opus 5.5 Video Generator Pricing: Plans and Credits",
+      "schemas": [
+        "FAQPage"
+      ]
+    },
+    {
+      "path": "/examples",
+      "status": 200,
+      "title": "Opus 5.5 Video Examples: 470+ Videos and Prompts Made with Claude Opus 5.5",
+      "schemas": []
+    },
+    {
+      "path": "/effects",
+      "status": 200,
+      "title": "Opus 5.5 Video Effects: 21 Motion Effects and the Prompts That Get Them",
+      "schemas": []
+    },
+    {
+      "path": "/blogs",
+      "status": 200,
+      "title": "Blog: Guides and Notes on Making Videos with Claude Opus 5.5 · Claude Motion Video",
+      "schemas": []
+    },
+    {
+      "path": "/contact",
+      "status": 200,
+      "title": "Contact Us · Claude Motion Video",
+      "schemas": []
+    },
+    {
+      "path": "/terms",
+      "status": 200,
+      "title": "Terms of Service · Claude Motion Video",
+      "schemas": []
+    },
+    {
+      "path": "/privacy",
+      "status": 200,
+      "title": "Privacy Policy · Claude Motion Video",
+      "schemas": []
+    },
+    {
+      "path": "/refunds",
+      "status": 200,
+      "title": "Refund Policy · Claude Motion Video",
+      "schemas": []
+    },
+    {
+      "path": "/featured",
+      "status": 200,
+      "title": "Featured On · Claude Motion Video",
+      "schemas": []
+    },
+    {
+      "path": "/opus-5-5-video-generator",
+      "status": 200,
+      "title": "Opus 5.5 Video Generator: Make Videos with Claude Opus 5.5 | Claude Motion Video",
+      "schemas": [
+        "FAQPage"
+      ]
+    },
+    {
+      "path": "/blogs/opus-5-5-video-prompt-guide",
+      "status": 200,
+      "title": "How to Write Opus 5.5 Video Prompts That Don't Look Generic · Claude Motion Video",
+      "schemas": [
+        "BlogPosting",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "path": "/blogs/opus-5-5-video-examples",
+      "status": 200,
+      "title": "Opus 5.5 Video Examples: 13 Real Videos and the Prompts Behind Them · Claude Motion Video",
+      "schemas": [
+        "BlogPosting",
+        "BreadcrumbList"
+      ]
+    }
+  ],
+  "texts": [
+    {
+      "path": "/llms.txt",
+      "status": 200,
+      "contentType": "text/plain; charset=utf-8",
+      "bytes": 1245
+    },
+    {
+      "path": "/llms-full.txt",
+      "status": 200,
+      "contentType": "text/plain; charset=utf-8",
+      "bytes": 14191
+    }
+  ],
+  "images": [
+    {
+      "path": "/og/home.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "path": "/og/text-animation-generator.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "path": "/og/animated-title-generator.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "path": "/og/letter-drop-animation.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "path": "/og/masked-rise-animation.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "path": "/og/typewriter-cursor-animation.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "path": "/og/stretch-slide-in-animation.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "path": "/og/squash-and-stretch-animation.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "path": "/og/outline-echo-effect.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "path": "/og/decode-scramble-text-effect.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    },
+    {
+      "path": "/og/skewed-wipe-transition.png",
+      "status": 200,
+      "width": 1200,
+      "height": 630
+    }
+  ],
+  "internalLinks": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/studio",
+      "status": 200
+    },
+    {
+      "path": "/pricing",
+      "status": 200
+    },
+    {
+      "path": "/blogs",
+      "status": 200
+    },
+    {
+      "path": "/opus-5-5-video-generator",
+      "status": 200
+    },
+    {
+      "path": "/examples",
+      "status": 200
+    },
+    {
+      "path": "/text-animation-generator",
+      "status": 200
+    },
+    {
+      "path": "/animated-title-generator",
+      "status": 200
+    },
+    {
+      "path": "/effects",
+      "status": 200
+    },
+    {
+      "path": "/effects/letter-drop-animation",
+      "status": 200
+    },
+    {
+      "path": "/effects/masked-rise-animation",
+      "status": 200
+    },
+    {
+      "path": "/effects/typewriter-cursor-animation",
+      "status": 200
+    },
+    {
+      "path": "/effects/stretch-slide-in-animation",
+      "status": 200
+    },
+    {
+      "path": "/effects/squash-and-stretch-animation",
+      "status": 200
+    },
+    {
+      "path": "/effects/outline-echo-effect",
+      "status": 200
+    },
+    {
+      "path": "/effects/decode-scramble-text-effect",
+      "status": 200
+    },
+    {
+      "path": "/effects/skewed-wipe-transition",
+      "status": 200
+    },
+    {
+      "path": "/featured",
+      "status": 200
+    },
+    {
+      "path": "/contact",
+      "status": 200
+    },
+    {
+      "path": "/terms",
+      "status": 200
+    },
+    {
+      "path": "/privacy",
+      "status": 200
+    },
+    {
+      "path": "/refunds",
+      "status": 200
+    }
+  ],
+  "robotsUnchanged": true,
+  "unknownRouteStatus": 404,
+  "failures": []
+}

@@ -9,7 +9,17 @@ declare global {
 
 const productionHosts = new Set(['claudemotionvideo.com', 'www.claudemotionvideo.com']);
 const pageTitles = new Map([
-  ['/', 'AI Motion Graphics You Can Edit'],
+  ['/', 'Text Animation Generator'],
+  ['/text-animation-generator', 'Text Animation Generator'],
+  ['/animated-title-generator', 'Animated Title Generator'],
+  ['/effects/letter-drop-animation', 'Letter Drop Animation'],
+  ['/effects/masked-rise-animation', 'Masked Rise Animation'],
+  ['/effects/typewriter-cursor-animation', 'Typewriter Cursor Animation'],
+  ['/effects/stretch-slide-in-animation', 'Stretch Slide-in Animation'],
+  ['/effects/squash-and-stretch-animation', 'Squash and Stretch Animation'],
+  ['/effects/outline-echo-effect', 'Outline Echo Effect'],
+  ['/effects/decode-scramble-text-effect', 'Decode Scramble Text Effect'],
+  ['/effects/skewed-wipe-transition', 'Skewed Wipe Transition'],
   ['/pricing', 'Pricing'],
   ['/examples', 'Examples'],
   ['/effects', 'Motion Effects'],

@@ -1,0 +1,30 @@
+# Claude Motion Video
+
+> An AI text animation and motion graphics generator. Turn a sentence, a screenshot
+> or a title into an animated video. Every frame is rendered as code by Claude Opus 5.5,
+> so text and UI stay sharp and any line can be changed without re-rendering the clip.
+
+Independent product. Not affiliated with Anthropic.
+
+## Core pages
+- Homepage / text animation generator: https://claudemotionvideo.com/
+- Animated text animation tool: https://claudemotionvideo.com/text-animation-generator
+- Animated title generator: https://claudemotionvideo.com/animated-title-generator
+- Examples (470+ real clips with prompts): https://claudemotionvideo.com/examples
+- Effects library: https://claudemotionvideo.com/effects
+- Pricing: https://claudemotionvideo.com/pricing
+
+## Specs
+- Max clip length: 30 seconds
+- Aspect ratios: 16:9, 9:16, 1:1
+- Export: 1080p MP4
+- No Claude subscription or API key required
+
+## Effects available
+Letter drop, masked rise, typewriter cursor, stretch slide-in, squash and stretch,
+outline echo, decode scramble, skewed wipe.
+
+## What it is not
+- Not a pixel-painting video model (unlike Sora / Veo / Seedance): every frame is
+  code, which is why text and UI stay sharp.
+- Not affiliated with Anthropic.

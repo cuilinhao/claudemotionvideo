@@ -1,0 +1,309 @@
+# Claude Motion Video — complete text
+
+Independent product. Not affiliated with Anthropic.
+
+Source: https://claudemotionvideo.com/
+
+## Homepage
+
+Animate text and titles with AI
+
+Text animation generator
+
+From a screenshot or a sentence, made by Claude Opus 5.5 . Describe an edit by chat and review the new version. Unlike most AI motion graphics tools, every frame is code.
+
+Try it in the Studio Browse examples Claude Opus 5.5
+
+16:9 · 9:16 · 1:1
+
+Up to 30s
+
+1080p MP4
+
+claudemotionvideo.com/studio Screen recording
+
+Screenshot to motion ✦ Edit by chat ✦ Focused shot edits ✦ Every frame is code ✦ Claude Opus 5.5 ✦ 1080p MP4 ✦ Every version kept ✦ Screenshot to motion ✦ Edit by chat ✦ Focused shot edits ✦ Every frame is code ✦ Claude Opus 5.5 ✦ 1080p MP4 ✦ Every version kept ✦ 01 · Templates
+
+Start your text animation from a template
+
+App launches, product walkthroughs, game ads, sale ads and more. Pick one, add your screenshot or your words, and make it yours.
+
+App launch video 16:9 · 15 s Product walkthrough 16:9 · 15 s · a screenshot of your app Mobile game ad 9:16 · 10 s · a screenshot of your game Flash-sale ad 9:16 · 10 s Social ad 9:16 9:16 · 10 s Poster come alive 9:16 · 10 s · your poster Logo reveal 16:9 · 10 s Data story 16:9 · 15 s Explainer 16:9 · 15 s Feature update 16:9 · 10 s Customer quote 1:1 · 10 s Motion showreel 16:9 · 15 s
+
+02 · Why Claude Motion Video
+
+Edited precisely, not re-rolled
+
+Change it, don't re-roll it
+
+Say what to change, or pick one shot on the timeline. Edits create a new version, with timeline selection available to focus the requested change.
+
+Your screenshot stays exact
+
+Text, UI and logos come straight from your image and move as it is. AI video models redraw them and blur the words.
+
+Every frame is code
+
+Claude Opus 5.5 writes the motion graphics frame by frame: exact timing, text and colours, rendered to a sharp 1080p MP4.
+
+03 · How it works
+
+How to make animated text with AI
+
+01 Add a screenshot or a sentence
+
+Drop in an app screenshot, game screen, product photo or poster and use it as a visual reference for code-based motion. The image can move, scale or be cropped; objects are not automatically separated into layers. No image? Describe the motion graphics in words.
+
+02 Watch it get made
+
+Claude returns a storyboard and animation code, which your browser previews and exports as an MP4. Generation time varies with the request and image inputs.
+
+03 Change any part, then export
+
+Ask for changes in plain words, select a shot to focus the edit, compare saved versions, and download a 1080p MP4.
+
+Explore the text animation generator → Create animated titles and intros → 04 · Effects
+
+Animated text and title effects you can ask for
+
+You can't ask for an effect you've never seen. Watch each one, then pick it in the Studio or copy its wording into your own prompt.
+
+See all effects Text Letter drop
+
+Letters fall in one by one and land with a small bounce. The classic showreel opener.
+
+letters drop in one by one from above with a slight overshoot bounce Copy
+
+Text Masked rise
+
+Each letter slides up from behind an invisible line, as if pushed out of the floor.
+
+each letter rises from behind a hidden baseline mask, staggered Copy
+
+Text Typewriter cursor
+
+Text types itself out with a blinking block cursor. Good for taglines and tech intros.
+
+the line types out character by character in a monospace font with a blinking block cursor Copy
+
+Text Stretch slide-in
+
+A word shoots in from the side, stretched wide, and snaps back to its normal width.
+
+the word slides in from the right stretched wide and snaps to its normal width Copy
+
+Text Squash and stretch
+
+Text falls with weight, squashes on impact, then settles. Makes type feel physical.
+
+the word falls from above, squashes on impact and springs back like a heavy object landing Copy
+
+Text Outline echo
+
+Outlined copies of a word ripple outward behind the solid word. Instant depth.
+
+outlined copies of the word expand outward like ripples behind the solid word Copy
+
+Text Decode scramble
+
+Random characters flicker and lock into the real word from left to right.
+
+the word resolves from random flickering glyphs into the final text, left to right Copy
+
+Transition Skewed wipe
+
+A slanted colour bar sweeps across the screen to cut between two scenes.
+
+cut between scenes with a fast skewed full-screen colour wipe Copy
+
+05 · Examples
+
+Motion graphics examples
+
+Real motion graphics people made with Claude Opus 5.5, the model Claude Motion Video runs on. Click one to watch it, read its prompt, and make your own version.
+
+Browse all 470+ examples
+
+06 · Under the hood
+
+Why your text and UI stay sharp
+
+AI video models paint every frame as pixels, so they redraw your interface, blur small text and give you a new random take each time you ask for a change. That's fine for live-action scenes, and wrong for a product video.
+
+Code-based animation works the other way. In Claude Motion Video, Claude Opus 5.5 writes code that animates your uploaded image and renders typography and shapes frame by frame. Your image remains available as a visual reference, and chat edits create a new version that you can review.
+
+Curious how that works? Read about the Opus 5.5 video generator , or just try the example in the Studio .
+
+07 · Pricing
+
+Motion graphics pricing
+
+Credits refill every month. Unused credits roll over, up to 2× your monthly amount. Cancel any time.
+
+Compare plans Monthly Yearly Up to -50% Starter
+
+$19.9 /month Billed monthly, cancel any time Eligible accounts · 3-day trial (about 3 videos) 1,500 credits a month About 15 videos a month (15s each)
+
+1080p MP4, no watermark
+
+Every scene type and effect
+
+Commercial use
+
+Get Starter Most popular Pro
+
+$39.9 /month Billed monthly, cancel any time Eligible accounts · 3-day trial (about 3 videos) 3,600 credits a month About 36 videos a month (15s each)
+
+Everything in Starter
+
+Lower cost per video
+
+Get Pro Max
+
+$79.9 /month Billed monthly, cancel any time Eligible accounts · 3-day trial (about 3 videos) 7,500 credits a month About 75 videos a month (15s each)
+
+Everything in Pro
+
+Lowest cost per video, for agencies and teams
+
+Get Max Starter -30%
+
+$19.9 $13.9 /month Billed yearly at $166.8 1,500 credits every month About 15 videos a month (15s each)
+
+1080p MP4, no watermark
+
+Every scene type and effect
+
+Commercial use
+
+Get Starter Most popular Pro -40%
+
+$39.9 $23.9 /month Billed yearly at $286.8 3,600 credits every month About 36 videos a month (15s each)
+
+Everything in Starter
+
+Lower cost per video
+
+Get Pro Max -50%
+
+$79.9 $39.9 /month Billed yearly at $478.8 7,500 credits every month About 75 videos a month (15s each)
+
+Everything in Pro
+
+Lowest cost per video, for agencies and teams
+
+Get Max Want to try first? Eligible accounts can start with a 3-day trial on a monthly plan.
+
+Pay safely and securely with Stripe
+
+Common options shown below may be offered when eligible; Stripe confirms the available methods at checkout.
+
+VISA
+
+AMERICAN EXPRESS
+
+Pay
+
+G Pay
+
+Link
+
+# Effect descriptions
+
+## Letter drop animation
+
+https://claudemotionvideo.com/effects/letter-drop-animation
+
+Letter drop introduces a headline one character at a time. Each letter starts above its final position, falls into place, overshoots slightly, and settles with a small bounce. The stagger creates a readable rhythm for short titles, product names, and showreel openings. Use the library preview to inspect the motion, then copy the original effect wording into a prompt with your own text.
+
+The prompt: letters drop in one by one from above with a slight overshoot bounce
+
+## Masked rise animation
+
+https://claudemotionvideo.com/effects/masked-rise-animation
+
+Masked rise reveals letters as they move upward through an invisible baseline. The hidden portion stays clipped until it crosses that line, giving the entrance a clean edge. A short stagger lets the word build progressively. This library effect suits restrained product titles, captions, and section headings. Keep enough room above the baseline for the finished text, and use the preview to judge its rhythm.
+
+The prompt: each letter rises from behind a hidden baseline mask, staggered
+
+## Typewriter cursor animation
+
+https://claudemotionvideo.com/effects/typewriter-cursor-animation
+
+Typewriter cursor reveals a line character by character in a monospace font, with a blinking block cursor marking the typing sequence. The changing text provides a natural point of attention for short taglines, terminal introductions, and message reveals. The library preview shows the specific effect. Choose a concise line and allow a final pause so viewers can read the complete message after typing ends.
+
+The prompt: the line types out character by character in a monospace font with a blinking block cursor
+
+## Stretch slide-in animation
+
+https://claudemotionvideo.com/effects/stretch-slide-in-animation
+
+Stretch slide-in brings a word into the frame from the right while its letters appear wider than their resting proportions. As the movement slows, the word snaps back to its normal width. The result gives a short headline a clear sense of speed and arrival. This library preview demonstrates the entrance; use compact text and leave horizontal space for the stretched shape to travel.
+
+The prompt: the word slides in from the right stretched wide and snaps to its normal width
+
+## Squash and stretch animation
+
+https://claudemotionvideo.com/effects/squash-and-stretch-animation
+
+Squash and stretch makes a word behave like a physical object. It falls from above, compresses when it lands, and springs back before settling into its readable shape. The changing proportions communicate weight through motion alone. This library effect works with brief, bold titles that can tolerate temporary distortion. Watch the preview to see the landing, then reuse the original wording with your own headline.
+
+The prompt: the word falls from above, squashes on impact and springs back like a heavy object landing
+
+## Outline echo effect
+
+https://claudemotionvideo.com/effects/outline-echo-effect
+
+Outline echo places expanding outlined copies behind a solid word. The repeated contours spread outward while the filled text remains the visual anchor, adding depth without replacing the headline. In the library preview, this creates a ripple around the word. Try it with a short title and a clear contrast between text and background so the overlapping outlines stay distinct as they expand.
+
+The prompt: outlined copies of the word expand outward like ripples behind the solid word
+
+## Decode scramble text effect
+
+https://claudemotionvideo.com/effects/decode-scramble-text-effect
+
+Decode scramble begins with unstable characters and progressively resolves them into a readable word from left to right. The flickering glyphs create a brief moment of uncertainty before the final text locks into place. This library effect is useful for short technology titles and reveal moments. Keep the finished phrase concise and give it enough time on screen after the scrambling stops.
+
+The prompt: the word resolves from random flickering glyphs into the final text, left to right
+
+## Skewed wipe transition
+
+https://claudemotionvideo.com/effects/skewed-wipe-transition
+
+Skewed wipe moves a slanted colour bar across the entire frame to cover the change between two scenes. Its diagonal edge adds direction to a fast transition while the full screen coverage hides the cut. The library preview shows the specific wipe. Use it between clearly different compositions, and choose a transition colour that belongs to the surrounding scenes or your visual palette.
+
+The prompt: cut between scenes with a fast skewed full-screen colour wipe
+
+# Frequently asked questions
+
+### What is a text animation generator?
+
+A text animation generator turns typed words into animated video without a timeline editor. You write the text, describe the motion you want in chat, and export a 1080p MP4. Claude Motion Video renders every frame as code, so your text and UI stay perfectly sharp and you can change one line without re-rendering the whole clip.
+
+### What is Claude Motion Video?
+
+A motion graphics generator you can edit precisely. Turn a screenshot, a product photo or one sentence into motion graphics (an app promo, a game ad, a product launch, a data story), then change any part by telling Claude Motion Video what you want. Export a 1080p MP4.
+
+### Can I turn my own screenshot into motion graphics?
+
+Yes. Add a screenshot, game screen, product photo or poster and say what should move: spin the wheel, pop the reward, draw the chart, sweep a shine across the bottle. Claude uses the uploaded image as visual input when writing animation code. The product does not automatically isolate people or objects into separate layers. If a generation is marked failed before a video is saved, its credits are returned automatically. You can use up to four images in one video; the first adds 60 credits and each more 20.
+
+### How do I change just one part?
+
+Type the change, like "make the headline bigger" or "slow the chart down". Edits create a new version. To focus a change, pick a shot on the timeline and describe the requested edit in chat. Every version is kept, so you can compare or go back.
+
+### How are code-based animations different from AI video generators like Sora or Veo?
+
+Video models generate pixels, while Claude Motion Video uses code for typography, shapes and timing and can use your image as a visual reference. The result may vary with your prompt, so review each saved version. For live-action or realistic people, a video model is the better tool.
+
+### What kinds of motion graphics can I make?
+
+App launch videos, product walkthroughs, mobile game ads, flash-sale ads, logo reveals, kinetic typography, explainers, data stories and 9:16 social posts, in 16:9, 9:16 or 1:1, up to 30 seconds.
+
+### Which AI makes the motion graphics?
+
+Claude Opus 5.5 plans and writes every video. See how it works on our Opus 5.5 video generator page.
+
+### Can I use the motion graphics commercially?
+
+Yes. Everything you make on Claude Motion Video is yours to use, including in ads and client work.
