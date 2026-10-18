@@ -6,6 +6,7 @@ import { renderToolPage } from './seo/pages.mjs';
 import { effectRoutes } from './seo/effect-routes.mjs';
 import { effectContent } from './seo/effect-content.mjs';
 import { renderEffectPage } from './seo/effect-pages.mjs';
+import { generateLlmsFull } from './seo/llms.mjs';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -108,6 +109,10 @@ async function build() {
     await mkdir(path.dirname(destination), { recursive: true });
     await writeFile(destination, injectAppTags(renderEffectPage(homepageSource, { ...route, ...content }), tags));
   }
+
+  const llmsFull = generateLlmsFull(homepageSource);
+  await writeFile(path.join(root, 'public', 'llms-full.txt'), llmsFull);
+  await writeFile(path.join(dist, 'llms-full.txt'), llmsFull);
 
   const alias = path.join(dist, 'refund', 'index.html');
   await mkdir(path.dirname(alias), { recursive: true });
