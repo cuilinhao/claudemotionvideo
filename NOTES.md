@@ -9,6 +9,7 @@
 - 验证：类型检查通过；25 个测试文件、236 项测试通过；最终构建通过；资源审计通过（13 路由、470 案例、21 效果、1,153 个本地资源引用）。12 个字体资源全部同源可用。
 - 浏览器验证：1440px 首页、价格页、Studio；390px 首页、价格页、登录和音频弹窗；其余 13 个页面无横向溢出或破图，记录见 `RECON/motion-theme-layout.json`。月/年价格切换、手机导航、免费示例生成 v2、视频设置与客服弹窗正常；本轮未发起付费生成或付款。
 - 截图：`RECON/screenshots/motion-theme/`。本节记录视觉改版，以下 Tellcut 复刻记录为改版前基线。
+- 已发布：代码提交 `dc6346e` 已推送 `main`；Cloudflare 正式版本 `087fd610-7475-4e3c-92b1-c733c0f92574`。线上浏览器确认暖白背景和三套字体、16px 价格卡片、月付切换、Studio 及 Google 登录按钮主题正确；390px 首页无横向溢出。生产截图以 `production-` 开头，HTTP 检查见 `RECON/motion-theme-production-http.json`。
 
 ## Tellcut 复刻基线
 

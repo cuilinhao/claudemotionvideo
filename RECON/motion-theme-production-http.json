@@ -1,0 +1,563 @@
+{
+  "checkedAt": "2026-10-18T12:49:01.763635+00:00",
+  "summary": {
+    "publicPages": 13,
+    "privatePages": 5,
+    "themeCss": 2,
+    "fonts": 12,
+    "totalRequests": 32,
+    "passed": 32,
+    "failed": 0
+  },
+  "pages": [
+    {
+      "url": "https://claudemotionvideo.com/",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/",
+      "sha256": "96b2f61f92d4c55ed7b3b858f66965fd73d4f069b5dcffc082b51e72cef57c76",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/pricing",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/pricing",
+      "sha256": "c8bdb30d149a3fd42fa227cec20d4fa4612cdae78b4910d7f45033fe3001bee6",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/examples",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/examples",
+      "sha256": "790e196102c281d1548265f2a397b4191e1a3802857dca74d98a6f2f939932f3",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/effects",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/effects",
+      "sha256": "cad0ed2b7e6f11d2301a669b808ecbc3ae2fc5736b88bcf654c2f6549164afa7",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/blogs",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/blogs",
+      "sha256": "4c12682e8aee5acb3a19fdbf902203ea8e07a2a65adf91ec984533b54f4fab09",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/contact",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/contact",
+      "sha256": "d50763e9cd0adb5731315ed55a4f06b94200ebd601034d4f7063b36b48fb2fa5",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/terms",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/terms",
+      "sha256": "31aae57aa4b4abdbe7cedc7974b6d9fc093869d8cbe3ab7c586290a88cf717ee",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/privacy",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/privacy",
+      "sha256": "f70b0c68aa9294f239ea53bf613dd3c8206097c96728fce991ec687d1b75ea9c",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/refunds",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/refunds",
+      "sha256": "c9c7493d6dd18319e0414086c46aabe9e8c98a5a9ab2b0b5d7e7d75dad694c5a",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/featured",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/featured",
+      "sha256": "efddca6910c0ce57ab3a72b47169b3274a96ff6a43b7cec20799c3b7fd203a9d",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/opus-5-5-video-generator",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/opus-5-5-video-generator",
+      "sha256": "e487d0feead5228e515d26cf5092176eb011bca58b9117b7b861359a5e81f484",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/blogs/opus-5-5-video-prompt-guide",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/blogs/opus-5-5-video-prompt-guide",
+      "sha256": "001f29df00c6a33e6089656196796f80adcf0bf7b9a2275c9cf1691909534718",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/blogs/opus-5-5-video-examples",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/blogs/opus-5-5-video-examples",
+      "sha256": "819c68770c8483c56134fa09b5216f0effc5528ded95ceea29ae4831d5842b88",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/studio",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/studio",
+      "sha256": "d34d97967d83ba39e490e9a0fecfd6b5b239665e8d7b791bab3d977a1379a230",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css",
+        "/assets/app-DDe80tUS.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/my-videos",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/my-videos",
+      "sha256": "504261b6bed2a265d10a3bf72c28a96f30d0a5f84e14ada5c4d442037914efe6",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css",
+        "/assets/app-DDe80tUS.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/account",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/account",
+      "sha256": "2558ef3cb404722791325558184b1cfb0add0af94167ca2e658e1b41fdeb3283",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css",
+        "/assets/app-DDe80tUS.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/sign-in",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/sign-in",
+      "sha256": "484a31bcb366e6818c1d9e20903b0ebbd9fd63c52c18b500a37c19362f0fdc66",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css",
+        "/assets/app-DDe80tUS.css"
+      ],
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/reset-password",
+      "status": 200,
+      "contentType": "text/html",
+      "effectiveUrl": "https://claudemotionvideo.com/reset-password",
+      "sha256": "2a2064df501453ff41fb90489fd2e8a604a9a743b6d87105e9fc2b3d1fe6026b",
+      "checks": {
+        "status200": true,
+        "htmlContentType": true,
+        "expectedStyleOrder": true,
+        "lightThemeColor": true,
+        "canonical": true
+      },
+      "stylesheets": [
+        "/reference-assets/fonts.css",
+        "/reference-assets/_astro/Base.CXy0q1tT.css",
+        "/assets/motion-theme-DgqVgnxM.css",
+        "/assets/app-DDe80tUS.css"
+      ],
+      "passed": true
+    }
+  ],
+  "assets": [
+    {
+      "url": "https://claudemotionvideo.com/assets/motion-theme-DgqVgnxM.css",
+      "status": 200,
+      "contentType": "text/css",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/motion-theme-DgqVgnxM.css",
+      "sha256": "6c25154576eabebfb29ba89b99dd4995fc4910a5466ac7d9aa0df57b7848e669",
+      "localSha256": "6c25154576eabebfb29ba89b99dd4995fc4910a5466ac7d9aa0df57b7848e669",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/app-DDe80tUS.css",
+      "status": 200,
+      "contentType": "text/css",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/app-DDe80tUS.css",
+      "sha256": "58ffd229b8fa5fe86643629e9e53be428af3173e912b44c9ecb9e879504d8ab8",
+      "localSha256": "58ffd229b8fa5fe86643629e9e53be428af3173e912b44c9ecb9e879504d8ab8",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/instrument-sans-latin-400-normal-DRC__1Mx.woff2",
+      "status": 200,
+      "contentType": "font/woff2",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/instrument-sans-latin-400-normal-DRC__1Mx.woff2",
+      "sha256": "9a91efaa3599a6ef01b2f49e9ec670e3a2f39baeef09c73198f1052cf3bb0850",
+      "localSha256": "9a91efaa3599a6ef01b2f49e9ec670e3a2f39baeef09c73198f1052cf3bb0850",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/instrument-sans-latin-400-normal-D1W7dsQl.woff",
+      "status": 200,
+      "contentType": "font/woff",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/instrument-sans-latin-400-normal-D1W7dsQl.woff",
+      "sha256": "797bd3eaa70edbd4757650ab44dad75fbfbfdf18bacedb4b71022c04621d30ad",
+      "localSha256": "797bd3eaa70edbd4757650ab44dad75fbfbfdf18bacedb4b71022c04621d30ad",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/instrument-sans-latin-500-normal-Dk9ku72i.woff2",
+      "status": 200,
+      "contentType": "font/woff2",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/instrument-sans-latin-500-normal-Dk9ku72i.woff2",
+      "sha256": "9d3547da16d950d12a677c772a3ff9b69846e60e7dcd1b5efd540993f7286532",
+      "localSha256": "9d3547da16d950d12a677c772a3ff9b69846e60e7dcd1b5efd540993f7286532",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/instrument-sans-latin-500-normal-Z6ESRlEs.woff",
+      "status": 200,
+      "contentType": "font/woff",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/instrument-sans-latin-500-normal-Z6ESRlEs.woff",
+      "sha256": "bd6a8dc8b0dc0cced0c32d3eda93f0e0e82c58ddefea8b53b3307b0c48da3089",
+      "localSha256": "bd6a8dc8b0dc0cced0c32d3eda93f0e0e82c58ddefea8b53b3307b0c48da3089",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/instrument-sans-latin-600-normal-B7fBEWYG.woff2",
+      "status": 200,
+      "contentType": "font/woff2",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/instrument-sans-latin-600-normal-B7fBEWYG.woff2",
+      "sha256": "efb770916eda95a0e31d80cccde9651d4e8617010b21220e9f227c4820d675da",
+      "localSha256": "efb770916eda95a0e31d80cccde9651d4e8617010b21220e9f227c4820d675da",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/instrument-sans-latin-600-normal-B9e8oLYv.woff",
+      "status": 200,
+      "contentType": "font/woff",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/instrument-sans-latin-600-normal-B9e8oLYv.woff",
+      "sha256": "9b4ce1f2b26be7cb087fd87d6f99a202136292ec820af75bd38ab9e53895cf28",
+      "localSha256": "9b4ce1f2b26be7cb087fd87d6f99a202136292ec820af75bd38ab9e53895cf28",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/source-serif-4-latin-400-normal-DJ5YJwmz.woff2",
+      "status": 200,
+      "contentType": "font/woff2",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/source-serif-4-latin-400-normal-DJ5YJwmz.woff2",
+      "sha256": "02194deb92d3975dd30e11a3824a1f1db32b48c93654e60560cb81ce8e7b5f95",
+      "localSha256": "02194deb92d3975dd30e11a3824a1f1db32b48c93654e60560cb81ce8e7b5f95",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/source-serif-4-latin-400-normal-Dn3IlU-Z.woff",
+      "status": 200,
+      "contentType": "font/woff",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/source-serif-4-latin-400-normal-Dn3IlU-Z.woff",
+      "sha256": "777f0f04bfdacfb14959c0be7cb6329b257659017ebbfb8c9e36f27be06b7662",
+      "localSha256": "777f0f04bfdacfb14959c0be7cb6329b257659017ebbfb8c9e36f27be06b7662",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/source-serif-4-latin-400-italic-0j97Jm6B.woff2",
+      "status": 200,
+      "contentType": "font/woff2",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/source-serif-4-latin-400-italic-0j97Jm6B.woff2",
+      "sha256": "882b7c150c29f29d4f8daae6b8dcae8662aac7f28ca34b34615305154136ecfd",
+      "localSha256": "882b7c150c29f29d4f8daae6b8dcae8662aac7f28ca34b34615305154136ecfd",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/source-serif-4-latin-400-italic-Dv9jnFA_.woff",
+      "status": 200,
+      "contentType": "font/woff",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/source-serif-4-latin-400-italic-Dv9jnFA_.woff",
+      "sha256": "07c51081ac6b14e5b229a70e25b2c93a64c9bcc53f32abda81c7e84c3b41aaa4",
+      "localSha256": "07c51081ac6b14e5b229a70e25b2c93a64c9bcc53f32abda81c7e84c3b41aaa4",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/dm-mono-latin-400-normal-4GdczIuU.woff2",
+      "status": 200,
+      "contentType": "font/woff2",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/dm-mono-latin-400-normal-4GdczIuU.woff2",
+      "sha256": "e1896b13b2b1bb112fac2f9571bd6c40e118746e77a4511edbf43fbb41bf3e1e",
+      "localSha256": "e1896b13b2b1bb112fac2f9571bd6c40e118746e77a4511edbf43fbb41bf3e1e",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    },
+    {
+      "url": "https://claudemotionvideo.com/assets/dm-mono-latin-400-normal--0xN8mdc.woff",
+      "status": 200,
+      "contentType": "font/woff",
+      "effectiveUrl": "https://claudemotionvideo.com/assets/dm-mono-latin-400-normal--0xN8mdc.woff",
+      "sha256": "1736dbec4c2da8403e7cf80523dbe77b00bff5fe9b3c0f2a953032ad5d84869a",
+      "localSha256": "1736dbec4c2da8403e7cf80523dbe77b00bff5fe9b3c0f2a953032ad5d84869a",
+      "checks": {
+        "status200": true,
+        "sha256MatchesLocalDist": true
+      },
+      "passed": true
+    }
+  ]
+}
