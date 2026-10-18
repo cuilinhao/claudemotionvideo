@@ -1,6 +1,6 @@
 # Claude Motion Video — 当前复刻记录
 
-更新：2026-10-18。本文件记录本轮 Tellcut 公开页面与 Studio 一致性改版；**本地构建、测试、路由与已记录的响应式检查通过；真实 Google 回调、本轮音频浏览器 QA 和生产部署仍为 pending**。此前已上线版本的生成、音频、Stripe 与统计验收，不等于本轮改版已发布。
+更新：2026-10-18。本文件记录本轮 Tellcut 公开页面与 Studio 一致性改版；**本轮首个生产版本已部署，代码已推送 main；真实 Google 登录、正式 Stripe Checkout 跳转、音频弹层与本地/线上音频导出已通过验收。** 首轮部署 `b58dce5d` 对应提交 `6ea7d5b`；补充 Google 登录和 Cloudflare 分析说明的最终隐私版 `cff42ef3-aa1f-42d4-9ee8-7c7a0585537b` 已部署，仅更新 `/privacy/index.html`，业务 bundle 未变。
 
 ## 来源和实现边界
 
@@ -27,7 +27,7 @@
 - React Studio 保留项目、版本、图片上传、任务轮询、选分镜编辑、预览和 MP4 导出。默认示例免费运行，任意自由修改引导用户创建自己的项目，不伪造 AI 结果。
 - `worker/ai.ts` 使用 APIMart 原生 Messages 接口和 `claude-opus-5-5`；图片以实际 Base64 内容发送。D1 记录任务与积分，Workflows 执行请求，R2 保存私有素材和成片。
 - 原站账号、付款、客服 islands 已替换为本站实现：邮件登录、密码登录/重置、账户积分、项目列表/重命名/删除、Stripe Checkout/Portal、客服提交。远程 D1 迁移 `0008_fidelity_services`、`0009_google_oauth`、`0010_email_verification` 已成功执行。
-- Google OAuth 后端已实现配置检测、state/PKCE 和回调；Google Cloud 项目 `claudemotionvideo` 和 OAuth 客户端已正式创建，Audience 已设为正式版，凭据已写入 Cloudflare 加密 secrets。**真实 Google 回调与线上登录实测 pending**。
+- Google OAuth 后端已实现配置检测、state/PKCE 和回调；Google Cloud 项目 `claudemotionvideo` 和 OAuth 客户端已正式创建，Audience 已设为正式版，凭据已写入 Cloudflare 加密 secrets。真实账号已通过仅 `openid email` 的授权返回 Pricing 并显示账户邮箱；本次授权未请求敏感 scope，也未出现警告。截图为 `RECON/screenshots/fidelity/production-google-success.png`。
 - 真实项目支持 Pulse/Ambient/Uplift 配乐、音乐/配音上传和 APIMart AI 配音。AudioPanel 在原生弹层关闭时仍保持挂载；音频 revision 用于防止旧混音覆盖新导出。
 - 支持浏览器通过 Mediabunny/WebCodecs 导出 H.264 + 可选 AAC；不支持编码时明确报错。默认原站示例与原视频保持本来音轨，不能把此前本站带声音样片当成本轮原站素材。
 - 代码图标下载的是 `.txt` HTML 源码，不注入私有图片、不添加自动播放；这是刻意保留的安全差异。
@@ -37,7 +37,10 @@
 - 主代理于 2026-10-18 19:37 完成全量验收：类型检查通过、236 项测试通过、构建通过、1,141 处资源引用审计通过。本次文档更新未重复构建。
 - 主代理已完成已记录的 1440px 本地桌面与原站截图对照。原站截图：`RECON/screenshots/fidelity/original-home-1440.png`、`original-studio-1440.png`；本站首页截图：`clone-home-1440.png`。截图不等于所有交互通过。
 - 本地路由检查：`RECON/fidelity-local-routes.json` 记录 18 个有效路由返回 200、2 个未知路由返回 404，并包含父页 CSP 与私有入口 noindex。`RECON/fidelity-browser-layout.json` 记录 768px 平板 11 页、390px 手机 9 页，均无横向溢出或破图；这不是所有页面/交互的完整设备矩阵。
-- **pending：** 真实 Google 回调与线上登录、本轮已登录项目/音频弹层及音频导出浏览器 QA、本轮生产部署与线上业务回归。
-- 历史生产生成/音频、Stripe 测试及正式 Checkout 页面、GA4/GSC 记录见 `README.md` 与 `RECON/analytics-verification.json`；不沿用为本轮改版的上线证明。
+- 首轮生产验收见 `RECON/fidelity-production-http.json`：605 项检查通过，失败 0；580 个生产资源均与预期大小和 SHA-256 匹配，包含路由、未知路径、重定向、sitemap、robots、CSP 与统计资源检查。
+- Google 真实登录成功；原 QA 账户经新版界面进入正式 Stripe Checkout，显示 3 天试用后 $19.90/月和 1,500 credits；已取消返回，未支付、未验证真实扣款。
+- `RECON/fidelity-audio-export.json` 记录本地与生产导出均为 1920×1080 H.264 + AAC 48 kHz 双声道，容器时长 10.069333 秒（10 秒视频的 AAC 编码尾部约 69 ms）；原生音频 dialog 在 390px 显示、Esc 关闭及焦点恢复通过。
+- 最终隐私文案已随 `cff42ef3` 部署。主代理最新 `npm run build`、1,141 处引用审计与 `git diff --check` 均通过。线上 `/privacy` GET 200，8 项检查通过，证据：`RECON/fidelity-final-privacy.json`。
+- 历史生成/编辑/失败返积分、Stripe 测试及 GA4/GSC 记录见 `README.md` 与 `RECON/analytics-verification.json`；本轮发布证据以上述新报告为准。未覆盖的原站私有机制和完整设备矩阵仍保留限制。
 
 原站私有功能差异见 [TEARDOWN.md](TEARDOWN.md)，发布记录见 [CLONE_REPORT.md](CLONE_REPORT.md)，核对清单见 [CLONE_AUDIT.md](CLONE_AUDIT.md)。运行和接口说明见 [README.md](README.md)、[docs/api-contract.md](docs/api-contract.md)。

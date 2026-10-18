@@ -1,0 +1,26 @@
+{
+  "deployment": "cff42ef3-aa1f-42d4-9ee8-7c7a0585537b",
+  "checkedAt": "2026-10-18T11:54:17.542469+00:00",
+  "url": "https://claudemotionvideo.com/privacy",
+  "method": "GET",
+  "httpStatus": 200,
+  "documentSha256": "803e4a0dad73c6d32e18d01178010bbdda1309bed499c4bff9489b0024ec4923",
+  "documentBytes": 15614,
+  "checks": {
+    "http200": true,
+    "updatedOctober18_2026": true,
+    "googleOpenIdAndEmailOnly": true,
+    "doesNotAccessGmail": true,
+    "googleAnalyticsDisclosed": true,
+    "cloudflareAutomaticBeaconDisclosed": true,
+    "umamiRemoved": true,
+    "canonicalCorrect": true
+  },
+  "passed": true,
+  "disclosureExcerpts": [
+    "Last updated October 18, 2026",
+    "Your email address and, when you use password sign-in, a password credential. Google sign-in requests only the OpenID and email scopes. We receive your Google account identifier and verified email address; we do not access Gmail content. Tokens returned during sign-in are used to verify your sign-in and are not stored.",
+    "Google Analytics measures visits to public pages and the studio using device, browser and page-visit information. Cloudflare automatically injects a beacon that collects website access and performance information. These analytics services receive technical and visit data as described above."
+  ],
+  "note": "One read-only GET of the final privacy page. Existing GA4 measurement ID was verified in fidelity-production-http.json; no asset re-download, authentication, model or payment calls."
+}

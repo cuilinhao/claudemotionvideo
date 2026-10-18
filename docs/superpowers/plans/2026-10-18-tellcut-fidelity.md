@@ -10,7 +10,7 @@
 
 **Spec:** 用户 2026-10-18 的逐页一致要求及“保留我的品牌，其余按原站复刻”确认；基准位于 RECON/source/tellcut-fidelity。
 
-**验收更新：2026-10-18 19:37。** 主代理已完成类型检查、236 项测试、构建与 1,141 处资源引用审计；本地 18 个有效路由 200、2 个未知路由 404。已记录的平板 11 页、手机 9 页无横向溢出或破图。真实 Google 回调、本轮音频浏览器 QA、生产部署及线上回归仍 pending，不能据此宣称全功能或 100% 完整复刻。
+**验收更新：2026-10-18 最终隐私版发布后。** 主代理已完成类型检查、236 项测试、构建与 1,141 处资源引用审计；本地 18 个有效路由 200、2 个未知路由 404，平板 11 页/手机 9 页无横向溢出或破图。首轮部署 `b58dce5d` / 提交 `6ea7d5b` 成功且已推送 main；生产 HTTP 605 项检查、580 个资源散列匹配通过。真实 Google 登录、正式 Checkout 进入/取消、音频弹层和本地/生产音频导出通过。最终隐私版 `cff42ef3-aa1f-42d4-9ee8-7c7a0585537b` 已部署，仅更新 `/privacy/index.html`，业务 bundle 未变；不能据此宣称全功能或 100% 完整复刻。
 
 ## Global Constraints
 
@@ -45,7 +45,8 @@
 - [x] data-checkout 按钮连接现有 Stripe Checkout；同步登录和 credits，并防止旧 me 请求覆盖退出或新登录状态。
 - [x] Google Cloud 项目 `claudemotionvideo` 和 OAuth 客户端正式创建，Audience 设为正式版，凭据写入 Cloudflare 加密 secrets。
 - [x] 远程迁移 `0008_fidelity_services.sql`、`0009_google_oauth.sql`、`0010_email_verification.sql` 成功应用。
-- [ ] 完成已配置 Google OAuth 的真实线上回调与账户登录验收；邮件、客服、支付也需本轮线上复验。
+- [x] 真实 Google 账号仅授权 `openid email`，成功回到 Pricing 并显示账户邮箱；本次无敏感 scope 或警告，证据为 `RECON/screenshots/fidelity/production-google-success.png`。
+- [x] 原 QA 账户通过新版界面进入正式 Stripe Checkout，显示 3 天试用后 $19.90/月、1,500 credits；已取消返回，没有支付，不记为正式扣款或付费发点验收。
 
 ### Task 3: Studio 与真实演示
 
@@ -54,7 +55,8 @@
 - [x] 复原侧栏、聊天、预览、版本与时间线布局；迁移 Lucky spin 真实代码和图片，默认示例可运行。
 - [x] 将真实生成、上传、历史和导出接到原样控件；音频放在项目工具中；HTML 源码下载改为不执行、不注入私有素材的 .txt。
 - [x] 保留生成/失败、项目切换、音频 revision 和隔离保护的实现与回归检查。
-- [ ] 完成本轮已登录/未登录交互、音频弹层焦点/长文件名、音频预览/导出和项目切换的完整浏览器复验。
+- [x] 390px 原生音频 dialog 显示、Esc 关闭和焦点恢复通过；本地/生产真实项目音频导出均完成。
+- [x] `RECON/fidelity-audio-export.json` 记录两次导出均为 1920×1080 H.264 + AAC 48 kHz 双声道，容器时长 10.069333 秒；约 69 ms AAC 尾部填充按实记录。
 
 ### Task 4: 集成、验证与发布
 
@@ -63,6 +65,9 @@
 - [x] 主代理 19:37 完成类型检查、全量 236 项回归/安全测试和构建。
 - [x] 保存 1440px 桌面对照和原站/本站截图；`RECON/fidelity-browser-layout.json` 记录 768px 平板 11 页、390px 手机 9 页，均无横向溢出或破图。
 - [x] 四份验收文档已区分源码实现、实际验证范围与私有原站能力未知项；未将公开页面布局检查外推为全部交互或设备通过。
-- [ ] 完成其余交互/console 检查和本轮音频浏览器 QA。
-- [ ] 部署后检查公开页面、Google/邮件登录、Stripe 跳转、Studio 预览/导出、安全响应头及全部素材。
-- [ ] 完成最终差异审查，使用中文提交并推送；部署后以新证据更新文档。
+- [x] 本轮 Google 回调、正式 Stripe 跳转/取消、Studio 音频导出及 dialog 浏览器 QA 按上述覆盖通过；不外推未记录交互。
+- [x] 首轮部署 `b58dce5d-7274-40b5-bd2f-61cbfb86ae0a` 成功；`RECON/fidelity-production-http.json` 记录 605 项检查、失败 0，580 个生产资源大小/SHA-256 匹配，含页面、未知路由、重定向、CSP、canonical/sitemap/noindex、统计资源等检查。
+- [x] 首轮代码提交 `6ea7d5b` 已推送 main；四份文档已补本轮生产证据，保留原站私有机制与真实支付验收限制。
+- [x] 最终隐私版 `cff42ef3` 已部署 Google 登录与 Cloudflare 边缘分析脚本说明；Wrangler 仅上传 `/privacy/index.html` 一个新资产，业务 bundle 未变；主代理最新构建、1,141 处引用审计与 diff 检查通过。`RECON/fidelity-final-privacy.json` 记录线上 GET 200，8 项检查全部通过。
+
+**未覆盖范围：** 本轮未新增邮件收件箱/客服送达、所有项目操作组合、新生成完整链路、真实正式扣款及完整设备矩阵的生产验收。已有历史测试与真实业务证据继续保留；原站流式追问、CONFIG 检查器、自动分割、check/repair、评分等私有机制未声称实现或核验。

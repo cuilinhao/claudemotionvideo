@@ -41,13 +41,13 @@
 
 **OBSERVED：** 本轮主代理已对照公开原站和本地 1440×900 Studio，默认示例可运行。`RECON/fidelity-browser-layout.json` 另记录 768px 平板 11 页、390px 手机 9 页，横向溢出与破图均为 0；`RECON/fidelity-local-routes.json` 记录 18 个有效路由 200、2 个未知路由 404。这些检查不等于全部已登录流程或像素级验收通过。
 
-主代理 2026-10-18 19:37 的类型检查、236 项测试、构建及 1,141 处资源引用审计均通过；远程迁移 0008/0009/0010 已成功。真实 Google 回调、本轮音频浏览器 QA 和生产部署仍 pending。
+主代理 2026-10-18 19:37 的类型检查、236 项测试、构建及 1,141 处资源引用审计均通过；远程迁移 0008/0009/0010 已成功。首轮生产部署 `b58dce5d`（提交 `6ea7d5b`）及 main 推送已完成；`RECON/fidelity-production-http.json` 记录 605 项检查、580 个资源 SHA-256 匹配全部通过。真实 Google 回调、正式 Stripe Checkout 进入/取消、本地与生产音频导出也已通过。Google 与 Cloudflare 分析说明的最终隐私版 `cff42ef3-aa1f-42d4-9ee8-7c7a0585537b` 已部署，仅更新 `/privacy/index.html`，业务 bundle 未变；主代理最新构建、1,141 处引用审计与 diff 检查均通过。`RECON/fidelity-final-privacy.json` 记录最终隐私页线上 GET 200，日期、Google 授权范围/不访问 Gmail、GA/Cloudflare 披露、Umami 移除及 canonical 等 8 项检查通过。
 
 ## 私有 UI 与当前实现的差异
 
 | 原站公开 bundle 中的入口 | 本站现状 | 尚不能核验的部分 |
 |---|---|---|
-| Google / magic-link 登录 | 本站邮件链接和密码流程真实接 API；Google Cloud 项目 `claudemotionvideo`、OAuth 客户端、正式版 Audience 和 Cloudflare 加密凭据均已配置，真实回调与线上登录实测 pending。 | 原站账号绑定、Google 回调和邮件送达实际行为。 |
+| Google / magic-link 登录 | 本站邮件链接和密码流程真实接 API；Google Cloud 项目 `claudemotionvideo`、OAuth 客户端、正式版 Audience 和 Cloudflare 加密凭据均已配置，真实账号仅授权 `openid email` 后已成功回到 Pricing 并显示邮箱，未出现敏感 scope 或警告。 | 原站账号绑定、Google 回调和邮件送达实际行为。 |
 | 流式生成进度、模型追问/选项回复 | 本站持久任务加轮询，显示真实 progress；没有伪造原站的流式 token 或多轮问卷。 | 原站私有协议、收费时点与追问策略。 |
 | 画布文字/颜色 CONFIG 检查器 | 本站初始设置和聊天编辑可改变结果；未移植原站 CONFIG 原地编辑/持久化端点。 | 原站手动修改与版本保存的全部规则。 |
 | 图片分析、区域选择、cutout/mask 请求 | 本站发送原始像素，支持模型 drawImage、移动和矩形裁切；没有自动分割服务。 | 原站分割模型、蒙版质量、收费与数据处理。 |
@@ -65,4 +65,4 @@
 
 生成使用 APIMart `/v1/messages`，默认 `claude-opus-5-5`，要求确定性的 `canvas#stage`、`window.seek(t)`、`window.DURATION` 与 `window.ASSETS`。服务端验证脚本；预览使用 opaque sandbox iframe、限制 CSP、来源及随机 channel 检查。MP4 在浏览器按 1080p、30fps 编码，音轨可为 AAC，随后上传私有 R2。上述事实描述本站，并不能证明 Tellcut 使用同一提供商、提示或存储架构。
 
-已记录的四个原站 MP4 音轨抽查：Studio 演示、launch、game、showreel 均为 H.264 视频单轨；此结果只覆盖这四个文件，不能外推所有原站成片。本站带音乐/AI 配音的真实导出证据记录在 `README.md`，其样片与本轮原始参考素材分别保留。
+已记录的四个原站 MP4 音轨抽查：Studio 演示、launch、game、showreel 均为 H.264 视频单轨；此结果只覆盖这四个文件，不能外推所有原站成片。本站带音乐/AI 配音的历史真实导出证据记录在 `README.md`，其样片与本轮原始参考素材分别保留。本轮 `RECON/fidelity-audio-export.json` 另外记录本地及生产均导出 1920×1080 H.264 + AAC 48 kHz 双声道，容器时长 10.069333 秒；390px 原生音频 dialog、Esc 关闭及焦点恢复亦通过。本轮正式 Stripe Checkout 显示 3 天试用后 $19.90/月与 1,500 credits，测试取消返回，没有实际支付。

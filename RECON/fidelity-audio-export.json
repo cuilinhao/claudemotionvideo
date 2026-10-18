@@ -1,0 +1,51 @@
+{
+  "environment": "local",
+  "file": "orbit-audio-qa (4).mp4",
+  "probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "codec_type": "video",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "codec_name": "aac",
+        "codec_type": "audio",
+        "sample_rate": "48000",
+        "channels": 2
+      }
+    ],
+    "format": {
+      "duration": "10.069333",
+      "size": "5568622"
+    }
+  },
+  "production": {
+    "file": "create-a-10-second-premium-product-launch-for-orbit-using-the-uploaded-dashboard (2).mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 1920,
+          "height": 1080
+        },
+        {
+          "codec_name": "aac",
+          "codec_type": "audio",
+          "sample_rate": "48000",
+          "channels": 2
+        }
+      ],
+      "format": {
+        "duration": "10.069333",
+        "size": "3486242"
+      }
+    }
+  }
+}

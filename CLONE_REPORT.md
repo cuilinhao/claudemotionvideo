@@ -2,7 +2,7 @@
 
 日期：2026-10-18。目标是保留本站品牌，将 Tellcut 可公开取得的页面、演示与 Studio UI 按实际部署源码迁移，同时保留本站真实业务。
 
-**当前状态：本地类型检查、236 项测试、构建、资源引用与已记录的路由/响应式检查通过；真实 Google 回调、本轮音频浏览器 QA 和生产部署 pending。** 本记录不宣称 100% 完整复刻，也不将旧版线上验证当作本轮版本已部署的证明。
+**当前状态：本轮首个生产版本已发布并推送 main；Google 真实登录、Stripe Checkout 进入/取消、音频弹层与真实音频导出通过。** 首轮部署 `b58dce5d-7274-40b5-bd2f-61cbfb86ae0a` 对应提交 `6ea7d5b`；Google 与 Cloudflare 分析说明的最终隐私版 `cff42ef3-aa1f-42d4-9ee8-7c7a0585537b` 已部署，仅更新 `/privacy/index.html`，业务 bundle 未变。本记录不宣称 100% 完整复刻。
 
 ## 当前交付内容
 
@@ -14,7 +14,7 @@
 | Studio | 264px 可收起侧栏、聊天、预览、版本、时间轴、设置、效果、图片、原 Lucky spin 及三种免费示例修改。 |
 | 品牌 | Claude Motion Video 名称、本站域名、自有双菱形 favicon；替换原站品牌和业务入口。 |
 | 真实生成 | 本站 APIMart Messages、D1 任务和积分、Workflows、版本保存、私有 R2；上传内容和生成编辑不会发往 Tellcut 后端。 |
-| 真实账号与支付 | 邮件登录、密码/重置、积分/账户、Stripe Checkout/Portal/Webhook、My videos 重命名/删除/下载、客服提交；Google OAuth 生产配置已完成，待真实线上回调。 |
+| 真实账号与支付 | 邮件登录、密码/重置、积分/账户、Stripe Checkout/Portal/Webhook、My videos 重命名/删除/下载、客服提交；Google OAuth 已完成真实线上授权与回调。 |
 | 声音与导出 | 真实项目音乐/配音和 H.264 + 可选 AAC 导出；原站默认示例保持无声；导出 Stop 可取消。 |
 | 安全差异 | 代码下载为纯文本 `.txt`，不注入私有图片、不自动播放；模型内容只在受限预览中执行。 |
 
@@ -30,11 +30,14 @@
 | 桌面对照 | 主代理已记录 1440px 原站/本站对照，默认 Lucky spin 可运行；截图在 `RECON/screenshots/fidelity/`。 |
 | 响应式布局 | `RECON/fidelity-browser-layout.json`：768px 平板 11 页、390px 手机 9 页，均无横向溢出与破图；不代表完整交互/设备矩阵。 |
 | 本地路由 | `RECON/fidelity-local-routes.json`：18 个有效路由 200、2 个未知路径 404，记录父页 CSP 和私有入口 noindex。 |
-| 已登录与音频交互 | **pending**：本轮完整已登录项目、音频 dialog 焦点/文件名及预览/导出浏览器 QA。 |
+| 已登录与音频交互 | 已有 QA 账户在新版界面进入正式 Checkout；390px 原生音频 dialog 显示、Esc 关闭和焦点恢复通过。本地与生产真实导出通过，详见下一行。 |
+| 音频导出探测 | `RECON/fidelity-audio-export.json`：本地与生产均为 1920×1080 H.264 + AAC 48 kHz 双声道，容器时长 10.069333 秒；约 69 ms 的 AAC 尾部编码填充不宣称为恰好 10 秒。 |
 | 构建和引用审计 | 主代理 19:37 构建通过，`scripts/audit-reference.mjs` 的 1,141 处引用审计通过；文档更新阶段未重复构建。 |
 | 远程数据库迁移 | `0008_fidelity_services.sql`、`0009_google_oauth.sql`、`0010_email_verification.sql` 已成功应用。 |
-| 本轮生产发布 | **pending**：部署、13 页线上状态、素材加载、登录、支付跳转、生成、音频/MP4及安全响应头复验。 |
-| Google 登录 | Google Cloud 项目 `claudemotionvideo` 与 OAuth 客户端已正式创建，Audience 为正式版，凭据已存 Cloudflare 加密 secrets；**真实回调与线上登录实测 pending**。 |
+| 本轮生产发布 | 首轮部署 `b58dce5d` / 提交 `6ea7d5b` 成功，代码已 push main。`RECON/fidelity-production-http.json`：605 项检查通过、失败 0；580 个生产资源大小和 SHA-256 匹配，覆盖页面/未知路径/重定向、CSP、canonical、sitemap、robots 与统计资源。 |
+| Google 登录 | 项目 `claudemotionvideo`、正式版 Audience 与加密凭据已配置；真实账号只授权 `openid email` 后成功返回 Pricing 并显示账户邮箱，无敏感 scope 或警告。截图：`RECON/screenshots/fidelity/production-google-success.png`。 |
+| 正式 Stripe Checkout | 原 QA 账户经新版界面进入正式结账，显示 3 天试用后 $19.90/月、1,500 credits；已取消返回，未发生支付，不能记为正式扣款或付费发点验收。 |
+| 隐私文案补充 | 最终版本 `cff42ef3` 已部署 Google 登录与 Cloudflare 分析说明；Wrangler 仅上传 `/privacy/index.html` 一个新资产，业务 bundle 未变；最新构建、1,141 处引用审计和 diff 检查通过。`RECON/fidelity-final-privacy.json` 记录线上 GET 200，8 项检查全部通过。 |
 
 ## 历史生产证据与本轮分界
 
@@ -51,4 +54,4 @@
 - 完整浏览器/设备矩阵、长期并发和生成质量一致性未覆盖；浏览器必须支持所需 WebCodecs AVC/AAC 编码。
 - 退款/拒付后的积分调整仍以现有运营流程处理；失败生成返还积分不是订阅现金退款承诺。
 
-主代理完成最终 QA 与部署后，应以新证据更新上表 pending 项，而不是沿用本轮之前的“已上线”结论。
+首轮上线、业务验收与最终隐私版分别按上述部署和证据记录。未覆盖的私有机制、完整设备矩阵和真实扣款边界继续保留，不以一次发布作全量能力承诺。
