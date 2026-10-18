@@ -1,5 +1,6 @@
 import { copyFile, mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { transformHome } from './seo/home.mjs';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -85,7 +86,7 @@ async function build() {
     }
     const destination = path.join(dist, route);
     await mkdir(path.dirname(destination), { recursive: true });
-    await writeFile(destination, injectAppTags(html, tags));
+    await writeFile(destination, injectAppTags(route === 'index.html' ? transformHome(html) : html, tags));
   }
 
   const alias = path.join(dist, 'refund', 'index.html');
