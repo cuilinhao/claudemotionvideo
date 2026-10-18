@@ -3,7 +3,7 @@ import { PUBLIC_PAGE_PATHS, siteAssetPath } from '../worker/site-routes';
 
 describe('static page routing', () => {
   it('serves every public page through its generated HTML file', () => {
-    expect(PUBLIC_PAGE_PATHS.size).toBe(13);
+    expect(PUBLIC_PAGE_PATHS.size).toBe(15);
     for (const path of PUBLIC_PAGE_PATHS) expect(siteAssetPath(path)).toBe(`${path === '/' ? '' : path}/index.html`);
   });
   it.each(['/studio', '/my-videos', '/account', '/sign-in', '/reset-password'])('serves the app entry for %s', path => {

@@ -1,4 +1,5 @@
 export const PUBLIC_PAGE_PATHS = new Set([
+  '/text-animation-generator', '/animated-title-generator',
   '/', '/pricing', '/examples', '/effects', '/blogs', '/contact', '/terms', '/privacy', '/refunds',
   '/featured', '/opus-5-5-video-generator',
   '/blogs/opus-5-5-video-prompt-guide', '/blogs/opus-5-5-video-examples',
