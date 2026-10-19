@@ -82,6 +82,7 @@ X 登录态验证已在用户追加授权后完成；GSC 进度见下方记录�
 - 已成功请求索引：两个工具页、首页、Letter drop、Masked rise、Typewriter cursor、Stretch slide-in，共 7 页。每页均出现“已请求编入索引”，已加入优先抓取队列。
 - 待请求：Squash and stretch、Outline echo、Decode scramble、Skewed wipe，共 4 页。
 - 阻碍：GSC 两次显示“无法连接到 reCAPTCHA 服务”。登录仍有效，已保留当前页面并请用户恢复网络连接。没有绕过验证，也没有将未收到成功回执的页面记为完成。
-- 逐页状态见 [平台验证记录](evidence/platform-validation.json)。浏览器截图保存在原工作目录 `RECON/seo-platform-validation/`，没有上传账号页面截图到 GitHub。
+- 2026-10-18 22:18（北京时间）再次请求 Squash and stretch，仍因无法连接 reCAPTCHA 服务而失败；未出现可操作的验证码，新增成功请求为 0，剩余 4 页。
+- 逐页状态见 [平台验证记录](evidence/platform-validation.json)。重复的临时账号页面截图与报告已清理，验证结果保留在本记录及平台验证记录中。
 
 请求索引只代表 Google 接受抓取请求，实际收录仍由 Google 决定。
