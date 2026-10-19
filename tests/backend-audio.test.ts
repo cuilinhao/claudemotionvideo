@@ -6,7 +6,7 @@ import { DEFAULT_AUDIO_SETTINGS, MAX_AUDIO_BYTES } from '../shared/audio';
 import { makeDb, seedUser } from './backend-db';
 import type { Env } from '../worker/types';
 
-const origin = 'https://claudemotionvideo.com';
+const origin = 'https://cmotionvideo.com';
 function wav() {
   const bytes = new Uint8Array(48); const view = new DataView(bytes.buffer);
   const write = (offset: number, text: string) => bytes.set(new TextEncoder().encode(text), offset);

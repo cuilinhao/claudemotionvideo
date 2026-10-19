@@ -35,15 +35,15 @@
     }
   ],
   "vars": {
-    "APP_URL": "https://claudemotionvideo.com",
+    "APP_URL": "https://cmotionvideo.com",
     "STRIPE_SINGLE_VIDEO_PRICE": "price_1URuZz7UYmtkCYxVvj1nv7rN",
     "APIMART_MODEL": "claude-opus-5-5",
-    "EMAIL_FROM": "noreply@claudemotionvideo.com"
+    "EMAIL_FROM": "noreply@cmotionvideo.com"
   },
-  "send_email": [{ "name": "EMAIL", "allowed_sender_addresses": ["noreply@claudemotionvideo.com"] }],
+  "send_email": [{ "name": "EMAIL", "allowed_sender_addresses": ["noreply@cmotionvideo.com"] }],
   "routes": [
-    { "pattern": "claudemotionvideo.com/*", "zone_name": "claudemotionvideo.com" },
-    { "pattern": "www.claudemotionvideo.com/*", "zone_name": "claudemotionvideo.com" }
+    { "pattern": "cmotionvideo.com/*", "zone_name": "cmotionvideo.com" },
+    { "pattern": "www.cmotionvideo.com/*", "zone_name": "cmotionvideo.com" }
   ],
   "triggers": {
     "crons": [

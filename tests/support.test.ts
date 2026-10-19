@@ -3,7 +3,7 @@ import { app } from '../worker/app';
 import type { Env } from '../worker/types';
 import { makeDb } from './backend-db';
 
-const origin = 'https://claudemotionvideo.com';
+const origin = 'https://cmotionvideo.com';
 describe('public support delivery', () => {
   let env: Env; let messages: EmailMessageBuilder[];
   const request = (body: unknown = { email: 'visitor@example.com', body: 'I need help with my video.', page: '/studio' }, headers: Record<string, string> = {}) => app.request(origin + '/api/support', {
@@ -11,13 +11,13 @@ describe('public support delivery', () => {
   }, env);
   beforeEach(() => {
     const { db } = makeDb(); messages = [];
-    env = { DB: db, APP_URL: origin, EMAIL_FROM: 'noreply@claudemotionvideo.com', EMAIL: { send: async (message: EmailMessageBuilder) => { messages.push(message); return { messageId: 'support-message-id' }; } } } as unknown as Env;
+    env = { DB: db, APP_URL: origin, EMAIL_FROM: 'noreply@cmotionvideo.com', EMAIL: { send: async (message: EmailMessageBuilder) => { messages.push(message); return { messageId: 'support-message-id' }; } } } as unknown as Env;
   });
   it('delivers an anonymous request as plain text to the site support mailbox and records delivery', async () => {
     const response = await request({ email: ' Visitor@Example.com ', body: '<img src=x onerror=alert(1)> Please help.', page: '/studio' });
     expect(response.status).toBe(200); expect(await response.json()).toMatchObject({ ok: true });
     expect(messages).toHaveLength(1);
-    expect(messages[0]).toMatchObject({ to: 'cuilinhao2015@gmail.com', from: 'noreply@claudemotionvideo.com', replyTo: 'visitor@example.com' });
+    expect(messages[0]).toMatchObject({ to: 'cuilinhao2015@gmail.com', from: 'noreply@cmotionvideo.com', replyTo: 'visitor@example.com' });
     expect(messages[0].html).toBeUndefined();
     expect(messages[0].text).toContain('<img src=x onerror=alert(1)> Please help.');
     expect(messages[0].text).toContain('/studio');

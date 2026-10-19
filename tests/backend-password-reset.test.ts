@@ -10,7 +10,7 @@ describe('password reset tokens', () => {
     await db.prepare('UPDATE users SET password_hash=? WHERE id=?').bind(await hashPassword('old password value'), 'alice').run();
     await createSession(db, 'alice');
     const messages: { text?: string }[] = [];
-    const env = { DB: db, APP_URL: 'https://claudemotionvideo.com', EMAIL_FROM: 'support@claudemotionvideo.com', EMAIL: { send: async (message: { text?: string }) => { messages.push(message); return { messageId: 'm' }; } } } as unknown as Env;
+    const env = { DB: db, APP_URL: 'https://cmotionvideo.com', EMAIL_FROM: 'support@cmotionvideo.com', EMAIL: { send: async (message: { text?: string }) => { messages.push(message); return { messageId: 'm' }; } } } as unknown as Env;
     await requestPasswordReset(env, 'alice@example.com', 100);
     const token = messages[0].text!.match(/#token=([a-f0-9]+)/)![1];
     const stored = await db.prepare('SELECT token_hash FROM password_resets').first('token_hash');
@@ -25,7 +25,7 @@ describe('password reset tokens', () => {
   it('gives the same accepted result for unknown accounts and rejects expired tokens', async () => {
     const { db } = makeDb(); await seedUser(db);
     let token = '';
-    const env = { DB: db, APP_URL: 'https://claudemotionvideo.com', EMAIL_FROM: 'support@claudemotionvideo.com', EMAIL: { send: async (message: { text: string }) => { token = message.text.match(/#token=([a-f0-9]+)/)![1]; return { messageId: 'm' }; } } } as unknown as Env;
+    const env = { DB: db, APP_URL: 'https://cmotionvideo.com', EMAIL_FROM: 'support@cmotionvideo.com', EMAIL: { send: async (message: { text: string }) => { token = message.text.match(/#token=([a-f0-9]+)/)![1]; return { messageId: 'm' }; } } } as unknown as Env;
     const known = await requestPasswordReset(env, 'alice@example.com', 100);
     const unknown = await requestPasswordReset(env, 'unknown@example.com', 100);
     expect(unknown).toEqual(known);

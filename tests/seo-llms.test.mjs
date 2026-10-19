@@ -15,7 +15,7 @@ describe('LLM readable corpus',()=>{
  });
  it('preserves required concise entry point',()=>{
   const brief=readFileSync('public/llms.txt','utf8');
-  for(const p of ['text-animation-generator','animated-title-generator','examples','effects','pricing']) expect(brief).toContain(`https://claudemotionvideo.com/${p}`);
+  for(const p of ['text-animation-generator','animated-title-generator','examples','effects','pricing']) expect(brief).toContain(`https://cmotionvideo.com/${p}`);
   expect(brief).toContain('Max clip length: 30 seconds');
   expect(brief).not.toMatch(/\[占位\]/);
  });
