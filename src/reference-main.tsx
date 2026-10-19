@@ -20,32 +20,58 @@ function ReferenceApp() {
   const mounted = useRef(false);
   const authEpoch = useRef(0);
   const refreshRequest = useRef(0);
+  const refreshPending = useRef<Promise<User|null>|null>(null);
+  const sessionReady = useRef(false);
   const logoutPending = useRef(false);
-  const checkoutBusy = useRef(false);
+  const checkoutEpoch = useRef<number|null>(null);
   const configuration = useRef({billingEnabled:false,singleVideoEnabled:false});
   const noticeTimer = useRef<ReturnType<typeof setTimeout>|null>(null);
   const notify = useCallback((message: string) => {setNotice(message);if (noticeTimer.current) clearTimeout(noticeTimer.current);noticeTimer.current=setTimeout(()=>setNotice(''),5000);},[]);
-  const refresh = useCallback(async () => {
-    if (!mounted.current || logoutPending.current) return null;
+  const refresh = useCallback(() => {
+    if (!mounted.current || logoutPending.current) return Promise.resolve(null);
     const epoch = authEpoch.current, request = ++refreshRequest.current;
-    try {
-      const result = await api.me();
-      if (!mounted.current || epoch !== authEpoch.current || request !== refreshRequest.current) return null;
-      configuration.current = {billingEnabled: result.billingEnabled, singleVideoEnabled: result.singleVideoEnabled};
-      currentUser.current = result.user;
-      setUser(result.user);
-      return result.user;
-    } catch { return null; }
+    const pending = (async () => {
+      try {
+        const result = await api.me();
+        if (!mounted.current || epoch !== authEpoch.current || request !== refreshRequest.current) return null;
+        configuration.current = {billingEnabled: result.billingEnabled, singleVideoEnabled: result.singleVideoEnabled};
+        currentUser.current = result.user;
+        sessionReady.current = true;
+        setUser(result.user);
+        return result.user;
+      } catch {
+        if (mounted.current && epoch === authEpoch.current && request === refreshRequest.current) sessionReady.current = false;
+        return null;
+      }
+    })();
+    refreshPending.current = pending;
+    void pending.finally(() => { if (refreshPending.current === pending) refreshPending.current = null; });
+    return pending;
   },[]);
   const checkout = useCallback(async (choice: Checkout) => {
-    if (!mounted.current || logoutPending.current || checkoutBusy.current) return;
-    if (!currentUser.current) {setPending(choice);setAuth('login');return;}
-    const enabled = 'singleVideo' in choice ? configuration.current.singleVideoEnabled : configuration.current.billingEnabled;
-    if (!enabled) {notify('This checkout is being configured. Please try again later.');return;}
-    checkoutBusy.current=true;notify('Opening secure checkout…');
-    try {const result = 'singleVideo' in choice ? await api.checkoutSingleVideo() : await api.checkout(choice.plan,choice.interval);location.assign(result.url);}
-    catch (err) {notify(err instanceof Error ? err.message : 'Checkout could not open. Please try again.');checkoutBusy.current=false;}
-  },[notify]);
+    if (!mounted.current || logoutPending.current || checkoutEpoch.current === authEpoch.current) return;
+    const epoch = authEpoch.current;
+    checkoutEpoch.current = epoch;
+    let navigating = false;
+    try {
+      let pending = refreshPending.current ?? (sessionReady.current ? null : refresh());
+      while (pending) {
+        await pending;
+        if (!mounted.current || logoutPending.current || epoch !== authEpoch.current) return;
+        pending = refreshPending.current;
+      }
+      if (!sessionReady.current) {notify('Could not check your sign-in status. Please try again.');return;}
+      if (!currentUser.current) {setPending(choice);setAuth('login');return;}
+      const enabled = 'singleVideo' in choice ? configuration.current.singleVideoEnabled : configuration.current.billingEnabled;
+      if (!enabled) {notify('This checkout is being configured. Please try again later.');return;}
+      notify('Opening secure checkout…');
+      const result = 'singleVideo' in choice ? await api.checkoutSingleVideo() : await api.checkout(choice.plan,choice.interval);
+      if (!mounted.current || logoutPending.current || epoch !== authEpoch.current) return;
+      location.assign(result.url);navigating = true;
+    } catch (err) {
+      if (mounted.current && epoch === authEpoch.current) notify(err instanceof Error ? err.message : 'Checkout could not open. Please try again.');
+    } finally {if (!navigating && checkoutEpoch.current === epoch) checkoutEpoch.current = null;}
+  },[notify,refresh]);
   useEffect(() => {
     mounted.current = true;
     void refresh();trackPageView(location.pathname);
@@ -72,6 +98,7 @@ function ReferenceApp() {
       mounted.current = false;
       authEpoch.current++;
       refreshRequest.current++;
+      refreshPending.current = null;
       logoutPending.current = false;
       removeEventListener('focus',focus);removeEventListener('cmv:signin',signin);document.removeEventListener('click',click);if(noticeTimer.current)clearTimeout(noticeTimer.current);
     };
@@ -80,6 +107,7 @@ function ReferenceApp() {
     if (!mounted.current || logoutPending.current) return;
     const epoch = ++authEpoch.current;
     refreshRequest.current++;
+    refreshPending.current = null;
     logoutPending.current = true;
     try {
       await api.logout();
@@ -104,6 +132,7 @@ function ReferenceApp() {
         if (!mounted.current) return;
         authEpoch.current++;
         refreshRequest.current++;
+        refreshPending.current = null;
         logoutPending.current = false;
         currentUser.current = next;
         setUser(next);
