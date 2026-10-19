@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const measurementId = 'G-ABC1234567';
 
-function browser(url = 'https://cmotionvideo.com/', referrer = '') {
+function browser(url = 'https://claudemotionvideo.com/', referrer = '') {
   const scripts: Record<string, unknown>[] = [];
   const page: {
     location: URL;
@@ -47,11 +47,11 @@ describe('production analytics', () => {
   });
 
   it.each([
-    [false, 'https://cmotionvideo.com/'],
+    [false, 'https://claudemotionvideo.com/'],
     [true, 'http://localhost:5173/'],
     [true, 'https://preview.workers.dev/'],
-    [true, 'https://cmotionvideo.com.example.org/'],
-    [true, 'http://cmotionvideo.com/'],
+    [true, 'https://claudemotionvideo.com.example.org/'],
+    [true, 'http://claudemotionvideo.com/'],
   ])('does not collect outside production HTTPS origins (%s, %s)', async (production, url) => {
     vi.stubEnv('PROD', production);
     const state = browser(url);
@@ -85,20 +85,20 @@ describe('production analytics', () => {
       }],
     ]);
     expect(state.views().map(view => view.page_location)).toEqual([
-      'https://cmotionvideo.com/',
-      'https://cmotionvideo.com/pricing',
-      'https://cmotionvideo.com/',
+      'https://claudemotionvideo.com/',
+      'https://claudemotionvideo.com/pricing',
+      'https://claudemotionvideo.com/',
     ]);
   });
 
   it('cleans initial and subsequent analytics context before any configuration or page view', async () => {
     const state = browser(
-      'https://cmotionvideo.com/studio?prompt=PRIVATE_PROMPT#token=PRIVATE_TOKEN',
+      'https://claudemotionvideo.com/studio?prompt=PRIVATE_PROMPT#token=PRIVATE_TOKEN',
       'https://www.google.com/search?q=PRIVATE_EMAIL#PRIVATE_FRAGMENT',
     );
     const { trackPageView } = await import('../src/lib/analytics');
     trackPageView('/studio');
-    state.page.location = new URL('https://cmotionvideo.com/pricing?email=PRIVATE_EMAIL#PRIVATE_FRAGMENT');
+    state.page.location = new URL('https://claudemotionvideo.com/pricing?email=PRIVATE_EMAIL#PRIVATE_FRAGMENT');
     trackPageView('/pricing');
     const commands = state.commands();
     const initialContext = commands.findIndex(command => command[0] === 'set');
@@ -106,18 +106,18 @@ describe('production analytics', () => {
     expect(initialContext).toBeGreaterThanOrEqual(0);
     expect(initialContext).toBeLessThan(configuration);
     expect(state.views()).toMatchObject([
-      { page_location: 'https://cmotionvideo.com/studio', page_referrer: 'https://www.google.com/', page_title: expect.stringContaining('Studio') },
-      { page_location: 'https://cmotionvideo.com/pricing', page_referrer: 'https://cmotionvideo.com/studio', page_title: expect.stringContaining('Pricing') },
+      { page_location: 'https://claudemotionvideo.com/studio', page_referrer: 'https://www.google.com/', page_title: expect.stringContaining('Studio') },
+      { page_location: 'https://claudemotionvideo.com/pricing', page_referrer: 'https://claudemotionvideo.com/studio', page_title: expect.stringContaining('Pricing') },
     ]);
     expect(JSON.stringify(commands)).not.toContain('PRIVATE_');
     expect(commands.filter(command => command[0] === 'set').at(-1)?.[1]).toMatchObject({
-      page_location: 'https://cmotionvideo.com/pricing',
-      page_referrer: 'https://cmotionvideo.com/studio',
+      page_location: 'https://claudemotionvideo.com/pricing',
+      page_referrer: 'https://claudemotionvideo.com/studio',
     });
   });
 
   it.each(['/reset-password', '/blogs/PRIVATE_PAYLOAD', '/PRIVATE_EMAIL'])('does not load a tag on private or unknown path %s', async pathname => {
-    const state = browser(`https://cmotionvideo.com${pathname}?secret=PRIVATE_QUERY#token=PRIVATE_TOKEN`);
+    const state = browser(`https://claudemotionvideo.com${pathname}?secret=PRIVATE_QUERY#token=PRIVATE_TOKEN`);
     const { trackPageView } = await import('../src/lib/analytics');
     trackPageView(pathname);
     expect(state.scripts).toEqual([]);
@@ -138,11 +138,11 @@ describe('production analytics', () => {
   });
 
   it('supports the www production hostname with a safe static blog title', async () => {
-    const state = browser('https://www.cmotionvideo.com/blogs/small-movements');
+    const state = browser('https://www.claudemotionvideo.com/blogs/small-movements');
     const { trackPageView } = await import('../src/lib/analytics');
     trackPageView('/blogs/small-movements');
     expect(state.views()).toMatchObject([{
-      page_location: 'https://www.cmotionvideo.com/blogs/small-movements',
+      page_location: 'https://www.claudemotionvideo.com/blogs/small-movements',
       page_title: expect.stringContaining('Small movements'),
     }]);
   });

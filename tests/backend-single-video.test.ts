@@ -13,7 +13,7 @@ const input: JobInput = { prompt: 'Animate this example', aspect: '16:9', durati
 async function setup(credits = 0) {
   const { db, sqlite } = makeDb(); await seedUser(db, 'alice', credits);
   await db.prepare("UPDATE users SET stripe_customer_id='cus_alice' WHERE id='alice'").run();
-  const env = { DB: db, APP_URL: 'https://cmotionvideo.com', APIMART_API_KEY: 'fixture', STRIPE_SECRET_KEY: 'sk_test_fixture', STRIPE_WEBHOOK_SECRET: 'whsec_fixture', STRIPE_SINGLE_VIDEO_PRICE: 'price_video', GENERATION: { create: async () => ({}), get: async () => ({ status: async () => ({ status: 'queued' }) }) } } as unknown as Env;
+  const env = { DB: db, APP_URL: 'https://claudemotionvideo.com', APIMART_API_KEY: 'fixture', STRIPE_SECRET_KEY: 'sk_test_fixture', STRIPE_WEBHOOK_SECRET: 'whsec_fixture', STRIPE_SINGLE_VIDEO_PRICE: 'price_video', GENERATION: { create: async () => ({}), get: async () => ({ status: async () => ({ status: 'queued' }) }) } } as unknown as Env;
   const user = (await db.prepare("SELECT * FROM users WHERE id='alice'").first<UserRow>())!;
   const session = { id: 'cs_video', mode: 'payment', status: 'complete', payment_status: 'paid', currency: 'usd', amount_total: 500, customer: 'cus_alice', client_reference_id: 'alice', metadata: { userId: 'alice', purchaseType: 'single_video' } };
   const lines = { object: 'list', has_more: false, data: [{ id: 'li_video', quantity: 1, price: { id: 'price_video', currency: 'usd', unit_amount: 500, type: 'one_time' } }] };

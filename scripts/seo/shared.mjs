@@ -1,4 +1,4 @@
-export const origin = 'https://cmotionvideo.com';
+export const origin = 'https://claudemotionvideo.com';
 export const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const plainText = (html) => html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 export const jsonLd = (data) => `<script type="application/ld+json">${JSON.stringify({'@context':'https://schema.org', ...data}).replace(/</g, '\\u003c')}</script>`;

@@ -6,7 +6,7 @@ if (!['test', 'live'].includes(mode)) throw new Error('Use test or live');
 const key = fs.readFileSync(`.secrets/stripe-${mode}-key`, 'utf8').trim();
 if (!new RegExp(`^(sk|rk)_${mode}_`).test(key)) throw new Error('Key mode mismatch');
 const stripe = new Stripe(key);
-const url = 'https://cmotionvideo.com/api/billing/webhook';
+const url = 'https://claudemotionvideo.com/api/billing/webhook';
 const apiVersion = '2026-09-30.endive';
 const enabledEvents = [
   'checkout.session.completed',

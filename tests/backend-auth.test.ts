@@ -12,9 +12,9 @@ describe('account security', () => {
     expect(await verifyPassword('incorrect password', 'malformed')).toBe(false);
   });
   it('accepts exact origin only and rejects missing or lookalike origin on mutations', () => {
-    expect(allowedOrigin('https://cmotionvideo.com', 'https://cmotionvideo.com')).toBe(true);
-    expect(allowedOrigin('https://cmotionvideo.com.evil.test', 'https://cmotionvideo.com')).toBe(false);
-    expect(allowedOrigin(null, 'https://cmotionvideo.com')).toBe(false);
+    expect(allowedOrigin('https://claudemotionvideo.com', 'https://claudemotionvideo.com')).toBe(true);
+    expect(allowedOrigin('https://claudemotionvideo.com.evil.test', 'https://claudemotionvideo.com')).toBe(false);
+    expect(allowedOrigin(null, 'https://claudemotionvideo.com')).toBe(false);
   });
   it('enforces a shared database rate limit and opens a fresh time window', async () => {
     const { db } = makeDb();

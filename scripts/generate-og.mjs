@@ -86,7 +86,7 @@ h1 span{display:block;white-space:nowrap}h1 .accent{color:${palette.coral}}
 <div class="motion" aria-hidden="true"><i></i><i></i><i></i></div><div class="top-rule"></div>
 <section class="content"><div class="label">${escapeHtml(card.label)}</div>
 <h1><span>${escapeHtml(firstLine)}</span><span class="accent">${escapeHtml(secondLine)}</span></h1></section>
-<footer class="footer"><span class="domain">cmotionvideo.com</span><span class="format">1080p MP4</span></footer>
+<footer class="footer"><span class="domain">claudemotionvideo.com</span><span class="format">1080p MP4</span></footer>
 </main><script>
 // All fonts are embedded, so generation never depends on a network font service.
 document.fonts.ready.then(() => {

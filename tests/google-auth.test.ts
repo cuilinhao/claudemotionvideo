@@ -4,7 +4,7 @@ import { createSession } from '../worker/auth';
 import type { Env } from '../worker/types';
 import { makeDb, seedUser } from './backend-db';
 
-const origin = 'https://cmotionvideo.com';
+const origin = 'https://claudemotionvideo.com';
 const clientId = 'client-id.apps.googleusercontent.com';
 const encoder = new TextEncoder();
 let signingKey: CryptoKey;

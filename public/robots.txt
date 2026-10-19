@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 # Private app routes return X-Robots-Tag: noindex; allow crawlers to read it.
-Sitemap: https://cmotionvideo.com/sitemap.xml
+Sitemap: https://claudemotionvideo.com/sitemap.xml

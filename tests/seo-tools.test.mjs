@@ -10,7 +10,7 @@ describe('indexable tool pages',()=>{
   expect(PUBLIC_PAGE_PATHS.has(page.path)).toBe(true);
   expect(siteAssetPath(page.path)).toBe(`${page.path}/index.html`);
   expect(html).toContain(`<h1>${page.h1}</h1>`);
-  expect(html).toContain(`href="https://cmotionvideo.com${page.path}"`);
+  expect(html).toContain(`href="https://claudemotionvideo.com${page.path}"`);
   expect(html.match(/<h1>/g)).toHaveLength(1);
   expect(html).toContain('<ol class="seo-steps">');
   expect(page.introduction.split(/\s+/).length).toBeGreaterThanOrEqual(80);

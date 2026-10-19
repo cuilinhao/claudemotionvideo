@@ -6,7 +6,7 @@ import type { JobRow } from '../worker/types';
 import { makeDb, seedUser } from './backend-db';
 import type { Env } from '../worker/types';
 
-const origin = 'https://cmotionvideo.com';
+const origin = 'https://claudemotionvideo.com';
 describe('authenticated resource boundaries and durable job creation', () => {
   let env: Env; let cookie: string;
   const request = (path: string, init: RequestInit = {}) => app.request(origin + path, {

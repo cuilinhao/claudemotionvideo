@@ -54,8 +54,8 @@ describe('Stripe production configuration', () => {
   });
   it('adopts the prior application configuration without duplicating it', async () => {
     const { stripe, remote, creations } = stripeFixture([{ id: 'bpc_legacy', livemode: true,
-      business_profile: { headline: 'Manage your Claude Motion Video subscription', privacy_policy_url: 'https://cmotionvideo.com/privacy', terms_of_service_url: 'https://cmotionvideo.com/terms' },
-      default_return_url: 'https://cmotionvideo.com/studio',
+      business_profile: { headline: 'Manage your Claude Motion Video subscription', privacy_policy_url: 'https://claudemotionvideo.com/privacy', terms_of_service_url: 'https://claudemotionvideo.com/terms' },
+      default_return_url: 'https://claudemotionvideo.com/studio',
     }]);
     expect((await ensurePortalConfiguration(stripe, 'live')).id).toBe('bpc_legacy');
     expect(creations()).toBe(0);

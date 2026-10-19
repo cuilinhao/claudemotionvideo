@@ -4,7 +4,7 @@ import { createSession, digest, getSessionUser, hashPassword, verifyPassword } f
 import type { Env } from '../worker/types';
 import { makeDb, seedUser } from './backend-db';
 
-const origin = 'https://cmotionvideo.com';
+const origin = 'https://claudemotionvideo.com';
 describe('email magic-link sign in', () => {
   let env: Env;
   let messages: EmailMessageBuilder[];
@@ -21,7 +21,7 @@ describe('email magic-link sign in', () => {
   const consume = (value = token()) => request('/api/auth/magic-link/consume', { token: value });
   beforeEach(() => {
     const { db } = makeDb(); messages = [];
-    env = { DB: db, APP_URL: origin, EMAIL_FROM: 'noreply@cmotionvideo.com',
+    env = { DB: db, APP_URL: origin, EMAIL_FROM: 'noreply@claudemotionvideo.com',
       EMAIL: { send: async (message: EmailMessageBuilder) => { messages.push(message); return { messageId: 'mail-id' }; } },
     } as unknown as Env;
   });
@@ -31,7 +31,7 @@ describe('email magic-link sign in', () => {
     const sent = await send(' NEW@Example.com ', '/studio?scene=launch');
     expect(sent.status).toBe(200);
     expect(await sent.json()).toMatchObject({ ok: true });
-    expect(messages[0]).toMatchObject({ to: 'new@example.com', from: 'noreply@cmotionvideo.com' });
+    expect(messages[0]).toMatchObject({ to: 'new@example.com', from: 'noreply@claudemotionvideo.com' });
     expect(messages[0].text).toContain(`${origin}/sign-in#token=`);
     expect(await env.DB.prepare('SELECT COUNT(*) AS n FROM users').first('n')).toBe(0);
     expect(await env.DB.prepare('SELECT token_hash FROM magic_links').first('token_hash')).toBe(await digest(token()));

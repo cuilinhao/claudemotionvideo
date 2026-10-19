@@ -21,7 +21,7 @@ const windows = [];
 afterEach(() => { windows.splice(0).forEach(window => window.close()); });
 
 function browser(fetchResponse = path => Response.json(path.endsWith('/examples.json') ? examples : media), playResult) {
-  const dom = new JSDOM(`<!doctype html><button class="card" data-id="first" data-fmt="16:9">First</button><button class="card" data-id="second" data-fmt="9:16">Second</button><dialog id="example-dlg"><button class="modal-close">Close</button><div class="modal-body"></div></dialog>`, { url: 'https://cmotionvideo.com/examples', runScripts: 'outside-only' });
+  const dom = new JSDOM(`<!doctype html><button class="card" data-id="first" data-fmt="16:9">First</button><button class="card" data-id="second" data-fmt="9:16">Second</button><dialog id="example-dlg"><button class="modal-close">Close</button><div class="modal-body"></div></dialog>`, { url: 'https://claudemotionvideo.com/examples', runScripts: 'outside-only' });
   const { window } = dom;
   windows.push(window);
   // jsdom also lacks the native dialog methods. Model the open flag and the
@@ -77,7 +77,7 @@ describe('shared example video dialog', () => {
     const video = page.query('video');
     expect(video).not.toBeNull();
     expect(video.src).toBe(media.first.url);
-    expect(video.poster).toBe('https://cmotionvideo.com/reference-assets/first.jpg');
+    expect(video.poster).toBe('https://claudemotionvideo.com/reference-assets/first.jpg');
     expect(video.controls).toBe(true);
     expect(video.playsInline).toBe(true);
     expect(video.preload).toBe('metadata');

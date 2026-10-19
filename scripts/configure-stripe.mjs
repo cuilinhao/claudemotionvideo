@@ -13,8 +13,8 @@ export async function ensurePortalConfiguration(stripe, mode) {
   const settings = {
     business_profile: {
       headline: 'Manage your Claude Motion Video subscription',
-      privacy_policy_url: 'https://cmotionvideo.com/privacy',
-      terms_of_service_url: 'https://cmotionvideo.com/terms',
+      privacy_policy_url: 'https://claudemotionvideo.com/privacy',
+      terms_of_service_url: 'https://claudemotionvideo.com/terms',
     },
     features: {
       customer_update: { enabled: true, allowed_updates: ['email', 'name', 'address'] },
@@ -23,7 +23,7 @@ export async function ensurePortalConfiguration(stripe, mode) {
       subscription_cancel: { enabled: true, mode: 'at_period_end' },
       subscription_update: { enabled: false },
     },
-    default_return_url: 'https://cmotionvideo.com/studio',
+    default_return_url: 'https://claudemotionvideo.com/studio',
     metadata: { cmv_app: 'claudemotionvideo' },
   };
   let marked;

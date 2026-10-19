@@ -7,12 +7,12 @@
 Independent product. Not affiliated with Anthropic.
 
 ## Core pages
-- Homepage / text animation generator: https://cmotionvideo.com/
-- Animated text animation tool: https://cmotionvideo.com/text-animation-generator
-- Animated title generator: https://cmotionvideo.com/animated-title-generator
-- Examples (470+ real clips with prompts): https://cmotionvideo.com/examples
-- Effects library: https://cmotionvideo.com/effects
-- Pricing: https://cmotionvideo.com/pricing
+- Homepage / text animation generator: https://claudemotionvideo.com/
+- Animated text animation tool: https://claudemotionvideo.com/text-animation-generator
+- Animated title generator: https://claudemotionvideo.com/animated-title-generator
+- Examples (470+ real clips with prompts): https://claudemotionvideo.com/examples
+- Effects library: https://claudemotionvideo.com/effects
+- Pricing: https://claudemotionvideo.com/pricing
 
 ## Specs
 - Max clip length: 30 seconds

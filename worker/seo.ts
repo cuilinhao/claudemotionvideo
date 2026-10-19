@@ -1,5 +1,5 @@
 import { PUBLIC_PAGE_PATHS } from './site-routes';
-const SITE_ORIGIN = 'https://cmotionvideo.com';
+const SITE_ORIGIN = 'https://claudemotionvideo.com';
 
 export async function applyPageSeo(response: Response, url: URL): Promise<Response> {
   if (response.status !== 200 || !/^text\/html(?:;|$)/i.test(response.headers.get('Content-Type') ?? '')) {
