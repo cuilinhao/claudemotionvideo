@@ -19,9 +19,9 @@ describe('crawler discovery',()=>{
  it.each(pages)('adds truthful breadcrumbs and raster sharing to $path',({path,html})=>{
   const schemas=[...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(m=>JSON.parse(m[1]));
   const crumbs=schemas.find(s=>s['@type']==='BreadcrumbList');
-  expect(crumbs.itemListElement.at(-1).item).toBe('https://claudemotionvideo.com'+path);
+  expect(crumbs.itemListElement.at(-1).item).toBe('https://cmotionvideo.com'+path);
   expect(html).toContain('aria-current="page"');
-  expect(html).toContain(`content="https://claudemotionvideo.com/og/${path.split('/').at(-1)}.png"`);
+  expect(html).toContain(`content="https://cmotionvideo.com/og/${path.split('/').at(-1)}.png"`);
   expect(html).toContain('name="twitter:card" content="summary_large_image"');
   expect(html).toContain('rel="apple-touch-icon" href="/favicon.svg"');
   if(path.startsWith('/effects/')) for(const route of effectRoutes.filter(r=>!path.endsWith(r.slug))) expect(html).toContain(`href="/effects/${route.slug}"`);

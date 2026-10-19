@@ -2,7 +2,7 @@
 
 Independent product. Not affiliated with Anthropic.
 
-Source: https://claudemotionvideo.com/
+Source: https://cmotionvideo.com/
 
 ## Homepage
 
@@ -20,7 +20,7 @@ Up to 30s
 
 1080p MP4
 
-claudemotionvideo.com/studio Screen recording
+cmotionvideo.com/studio Screen recording
 
 Screenshot to motion ✦ Edit by chat ✦ Focused shot edits ✦ Every frame is code ✦ Claude Opus 5.5 ✦ 1080p MP4 ✦ Every version kept ✦ Screenshot to motion ✦ Edit by chat ✦ Focused shot edits ✦ Every frame is code ✦ Claude Opus 5.5 ✦ 1080p MP4 ✦ Every version kept ✦ 01 · Templates
 
@@ -224,7 +224,7 @@ Link
 
 ## Letter drop animation
 
-https://claudemotionvideo.com/effects/letter-drop-animation
+https://cmotionvideo.com/effects/letter-drop-animation
 
 Letter drop introduces a headline one character at a time. Each letter starts above its final position, falls into place, overshoots slightly, and settles with a small bounce. The stagger creates a readable rhythm for short titles, product names, and showreel openings. Use the library preview to inspect the motion, then copy the original effect wording into a prompt with your own text.
 
@@ -232,7 +232,7 @@ The prompt: letters drop in one by one from above with a slight overshoot bounce
 
 ## Masked rise animation
 
-https://claudemotionvideo.com/effects/masked-rise-animation
+https://cmotionvideo.com/effects/masked-rise-animation
 
 Masked rise reveals letters as they move upward through an invisible baseline. The hidden portion stays clipped until it crosses that line, giving the entrance a clean edge. A short stagger lets the word build progressively. This library effect suits restrained product titles, captions, and section headings. Keep enough room above the baseline for the finished text, and use the preview to judge its rhythm.
 
@@ -240,7 +240,7 @@ The prompt: each letter rises from behind a hidden baseline mask, staggered
 
 ## Typewriter cursor animation
 
-https://claudemotionvideo.com/effects/typewriter-cursor-animation
+https://cmotionvideo.com/effects/typewriter-cursor-animation
 
 Typewriter cursor reveals a line character by character in a monospace font, with a blinking block cursor marking the typing sequence. The changing text provides a natural point of attention for short taglines, terminal introductions, and message reveals. The library preview shows the specific effect. Choose a concise line and allow a final pause so viewers can read the complete message after typing ends.
 
@@ -248,7 +248,7 @@ The prompt: the line types out character by character in a monospace font with a
 
 ## Stretch slide-in animation
 
-https://claudemotionvideo.com/effects/stretch-slide-in-animation
+https://cmotionvideo.com/effects/stretch-slide-in-animation
 
 Stretch slide-in brings a word into the frame from the right while its letters appear wider than their resting proportions. As the movement slows, the word snaps back to its normal width. The result gives a short headline a clear sense of speed and arrival. This library preview demonstrates the entrance; use compact text and leave horizontal space for the stretched shape to travel.
 
@@ -256,7 +256,7 @@ The prompt: the word slides in from the right stretched wide and snaps to its no
 
 ## Squash and stretch animation
 
-https://claudemotionvideo.com/effects/squash-and-stretch-animation
+https://cmotionvideo.com/effects/squash-and-stretch-animation
 
 Squash and stretch makes a word behave like a physical object. It falls from above, compresses when it lands, and springs back before settling into its readable shape. The changing proportions communicate weight through motion alone. This library effect works with brief, bold titles that can tolerate temporary distortion. Watch the preview to see the landing, then reuse the original wording with your own headline.
 
@@ -264,7 +264,7 @@ The prompt: the word falls from above, squashes on impact and springs back like 
 
 ## Outline echo effect
 
-https://claudemotionvideo.com/effects/outline-echo-effect
+https://cmotionvideo.com/effects/outline-echo-effect
 
 Outline echo places expanding outlined copies behind a solid word. The repeated contours spread outward while the filled text remains the visual anchor, adding depth without replacing the headline. In the library preview, this creates a ripple around the word. Try it with a short title and a clear contrast between text and background so the overlapping outlines stay distinct as they expand.
 
@@ -272,7 +272,7 @@ The prompt: outlined copies of the word expand outward like ripples behind the s
 
 ## Decode scramble text effect
 
-https://claudemotionvideo.com/effects/decode-scramble-text-effect
+https://cmotionvideo.com/effects/decode-scramble-text-effect
 
 Decode scramble begins with unstable characters and progressively resolves them into a readable word from left to right. The flickering glyphs create a brief moment of uncertainty before the final text locks into place. This library effect is useful for short technology titles and reveal moments. Keep the finished phrase concise and give it enough time on screen after the scrambling stops.
 
@@ -280,7 +280,7 @@ The prompt: the word resolves from random flickering glyphs into the final text,
 
 ## Skewed wipe transition
 
-https://claudemotionvideo.com/effects/skewed-wipe-transition
+https://cmotionvideo.com/effects/skewed-wipe-transition
 
 Skewed wipe moves a slanted colour bar across the entire frame to cover the change between two scenes. Its diagonal edge adds direction to a fast transition while the full screen coverage hides the cut. The library preview shows the specific wipe. Use it between clearly different compositions, and choose a transition colour that belongs to the surrounding scenes or your visual palette.
 

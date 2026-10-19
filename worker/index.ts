@@ -10,8 +10,8 @@ export { GenerationWorkflow } from './workflow';
 export default {
   async fetch(request: Request, env: Env, context: ExecutionContext) {
     const url = new URL(request.url);
-    if (url.hostname === 'www.claudemotionvideo.com') {
-      url.hostname = 'claudemotionvideo.com'; url.protocol = 'https:';
+    if (url.hostname === 'www.cmotionvideo.com') {
+      url.hostname = 'cmotionvideo.com'; url.protocol = 'https:';
       return Response.redirect(url.toString(), 301);
     }
     if (url.pathname.startsWith('/api/')) return app.fetch(request, env, context);

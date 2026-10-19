@@ -7,7 +7,7 @@ declare global {
   }
 }
 
-const productionHosts = new Set(['claudemotionvideo.com', 'www.claudemotionvideo.com']);
+const productionHosts = new Set(['cmotionvideo.com', 'www.cmotionvideo.com']);
 const pageTitles = new Map([
   ['/', 'Text Animation Generator'],
   ['/text-animation-generator', 'Text Animation Generator'],

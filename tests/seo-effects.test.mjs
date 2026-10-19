@@ -28,7 +28,7 @@ describe('eight real effect pages',()=>{
   expect(existsSync('public'+content.example.thumbnailUrl)).toBe(true);
   const video=[...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(m=>JSON.parse(m[1])).find(x=>x['@type']==='VideoObject');
   expect(video.contentUrl).toBe(content.example.contentUrl);
-  expect(video.thumbnailUrl).toBe('https://claudemotionvideo.com'+content.example.thumbnailUrl);
+  expect(video.thumbnailUrl).toBe('https://cmotionvideo.com'+content.example.thumbnailUrl);
   expect(html).toContain(content.example.sourceUrl);
   if(video.uploadDate) expect(Number.isNaN(Date.parse(video.uploadDate))).toBe(false);
   expect(html).not.toMatch(/aggregateRating|reviewCount/);

@@ -29,7 +29,7 @@ async function setup() {
     else throw new Error(`Unexpected Stripe request ${method} ${path}`);
     return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } });
   });
-  const env = { DB: db, APP_URL: 'https://claudemotionvideo.com', STRIPE_SECRET_KEY: 'sk_test_fixture', STRIPE_WEBHOOK_SECRET: 'whsec_fixture', STRIPE_PRICES: JSON.stringify({ starter: { month: 'price_sm', year: 'price_sy' }, pro: { month: 'price_pm', year: 'price_py' }, max: { month: 'price_mm', year: 'price_my' } }) } as Env;
+  const env = { DB: db, APP_URL: 'https://cmotionvideo.com', STRIPE_SECRET_KEY: 'sk_test_fixture', STRIPE_WEBHOOK_SECRET: 'whsec_fixture', STRIPE_PRICES: JSON.stringify({ starter: { month: 'price_sm', year: 'price_sy' }, pro: { month: 'price_pm', year: 'price_py' }, max: { month: 'price_mm', year: 'price_my' } }) } as Env;
   const user = (await db.prepare("SELECT * FROM users WHERE id='alice'").first<UserRow>())!;
   return { db, env, user, submissions, sessions };
 }
