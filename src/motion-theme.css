@@ -264,13 +264,17 @@ html:root .site-body .foot-col .foot-title { font: 400 10px var(--mono); color: 
   html:root .site-body .hero h1 { font-size: 44px; letter-spacing: -.045em; }
   .hero .specs { gap: 6px; }
   .specs li { font-size: 9px; padding: 5px 7px; }
-  html:root .site-body .interval-tabs button { padding: 0 14px; font-size: 13px; }
+  html:root .site-body .interval-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  html:root .site-body .interval-tabs button { justify-content: center; min-height: 52px; height: auto; padding: 0 8px; font-size: 12px; }
+  html:root .site-body .interval-tabs button[data-tab=year] { flex-direction: column; gap: 2px; }
+  html:root .site-body .interval-tabs .save { padding: 2px 5px; font-size: 10px; white-space: nowrap; }
   html:root .site-body .plan.hot { box-shadow: none; }
   html:root .site-body .faq details p { padding-left: 0; }
   .foot-top { gap: 28px 20px; }
 }
 
-/* One-time video purchase alongside recurring plans. */
+/* Show only the selected one-time or subscription offer. */
+html:root .site-body .pricing [data-panel][hidden] { display: none; }
 html:root .site-body .pricing .single-video-card {
   display: grid;
   grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
